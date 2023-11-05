@@ -99,8 +99,9 @@ function Home() {
                     <h2
                         style={{
                             ...nameStyle,
-                            paddingTop: '5vw',
-                            marginLeft: '30vw',
+                            paddingTop: '2vw',
+                            paddingLeft: '30vw',
+                            paddingBottom: '2vw',
                             transform: `translateX(-${scrollPosition1}vw)`,
                         }}
                         className="name-1"
@@ -110,7 +111,7 @@ function Home() {
                     <h2
                         style={{
                             ...nameStyle,
-                            marginLeft: '5vw',
+                            paddingLeft: '5vw',
                             transform: `translateX(${scrollPosition2}vw)`,
                         }}
                         className="name-2"
@@ -120,7 +121,8 @@ function Home() {
                     <h2
                         style={{
                             ...nameStyle,
-                            marginLeft: '15vw',
+                            paddingLeft: '15vw',
+                            marginTop: '1vw',
                             transform: `translateX(-${scrollPosition3}vw)`,
                         }}
                         className="name-3"

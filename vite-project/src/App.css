@@ -14,6 +14,10 @@ body {
   color: var(--white);  
 }
 
+::-webkit-scrollbar {
+  width: 0px;
+}
+
 /* scroll button and hover */
 .down-button .button-image {
   width: 5.5vw;
@@ -35,10 +39,22 @@ transition: background-color 0.25s ease;
 
 .down-button:hover {
   background-color: var(--darkerbg);
+  cursor: pointer;
 }
 
 .down-button:hover .button-image{
   width: 6.5vw;
+}
+
+.name-1 {
+  width: 120vw;
+  border-bottom: 3px solid var(--black);
+}
+
+
+.name-3 {
+  width: 120vw;
+  border-top: 3px solid var(--black);
 }
 
 /* nav bar
