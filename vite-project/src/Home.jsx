@@ -8,6 +8,7 @@ function Home() {
     let scrollPosition2 = scrollPosition / 20;
     let scrollPosition3 = scrollPosition / 12.5;
 
+    const dogsButton = document.getElementById('dogs-button');
     const [lastPageButton, setLastPageButton] = useState(null);
 
     const handleScroll = () => {
@@ -17,12 +18,12 @@ function Home() {
     useEffect(() => {
         // Add a scroll event listener to track the scroll position
         window.addEventListener('scroll', handleScroll);
-
+        setLastPageButton(dogsButton);
         // Clean up the event listener when the component unmounts
         return () => {
             window.removeEventListener('scroll', handleScroll);
         };
-    }, []);
+    }, [dogsButton]);
 
     function easeInOut(t) {
         return t < 0.5
@@ -69,7 +70,6 @@ function Home() {
     });
 
     function handleMouseEnter(button) {
-        console.log(button);
         if (lastPageButton !== null) {
             lastPageButton.classList.remove('expanded');
         }
@@ -200,7 +200,7 @@ function Home() {
                         className="profile-picture"
                     />
                 </div>
-                <button id="dogs-button" className="page-button">
+                <button id="dogs-button" className="page-button expanded">
                     <h2>Dogs</h2>
                 </button>
                 <button

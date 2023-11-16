@@ -83,6 +83,11 @@ transition: all 0.25s ease;
   height: 50vh;
 }
 
+/* To show that the button is clickable; larger arrow, increase text size */
+.page-button:hover {
+
+}
+
 
 /* unmoving circles */
 .up-button-div {
