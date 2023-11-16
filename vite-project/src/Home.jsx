@@ -8,6 +8,8 @@ function Home() {
     let scrollPosition2 = scrollPosition / 20;
     let scrollPosition3 = scrollPosition / 12.5;
 
+    const [lastPageButton, setLastPageButton] = useState(null);
+
     const handleScroll = () => {
         setScrollPosition(window.scrollY);
     };
@@ -22,18 +24,21 @@ function Home() {
         };
     }, []);
 
+    function easeInOut(t) {
+        return t < 0.5
+            ? 4 * t * t * t
+            : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
+    }
+
     function scrollDown(event) {
         const buttonNumber = parseInt(event.target.dataset.number);
         const targetDivNumber = buttonNumber + 1;
         const targetElement = document.getElementById(`div${targetDivNumber}`);
 
-        const initialY = window.pageYOffset;
+        const initialY = window.scrollY;
         const targetY = targetElement.getBoundingClientRect().top + initialY;
         const distance = targetY - initialY;
         const duration = 1500;
-
-        const easeInOut = (t) =>
-            t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
 
         let startTime;
 
@@ -54,6 +59,22 @@ function Home() {
         }
 
         requestAnimationFrame(scroll);
+    }
+
+    const pageButtons = document.getElementsByClassName('page-button');
+    Array.from(pageButtons).forEach((button) => {
+        button.addEventListener('mouseenter', () => handleMouseEnter(button), {
+            once: true,
+        });
+    });
+
+    function handleMouseEnter(button) {
+        console.log(button);
+        if (lastPageButton !== null) {
+            lastPageButton.classList.remove('expanded');
+        }
+        button.classList.add('expanded');
+        setLastPageButton(button);
     }
 
     const nameStyle = {
@@ -107,9 +128,9 @@ function Home() {
                 href="https://fonts.googleapis.com/css2?family=Nunito:wght@200&display=swap"
                 rel="stylesheet"
             />
-            <div style={div1Style} id="div1">
+            <div style={div1Style} id="div1" className="page">
                 <div>
-                    <h2
+                    <h1
                         style={{
                             ...nameStyle,
                             paddingLeft: '30vw',
@@ -118,8 +139,8 @@ function Home() {
                         className="name-1"
                     >
                         Hi! My name is
-                    </h2>
-                    <h2
+                    </h1>
+                    <h1
                         style={{
                             ...nameStyle,
                             paddingLeft: '5vw',
@@ -128,8 +149,8 @@ function Home() {
                         className="name-2"
                     >
                         Raphaël Bajet.
-                    </h2>
-                    <h2
+                    </h1>
+                    <h1
                         style={{
                             ...nameStyle,
                             paddingLeft: '15vw',
@@ -139,7 +160,7 @@ function Home() {
                         className="name-3"
                     >
                         Call me Raphaël.
-                    </h2>
+                    </h1>
                 </div>
                 <div style={buttonDivStyle}>
                     <button
@@ -151,15 +172,36 @@ function Home() {
                             src="./downArrow.png"
                             className="button-image"
                             alt="Scroll Down"
-                            style={{ pointerEvents: 'none' }} // Add this line
+                            style={{ pointerEvents: 'none' }}
                         />
                     </button>
                 </div>
             </div>
 
-            <div style={div2Style} id="div2">
+            <div style={div2Style} id="div2" className="page">
+                <div style={buttonDivStyle} className="up-button-div">
+                    <button
+                        className="up-button"
+                        onClick={scrollDown}
+                        data-number="0"
+                    >
+                        <img
+                            src="./downArrow.png"
+                            className="button-image"
+                            alt="Scroll Up"
+                            style={{ pointerEvents: 'none' }}
+                        />
+                    </button>
+                </div>
+                <div className="profile-picture-div">
+                    <img
+                        src="./suitPicture.jpg"
+                        alt="Raphaël Bajet"
+                        className="profile-picture"
+                    />
+                </div>
                 <button id="dogs-button" className="page-button">
-                    Dogs
+                    <h2>Dogs</h2>
                 </button>
                 <button
                     id="art-button"
@@ -169,13 +211,18 @@ function Home() {
                         borderTop: '0.5vw solid var(--lightestblue)',
                     }}
                 >
-                    Art
+                    <h2>Art</h2>
                 </button>
-                <button id="aboutme-button" className="page-button">
-                    About Me
+                <button
+                    id="aboutme-button"
+                    className="page-button"
+                    onClick={scrollDown}
+                    data-number="2"
+                >
+                    <h2>About Me</h2>
                 </button>
             </div>
-            <div style={div3Style} id="div3"></div>
+            <div style={div3Style} id="div3" className="page"></div>
         </div>
     );
 }

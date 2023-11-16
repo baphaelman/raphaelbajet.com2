@@ -13,17 +13,17 @@ body {
 
   background-color: var(--bg);
   font-family: 'Nunito', sans-serif;
-  color: var(--offwhite);  
+  color: var(--offwhite);
 }
 
 ::-webkit-scrollbar {
-  width: 0px;
+  display: none;
 }
 
 /* scroll button and hover */
 .down-button .button-image {
-  width: 5.5vw;
-  transition: width 0.25s ease;
+  height: 10vh;
+  transition: all 0.25s ease;
 }
 
 .down-button {
@@ -34,8 +34,8 @@ align-items: center;
 background-color: var(--darkestblue);
 border: 0.5vw solid var(--lightestblue);
 box-sizing: border-box;
-width: 10vw;
-height: 10vw;
+width: 17vh;
+height: 17vh;
 border-radius: 50%;
 transition: all 0.25s ease;
 }
@@ -47,7 +47,7 @@ transition: all 0.25s ease;
 }
 
 .down-button:hover .button-image{
-  width: 6.5vw;
+  height: 12vh;
 }
 
 .name-1 {
@@ -64,7 +64,7 @@ transition: all 0.25s ease;
 }
 
 /* page 2 */
-
+/* page buttons */
 .page-button {
   color: var(--offwhite);
   height: 25vh;
@@ -74,10 +74,57 @@ transition: all 0.25s ease;
   border: none;
   background: transparent;
   transition: all ease 0.5s;
+  font-family: 'Nunito', sans-serif;
 }
 
-.page-button:hover {
+.page-button.expanded {
   background-color: var(--lightbg);
   cursor: pointer;
   height: 50vh;
+}
+
+
+/* unmoving circles */
+.up-button-div {
+  position: absolute;
+  transform: translate(0, 4vh);
+}
+
+.up-button .button-image {
+  height: 10vh;
+  transition: all 0.25s ease;
+  transform: rotate(180deg);
+}
+
+.up-button {
+display: flex;
+justify-content: center;
+align-items: center;
+
+background-color: var(--darkestblue);
+border: 0.5vw solid var(--lightestblue);
+box-sizing: border-box;
+width: 17vh;
+height: 17vh;
+border-radius: 50%;
+transition: all 0.25s ease;
+}
+
+.up-button:hover {
+  background-color: var(--lightbg);
+  border-color: var(--offwhite);
+  cursor: pointer;
+}
+
+.up-button:hover .button-image{
+  height: 12vh;
+}
+
+
+.profile-picture {
+  position: absolute;
+  transform: translate(-50%, 29vh);
+  width: 17vh;
+  height: 17vh;
+  border-radius: 50%;
 }
