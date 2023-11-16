@@ -22,11 +22,18 @@ function Home() {
         };
     }, []);
 
-    function startAnimation() {
-        const targetY = window.innerHeight;
-        const initialY = window.scrollY;
+    function scrollDown(event) {
+        const buttonNumber = parseInt(event.target.dataset.number);
+        const targetDivNumber = buttonNumber + 1;
+        const targetElement = document.getElementById(`div${targetDivNumber}`);
+
+        const initialY = window.pageYOffset;
+        const targetY = targetElement.getBoundingClientRect().top + initialY;
         const distance = targetY - initialY;
-        const duration = 1500; // Adjust as needed
+        const duration = 1500;
+
+        const easeInOut = (t) =>
+            t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
 
         let startTime;
 
@@ -49,12 +56,6 @@ function Home() {
         requestAnimationFrame(scroll);
     }
 
-    function easeInOut(t) {
-        return t < 0.5
-            ? 4 * t * t * t
-            : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
-    }
-
     const nameStyle = {
         fontSize: '10vw',
         margin: '0',
@@ -62,9 +63,9 @@ function Home() {
 
     const div1Style = {
         margin: '0',
-
+        fontWeight: '300',
         background: 'var(--bg)',
-        color: 'black',
+        color: 'var(--offwhite)',
         width: '100vw',
         height: '100vh',
         display: 'flex',
@@ -74,10 +75,20 @@ function Home() {
     const div2Style = {
         margin: '0',
 
-        background: 'var(--white)',
-        color: 'black',
+        background: 'var(--bg)',
+        color: 'var(--offwhite)',
         width: '100vw',
         height: '100vh',
+
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+    };
+
+    const div3Style = {
+        width: '100vw',
+        height: '100vh',
+        background: 'var(--offwhite)',
     };
 
     const buttonDivStyle = {
@@ -90,18 +101,18 @@ function Home() {
 
     return (
         <div>
-            <style>
-                @import
-                url('https://fonts.googleapis.com/css2?family=Raleway:wght@100&display=swap');
-            </style>
-            <div style={div1Style} className="div1">
+            <link rel="preconnect" href="https://fonts.googleapis.com" />
+            <link rel="preconnect" href="https://fonts.gstatic.com" />
+            <link
+                href="https://fonts.googleapis.com/css2?family=Nunito:wght@200&display=swap"
+                rel="stylesheet"
+            />
+            <div style={div1Style} id="div1">
                 <div>
                     <h2
                         style={{
                             ...nameStyle,
-                            paddingTop: '2vw',
                             paddingLeft: '30vw',
-                            paddingBottom: '2vw',
                             transform: `translateX(-${scrollPosition1}vw)`,
                         }}
                         className="name-1"
@@ -133,15 +144,38 @@ function Home() {
                 <div style={buttonDivStyle}>
                     <button
                         className="down-button"
-                        onClick={() => startAnimation()}
+                        onClick={scrollDown}
+                        data-number="1"
                     >
-                        <img src="./downArrow.png" className="button-image" />
+                        <img
+                            src="./downArrow.png"
+                            className="button-image"
+                            alt="Scroll Down"
+                            style={{ pointerEvents: 'none' }} // Add this line
+                        />
                     </button>
                 </div>
             </div>
-            <div style={div2Style} className="div2">
-                Why this no work
+
+            <div style={div2Style} id="div2">
+                <button id="dogs-button" className="page-button">
+                    Dogs
+                </button>
+                <button
+                    id="art-button"
+                    className="page-button"
+                    style={{
+                        borderBottom: '0.5vw solid var(--lightestblue)',
+                        borderTop: '0.5vw solid var(--lightestblue)',
+                    }}
+                >
+                    Art
+                </button>
+                <button id="aboutme-button" className="page-button">
+                    About Me
+                </button>
             </div>
+            <div style={div3Style} id="div3"></div>
         </div>
     );
 }
@@ -149,29 +183,13 @@ function Home() {
 export default Home;
 
 {
-    /*      <nav className="navbar">
-                <a href="/" className="navbar-link link-1">
-                    Home
-                </a>
-                <a href="/art" className="navbar-link link-2">
-                    Art
-                </a>
-                <a href="/dogs" className="navbar-link link-3">
-                    Dogs
-                </a>
-            </nav>
-
-
+    /*     
             
 <img
 src="suitPicture.jpg"
 alt="Raphaël Bajet"
 className="profile-picture"
 />
-<div class="name">
-<h2>Raphael</h2>
-<h2>Bajet</h2>
-</div>
 
 */
 }
