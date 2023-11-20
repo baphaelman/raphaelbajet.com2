@@ -13,17 +13,16 @@ body {
 
   background-color: var(--bg);
   font-family: 'Nunito', sans-serif;
-  color: var(--offwhite);
+  color: var(--white);
 }
 
-::-webkit-scrollbar {
-  display: none;
-}
+
 
 /* scroll button and hover */
 .down-button .button-image {
   height: 10vh;
   transition: all 0.25s ease;
+  pointer-events: none;
 }
 
 .down-button {
@@ -41,8 +40,8 @@ transition: all 0.25s ease;
 }
 
 .down-button:hover {
-  background-color: var(--lightbg);
-  border-color: var(--offwhite);
+  background-color: var(--lightestblue);
+  border-color: var(--white);
   cursor: pointer;
 }
 
@@ -66,7 +65,7 @@ transition: all 0.25s ease;
 /* page 2 */
 /* page buttons */
 .page-button {
-  color: var(--offwhite);
+  color: var(--white);
   height: 25vh;
   width: 100vw;
   margin: 0;
@@ -75,19 +74,67 @@ transition: all 0.25s ease;
   background: transparent;
   transition: all ease 0.5s;
   font-family: 'Nunito', sans-serif;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .page-button.expanded {
   background-color: var(--lightbg);
   cursor: pointer;
   height: 50vh;
+  transition: all ease 0.5s;
 }
+
+/* Page button insides */
+
+.page-button > h2 {
+  font-size: 8vw;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+  transition: all ease 0.5s;
+}
+
+#dogs-button-text {
+  transform: translate(30vw, 0);
+}
+
+#art-button-text {
+  transform: translate(-37vw, 0);
+}
+
+#aboutme-button-text {
+  transform: translate(-2vw, 0);
+}
+
+.page-button > img {
+  height: 8vw;
+  transition: all ease 0.5s;
+}
+
+#dogs-button-arrow {
+  transform: translate(30vw, 0) rotate(270deg);
+}
+
+#art-button-arrow {
+  transform: translate(-37vw, 0) rotate(90deg);
+}
+
 
 /* To show that the button is clickable; larger arrow, increase text size */
-.page-button:hover {
-
+.page-button.expanded > h2 {
+  font-size: 10vw;
 }
 
+.page-button.expanded:hover {
+  cursor: pointer;
+}
+
+.page-button.expanded > img {
+  height: 12vw;
+}
 
 /* unmoving circles */
 .up-button-div {
@@ -116,8 +163,8 @@ transition: all 0.25s ease;
 }
 
 .up-button:hover {
-  background-color: var(--lightbg);
-  border-color: var(--offwhite);
+  background-color: var(--lightestblue);
+  border-color: var(--white);
   cursor: pointer;
 }
 

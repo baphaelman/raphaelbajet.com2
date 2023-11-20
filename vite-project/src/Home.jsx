@@ -77,6 +77,54 @@ function Home() {
         setLastPageButton(button);
     }
 
+    function scrollSide(event) {
+        const buttonString = event.target.dataset.string;
+        const targetElement = document.getElementById(`${buttonString}-page`);
+
+        const initialY = window.scrollY;
+        const initialX = window.scrollX;
+        const targetX = targetElement.getBoundingClientRect().left + initialX;
+        const distance = targetX - initialX;
+        const duration = 1500;
+
+        let startTime;
+
+        function scroll(time) {
+            if (!startTime) {
+                startTime = time;
+            }
+
+            const elapsed = time - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const easedProgress = easeInOut(progress);
+
+            window.scrollTo(initialX + distance * easedProgress, initialY);
+
+            if (progress < 1) {
+                requestAnimationFrame(scroll);
+            }
+        }
+
+        requestAnimationFrame(scroll);
+    }
+
+    function scrollSide2(event) {
+        const buttonString = event.target.dataset.string;
+        const targetElement = document.getElementById(`${buttonString}-page`);
+
+        const targetX =
+            targetElement.getBoundingClientRect().left +
+            window.scrollX -
+            window.innerWidth;
+        const targetY = window.scrollY;
+
+        window.scrollTo({
+            left: targetX,
+            top: targetY,
+            behavior: 'smooth',
+        });
+    }
+
     const nameStyle = {
         fontSize: '10vw',
         margin: '0',
@@ -86,7 +134,6 @@ function Home() {
         margin: '0',
         fontWeight: '300',
         background: 'var(--bg)',
-        color: 'var(--offwhite)',
         width: '100vw',
         height: '100vh',
         display: 'flex',
@@ -97,7 +144,6 @@ function Home() {
         margin: '0',
 
         background: 'var(--bg)',
-        color: 'var(--offwhite)',
         width: '100vw',
         height: '100vh',
 
@@ -110,6 +156,22 @@ function Home() {
         width: '100vw',
         height: '100vh',
         background: 'var(--offwhite)',
+        display: 'flex',
+        justifyContent: 'center',
+    };
+
+    const dogsPageStyle = {
+        height: '100vh',
+        width: '100vw',
+        background: 'red',
+        transform: 'translate(100vw, -200vh)',
+    };
+
+    const artPageStyle = {
+        height: '100vh',
+        width: '100vw',
+        background: 'green',
+        transform: 'translate(-100vw, -300vh)',
     };
 
     const buttonDivStyle = {
@@ -172,12 +234,10 @@ function Home() {
                             src="./downArrow.png"
                             className="button-image"
                             alt="Scroll Down"
-                            style={{ pointerEvents: 'none' }}
                         />
                     </button>
                 </div>
             </div>
-
             <div style={div2Style} id="div2" className="page">
                 <div style={buttonDivStyle} className="up-button-div">
                     <button
@@ -200,18 +260,35 @@ function Home() {
                         className="profile-picture"
                     />
                 </div>
-                <button id="dogs-button" className="page-button expanded">
-                    <h2>Dogs</h2>
+                <button
+                    id="dogs-button"
+                    className="page-button expanded"
+                    onClick={scrollSide}
+                    data-string="dogs"
+                >
+                    <h2 id="dogs-button-text">Dogs</h2>
+                    <img
+                        src="./downArrow.png"
+                        alt="Scroll Right"
+                        id="dogs-button-arrow"
+                    />
                 </button>
                 <button
                     id="art-button"
                     className="page-button"
+                    onClick={scrollSide2}
                     style={{
                         borderBottom: '0.5vw solid var(--lightestblue)',
                         borderTop: '0.5vw solid var(--lightestblue)',
                     }}
+                    data-string="art"
                 >
-                    <h2>Art</h2>
+                    <img
+                        src="./downArrow.png"
+                        alt="Scroll Right"
+                        id="art-button-arrow"
+                    />
+                    <h2 id="art-button-text">Art</h2>
                 </button>
                 <button
                     id="aboutme-button"
@@ -219,10 +296,32 @@ function Home() {
                     onClick={scrollDown}
                     data-number="2"
                 >
-                    <h2>About Me</h2>
+                    <h2 id="aboutme-button-text">About Me</h2>
+                    <img
+                        src="./downArrow.png"
+                        alt="Scroll Right"
+                        id="aboutme-button-arrow"
+                    />
                 </button>
             </div>
-            <div style={div3Style} id="div3" className="page"></div>
+            <div style={div3Style} id="div3" className="page">
+                <div style={buttonDivStyle} className="up-button-div">
+                    <button
+                        className="up-button"
+                        onClick={scrollDown}
+                        data-number="1"
+                    >
+                        <img
+                            src="./downArrow.png"
+                            className="button-image"
+                            alt="Scroll Up"
+                            style={{ pointerEvents: 'none' }}
+                        />
+                    </button>
+                </div>
+            </div>
+            <div id="dogs-page" className="page" style={dogsPageStyle}></div>
+            <div id="art-page" className="page" style={artPageStyle}></div>
         </div>
     );
 }
