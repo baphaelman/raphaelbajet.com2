@@ -6,6 +6,8 @@
   --lightbg: #1D2D44;
   --darkestblue: #09101E;
   --lightestblue: #748CAB;
+
+  --YStart: 0;
 }
 
 body {
@@ -15,8 +17,6 @@ body {
   font-family: 'Nunito', sans-serif;
   color: var(--white);
 }
-
-
 
 /* scroll button and hover */
 .down-button .button-image {
@@ -179,4 +179,17 @@ transition: all 0.25s ease;
   width: 17vh;
   height: 17vh;
   border-radius: 50%;
+}
+
+.scrollDown {
+  animation: scrollDown 1.5s ease-in-out forwards;
+}
+
+@keyframes scrollDown {
+  from {
+    transform: translateY(var(--YStart));
+  }
+  to {
+    transform: translateY(var(--YStart) - 100vh);
+  }
 }

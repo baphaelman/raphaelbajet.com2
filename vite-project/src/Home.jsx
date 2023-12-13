@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useEffect } from 'react';
-
 function Home() {
     const [scrollPosition, setScrollPosition] = useState(0);
+    const [scrollDown, setScrollDown] = useState(0);
     let scrollPosition1 = scrollPosition / 5;
     let scrollPosition2 = scrollPosition / 20;
     let scrollPosition3 = scrollPosition / 12.5;
@@ -14,6 +13,12 @@ function Home() {
     const handleScroll = () => {
         setScrollPosition(window.scrollY);
     };
+
+    function scrollDown4() {
+        setScrollDown((prevScrollDown) => prevScrollDown + 1);
+        document.documentElement.style.setProperty('--YStart', value);
+        console.log(document.documentElement.style);
+    }
 
     useEffect(() => {
         // Add a scroll event listener to track the scroll position
@@ -29,37 +34,6 @@ function Home() {
         return t < 0.5
             ? 4 * t * t * t
             : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
-    }
-
-    function scrollDown(event) {
-        const buttonNumber = parseInt(event.target.dataset.number);
-        const targetDivNumber = buttonNumber + 1;
-        const targetElement = document.getElementById(`div${targetDivNumber}`);
-
-        const initialY = window.scrollY;
-        const targetY = targetElement.getBoundingClientRect().top + initialY;
-        const distance = targetY - initialY;
-        const duration = 1500;
-
-        let startTime;
-
-        function scroll(time) {
-            if (!startTime) {
-                startTime = time;
-            }
-
-            const elapsed = time - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            const easedProgress = easeInOut(progress);
-
-            window.scrollTo(0, initialY + distance * easedProgress);
-
-            if (progress < 1) {
-                requestAnimationFrame(scroll);
-            }
-        }
-
-        requestAnimationFrame(scroll);
     }
 
     const pageButtons = document.getElementsByClassName('page-button');
@@ -183,14 +157,15 @@ function Home() {
     };
 
     return (
-        <div>
+        <div className={scrollDown ? 'scrollDown' : ''}>
             <link rel="preconnect" href="https://fonts.googleapis.com" />
             <link rel="preconnect" href="https://fonts.gstatic.com" />
             <link
                 href="https://fonts.googleapis.com/css2?family=Nunito:wght@200&display=swap"
                 rel="stylesheet"
             />
-            <div style={div1Style} id="div1" className="page">
+
+            <div style={div1Style} id="div1">
                 <div>
                     <h1
                         style={{
@@ -227,7 +202,9 @@ function Home() {
                 <div style={buttonDivStyle}>
                     <button
                         className="down-button"
-                        onClick={scrollDown}
+                        onClick={() => {
+                            scrollDown4;
+                        }}
                         data-number="1"
                     >
                         <img
@@ -242,7 +219,9 @@ function Home() {
                 <div style={buttonDivStyle} className="up-button-div">
                     <button
                         className="up-button"
-                        onClick={scrollDown}
+                        onClick={() => {
+                            scrollDown4;
+                        }}
                         data-number="0"
                     >
                         <img
@@ -293,7 +272,9 @@ function Home() {
                 <button
                     id="aboutme-button"
                     className="page-button"
-                    onClick={scrollDown}
+                    onClick={() => {
+                        scrollDown4;
+                    }}
                     data-number="2"
                 >
                     <h2 id="aboutme-button-text">About Me</h2>
@@ -308,7 +289,9 @@ function Home() {
                 <div style={buttonDivStyle} className="up-button-div">
                     <button
                         className="up-button"
-                        onClick={scrollDown}
+                        onClick={() => {
+                            scrollDown4;
+                        }}
                         data-number="1"
                     >
                         <img
