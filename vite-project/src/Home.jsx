@@ -87,8 +87,9 @@ function Home() {
     const div3Style = {
         width: '100vw',
         height: '100vh',
-        background: 'var(--offwhite)',
+        background: 'var(--bg)',
         display: 'flex',
+        flexDirection: 'column',
         justifyContent: 'center',
     };
 
@@ -112,6 +113,7 @@ function Home() {
         justifyContent: 'center',
         alignItems: 'center',
         flex: '1',
+        zIndex: '100',
     };
 
     const firstArtStyle = {
@@ -129,10 +131,12 @@ function Home() {
     /* the 'left' button in art, not the button that says art */
     const artButtonStyle = {
         position: 'absolute',
-        right: '29vw',
-        top: '50%',
+        right: '28.5vw',
+    };
 
-        zIndex: '1',
+    const dogsButtonStyle = {
+        position: 'absolute',
+        top: '70vh',
     };
 
     return (
@@ -266,6 +270,17 @@ function Home() {
                 </button>
             </div>
             <div style={div3Style} id="div3" className="page">
+                <div className="img-triple">
+                    <button>
+                        <img src="./aboutme/mosaic.jpg" alt="About Me" />
+                    </button>
+                    <button>
+                        <img src="./aboutme/heel_hook.jpg" alt="About Me" />
+                    </button>
+                    <button>
+                        <img src="./aboutme/v3.jpg" alt="About Me" />
+                    </button>
+                </div>
                 <div style={buttonDivStyle} className="up-button-div">
                     <button
                         className="up-button circle-button"
@@ -280,6 +295,17 @@ function Home() {
                         />
                     </button>
                 </div>
+                <div className="img-triple">
+                    <button>
+                        <img src="./aboutme/norcal.jpg" alt="About Me" />
+                    </button>
+                    <button>
+                        <img src="./aboutme/henry_cowell.jpg" alt="About Me" />
+                    </button>
+                    <button>
+                        <img src="./aboutme/sunol.jpg" alt="About Me" />
+                    </button>
+                </div>
             </div>
             <div id="dogs-page" className="page" style={dogsPageStyle}>
                 <div style={buttonDivStyle} className="right-button-div">
@@ -287,6 +313,7 @@ function Home() {
                         className="left-button circle-button"
                         onClick={() => handleScroll(eventNumbers[2], '')}
                         data-number="0"
+                        style={dogsButtonStyle}
                     >
                         <img
                             src="./downArrow.png"
@@ -296,17 +323,29 @@ function Home() {
                         />
                     </button>
                 </div>
-                <div style={blueArtStyle}>
-                    <img src="./dogs/mosaic.jpg" alt="Art" />
-                    <img src="./dogs/heel_hook.jpg" alt="Art" />
-                    <img src="./dogs/v3.jpg.jpg" alt="Art" />
+                <div className="dogs-triple">
+                    <button>
+                        <img src="./dogs/bonny.jpg" alt="Dogs" />
+                    </button>
+                    <button>
+                        <img src="./dogs/dogs_and_me.jpg" alt="Dogs" />
+                    </button>
+                    <button>
+                        <img src="./dogs/kaya.jpg" alt="Dogs" />
+                    </button>
                 </div>
             </div>
             <div id="art-page" className="page" style={artPageStyle}>
-                <div style={firstArtStyle} className="art-triple">
-                    <img src="./art/art_drop.jpg" alt="Art" id="art-1" />
-                    <img src="./art/art_man.jpg" alt="Art" id="art-2" />
-                    <img src="./art/art_swirl.jpg" alt="Art" id="art-3" />
+                <div style={firstArtStyle} className="img-triple">
+                    <button>
+                        <img src="./art/art_drop.jpg" alt="Art" id="art-1" />
+                    </button>
+                    <button>
+                        <img src="./art/art_man.jpg" alt="Art" id="art-2" />
+                    </button>
+                    <button>
+                        <img src="./art/art_swirl.jpg" alt="Art" id="art-3" />
+                    </button>
                 </div>
                 <div style={buttonDivStyle} className="right-button-div">
                     <button
@@ -323,10 +362,16 @@ function Home() {
                         />
                     </button>
                 </div>
-                <div style={blueArtStyle} className="art-triple">
-                    <img src="./art/art_blue1.jpg" alt="Art" id="art-4" />
-                    <img src="./art/art_blue2.jpg" alt="Art" id="art-5" />
-                    <img src="./art/art_blue3.jpg" alt="Art" id="art-6" />
+                <div style={blueArtStyle} className="img-triple">
+                    <button>
+                        <img src="./art/art_blue1.jpg" alt="Art" id="art-4" />
+                    </button>
+                    <button>
+                        <img src="./art/art_blue2.jpg" alt="Art" id="art-5" />
+                    </button>
+                    <button>
+                        <img src="./art/art_blue3.jpg" alt="Art" id="art-6" />
+                    </button>
                 </div>
             </div>
         </div>
