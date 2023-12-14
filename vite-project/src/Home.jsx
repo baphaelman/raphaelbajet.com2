@@ -1,40 +1,45 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
 function Home() {
-    const [scrollPosition, setScrollPosition] = useState(0);
-    const [scrollDown, setScrollDown] = useState(0);
-    let scrollPosition1 = scrollPosition / 5;
-    let scrollPosition2 = scrollPosition / 20;
-    let scrollPosition3 = scrollPosition / 12.5;
+    const [marginTop, setMarginTop] = useState(0);
+    const [marginLeft, setMarginLeft] = useState(0);
+    const [textMarginLeft, setTextMarginLeft] = useState(0);
+    const firstTextMarginLeft = textMarginLeft * (3 / 4);
+    const secondTextMarginLeft = -1 * textMarginLeft;
+    const thirdTextMarginLeft = textMarginLeft;
 
-    const dogsButton = document.getElementById('dogs-button');
-    const [lastPageButton, setLastPageButton] = useState(null);
+    function handleScroll(x, y) {
+        if (x === 'down') {
+            const newMarginTop = marginTop - 100;
+            setMarginTop(newMarginTop);
+        } else if (x === 'up') {
+            const newMarginTop = marginTop + 100;
+            setMarginTop(newMarginTop);
+        } else if (x === 'left') {
+            const newMarginRight = marginLeft + 100;
+            setMarginLeft(newMarginRight);
+        } else if (x === 'right') {
+            const newMarginRight = marginLeft - 100;
+            setMarginLeft(newMarginRight);
+        }
 
-    const handleScroll = () => {
-        setScrollPosition(window.scrollY);
+        if (y === 'down') {
+            const newTextMarginLeft = textMarginLeft + 80;
+            setTextMarginLeft(newTextMarginLeft);
+        } else if (y === 'up') {
+            const newTextMarginLeft = textMarginLeft - 80;
+            setTextMarginLeft(newTextMarginLeft);
+        }
+    }
+
+    const pageStyle = {
+        marginTop: marginTop + 'vh',
+        marginLeft: marginLeft + 'vw',
+        transition: 'all 1.5s ease',
     };
 
-    function scrollDown4() {
-        setScrollDown((prevScrollDown) => prevScrollDown + 1);
-        document.documentElement.style.setProperty('--YStart', value);
-        console.log(document.documentElement.style);
-    }
+    const eventNumbers = ['down', 'up', 'left', 'right'];
 
-    useEffect(() => {
-        // Add a scroll event listener to track the scroll position
-        window.addEventListener('scroll', handleScroll);
-        setLastPageButton(dogsButton);
-        // Clean up the event listener when the component unmounts
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-        };
-    }, [dogsButton]);
-
-    function easeInOut(t) {
-        return t < 0.5
-            ? 4 * t * t * t
-            : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
-    }
+    const [lastPageButton, setLastPageButton] = useState(null);
 
     const pageButtons = document.getElementsByClassName('page-button');
     Array.from(pageButtons).forEach((button) => {
@@ -51,57 +56,10 @@ function Home() {
         setLastPageButton(button);
     }
 
-    function scrollSide(event) {
-        const buttonString = event.target.dataset.string;
-        const targetElement = document.getElementById(`${buttonString}-page`);
-
-        const initialY = window.scrollY;
-        const initialX = window.scrollX;
-        const targetX = targetElement.getBoundingClientRect().left + initialX;
-        const distance = targetX - initialX;
-        const duration = 1500;
-
-        let startTime;
-
-        function scroll(time) {
-            if (!startTime) {
-                startTime = time;
-            }
-
-            const elapsed = time - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            const easedProgress = easeInOut(progress);
-
-            window.scrollTo(initialX + distance * easedProgress, initialY);
-
-            if (progress < 1) {
-                requestAnimationFrame(scroll);
-            }
-        }
-
-        requestAnimationFrame(scroll);
-    }
-
-    function scrollSide2(event) {
-        const buttonString = event.target.dataset.string;
-        const targetElement = document.getElementById(`${buttonString}-page`);
-
-        const targetX =
-            targetElement.getBoundingClientRect().left +
-            window.scrollX -
-            window.innerWidth;
-        const targetY = window.scrollY;
-
-        window.scrollTo({
-            left: targetX,
-            top: targetY,
-            behavior: 'smooth',
-        });
-    }
-
     const nameStyle = {
         fontSize: '10vw',
         margin: '0',
+        whiteSpace: 'nowrap',
     };
 
     const div1Style = {
@@ -137,14 +95,14 @@ function Home() {
     const dogsPageStyle = {
         height: '100vh',
         width: '100vw',
-        background: 'red',
+        background: 'var(--bg)',
         transform: 'translate(100vw, -200vh)',
     };
 
     const artPageStyle = {
         height: '100vh',
         width: '100vw',
-        background: 'green',
+        background: 'var(--bg)',
         transform: 'translate(-100vw, -300vh)',
     };
 
@@ -156,8 +114,29 @@ function Home() {
         flex: '1',
     };
 
+    const firstArtStyle = {
+        width: '100vw',
+        display: 'flex',
+        justifyContent: 'space-around',
+    };
+
+    const blueArtStyle = {
+        width: '100vw',
+        display: 'flex',
+        justifyContent: 'space-around',
+    };
+
+    /* the 'left' button in art, not the button that says art */
+    const artButtonStyle = {
+        position: 'absolute',
+        right: '29vw',
+        top: '50%',
+
+        zIndex: '1',
+    };
+
     return (
-        <div className={scrollDown ? 'scrollDown' : ''}>
+        <div style={pageStyle}>
             <link rel="preconnect" href="https://fonts.googleapis.com" />
             <link rel="preconnect" href="https://fonts.gstatic.com" />
             <link
@@ -171,9 +150,10 @@ function Home() {
                         style={{
                             ...nameStyle,
                             paddingLeft: '30vw',
-                            transform: `translateX(-${scrollPosition1}vw)`,
+                            marginLeft: firstTextMarginLeft + 'vw',
+                            transition: 'all 1.5s ease',
                         }}
-                        className="name-1"
+                        className="name-1 name"
                     >
                         Hi! My name is
                     </h1>
@@ -181,9 +161,10 @@ function Home() {
                         style={{
                             ...nameStyle,
                             paddingLeft: '5vw',
-                            transform: `translateX(${scrollPosition2}vw)`,
+                            marginLeft: secondTextMarginLeft + 'vw',
+                            transition: 'all 1.5s ease',
                         }}
-                        className="name-2"
+                        className="name-2 name"
                     >
                         Raphaël Bajet.
                     </h1>
@@ -192,19 +173,20 @@ function Home() {
                             ...nameStyle,
                             paddingLeft: '15vw',
                             marginTop: '1vw',
-                            transform: `translateX(-${scrollPosition3}vw)`,
+                            marginLeft: thirdTextMarginLeft + 'vw',
+                            transition: 'all 1.5s ease',
                         }}
-                        className="name-3"
+                        className="name-3 name"
                     >
                         Call me Raphaël.
                     </h1>
                 </div>
                 <div style={buttonDivStyle}>
                     <button
-                        className="down-button"
-                        onClick={() => {
-                            scrollDown4;
-                        }}
+                        className="circle-button"
+                        onClick={() =>
+                            handleScroll(eventNumbers[0], eventNumbers[1])
+                        }
                         data-number="1"
                     >
                         <img
@@ -218,10 +200,10 @@ function Home() {
             <div style={div2Style} id="div2" className="page">
                 <div style={buttonDivStyle} className="up-button-div">
                     <button
-                        className="up-button"
-                        onClick={() => {
-                            scrollDown4;
-                        }}
+                        className="up-button circle-button"
+                        onClick={() =>
+                            handleScroll(eventNumbers[1], eventNumbers[0])
+                        }
                         data-number="0"
                     >
                         <img
@@ -242,7 +224,7 @@ function Home() {
                 <button
                     id="dogs-button"
                     className="page-button expanded"
-                    onClick={scrollSide}
+                    onClick={() => handleScroll(eventNumbers[3], '')}
                     data-string="dogs"
                 >
                     <h2 id="dogs-button-text">Dogs</h2>
@@ -255,7 +237,7 @@ function Home() {
                 <button
                     id="art-button"
                     className="page-button"
-                    onClick={scrollSide2}
+                    onClick={() => handleScroll(eventNumbers[2], '')}
                     style={{
                         borderBottom: '0.5vw solid var(--lightestblue)',
                         borderTop: '0.5vw solid var(--lightestblue)',
@@ -272,9 +254,7 @@ function Home() {
                 <button
                     id="aboutme-button"
                     className="page-button"
-                    onClick={() => {
-                        scrollDown4;
-                    }}
+                    onClick={() => handleScroll(eventNumbers[0], '')}
                     data-number="2"
                 >
                     <h2 id="aboutme-button-text">About Me</h2>
@@ -288,11 +268,9 @@ function Home() {
             <div style={div3Style} id="div3" className="page">
                 <div style={buttonDivStyle} className="up-button-div">
                     <button
-                        className="up-button"
-                        onClick={() => {
-                            scrollDown4;
-                        }}
-                        data-number="1"
+                        className="up-button circle-button"
+                        onClick={() => handleScroll(eventNumbers[1], '')}
+                        data-number="0"
                     >
                         <img
                             src="./downArrow.png"
@@ -303,8 +281,54 @@ function Home() {
                     </button>
                 </div>
             </div>
-            <div id="dogs-page" className="page" style={dogsPageStyle}></div>
-            <div id="art-page" className="page" style={artPageStyle}></div>
+            <div id="dogs-page" className="page" style={dogsPageStyle}>
+                <div style={buttonDivStyle} className="right-button-div">
+                    <button
+                        className="left-button circle-button"
+                        onClick={() => handleScroll(eventNumbers[2], '')}
+                        data-number="0"
+                    >
+                        <img
+                            src="./downArrow.png"
+                            className="button-image"
+                            alt="Scroll Up"
+                            style={{ pointerEvents: 'none' }}
+                        />
+                    </button>
+                </div>
+                <div style={blueArtStyle}>
+                    <img src="./dogs/mosaic.jpg" alt="Art" />
+                    <img src="./dogs/heel_hook.jpg" alt="Art" />
+                    <img src="./dogs/v3.jpg.jpg" alt="Art" />
+                </div>
+            </div>
+            <div id="art-page" className="page" style={artPageStyle}>
+                <div style={firstArtStyle} className="art-triple">
+                    <img src="./art/art_drop.jpg" alt="Art" id="art-1" />
+                    <img src="./art/art_man.jpg" alt="Art" id="art-2" />
+                    <img src="./art/art_swirl.jpg" alt="Art" id="art-3" />
+                </div>
+                <div style={buttonDivStyle} className="right-button-div">
+                    <button
+                        className="right-button circle-button"
+                        onClick={() => handleScroll(eventNumbers[3], '')}
+                        data-number="0"
+                        style={artButtonStyle}
+                    >
+                        <img
+                            src="./downArrow.png"
+                            className="button-image"
+                            alt="Scroll Right"
+                            style={{ pointerEvents: 'none' }}
+                        />
+                    </button>
+                </div>
+                <div style={blueArtStyle} className="art-triple">
+                    <img src="./art/art_blue1.jpg" alt="Art" id="art-4" />
+                    <img src="./art/art_blue2.jpg" alt="Art" id="art-5" />
+                    <img src="./art/art_blue3.jpg" alt="Art" id="art-6" />
+                </div>
+            </div>
         </div>
     );
 }

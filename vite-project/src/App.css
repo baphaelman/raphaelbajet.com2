@@ -16,6 +16,7 @@ body {
   background-color: var(--bg);
   font-family: 'Nunito', sans-serif;
   color: var(--white);
+  overflow: hidden;
 }
 
 /* scroll button and hover */
@@ -148,7 +149,19 @@ transition: all 0.25s ease;
   transform: rotate(180deg);
 }
 
-.up-button {
+.left-button .button-image {
+  height: 10vh;
+  transition: all 0.25s ease;
+  transform: rotate(90deg);
+}
+
+.right-button .button-image {
+  height: 10vh;
+  transition: all 0.25s ease;
+  transform: rotate(-90deg);
+}
+
+.circle-button {
 display: flex;
 justify-content: center;
 align-items: center;
@@ -162,16 +175,15 @@ border-radius: 50%;
 transition: all 0.25s ease;
 }
 
-.up-button:hover {
+.circle-button:hover {
   background-color: var(--lightestblue);
   border-color: var(--white);
   cursor: pointer;
 }
 
-.up-button:hover .button-image{
+.circle-button:hover .button-image{
   height: 12vh;
 }
-
 
 .profile-picture {
   position: absolute;
@@ -181,15 +193,25 @@ transition: all 0.25s ease;
   border-radius: 50%;
 }
 
-.scrollDown {
-  animation: scrollDown 1.5s ease-in-out forwards;
+#art-page > img {
+  width: 20vw;
+  margin: 1vw;
 }
 
-@keyframes scrollDown {
-  from {
-    transform: translateY(var(--YStart));
-  }
-  to {
-    transform: translateY(var(--YStart) - 100vh);
-  }
+.art-triple {
+  display: flex;
+  justify-content: center;
 }
+
+.art-triple > img {
+  border-radius: 1.5vw;
+  flex: 1;
+  position: relative;
+  object-fit: cover; /* Crop the image to maintain aspect ratio */
+  object-position: center;
+  width: 33.3vw;
+  height: 50vh;
+}
+
+/* horizontally scrolling text */
+
