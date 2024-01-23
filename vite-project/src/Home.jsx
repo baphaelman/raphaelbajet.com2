@@ -105,6 +105,8 @@ function Home() {
         width: '100vw',
         background: 'var(--bg)',
         transform: 'translate(-100vw, -300vh)',
+        displau: 'flex',
+        flexDirection: 'column',
     };
 
     const buttonDivStyle = {
@@ -113,31 +115,31 @@ function Home() {
         justifyContent: 'center',
         alignItems: 'center',
         flex: '1',
+        position: 'absolute',
         zIndex: '100',
-    };
-
-    const firstArtStyle = {
-        width: '100vw',
-        display: 'flex',
-        justifyContent: 'space-around',
-    };
-
-    const blueArtStyle = {
-        width: '100vw',
-        display: 'flex',
-        justifyContent: 'space-around',
     };
 
     /* the 'left' button in art, not the button that says art */
     const artButtonStyle = {
         position: 'absolute',
-        right: '28.5vw',
+        bottom: '42vh',
+        left: '62vw',
     };
 
     const dogsButtonStyle = {
         position: 'absolute',
-        top: '70vh',
+        bottom: '42vh',
+        left: '28.5vw',
     };
+
+    const aboutMeButtonStyle = {
+        position: 'absolute',
+        left: '28.5vw',
+    }
+
+    const tallTripleStyle = {
+        height: '100vh',
+    }
 
     return (
         <div style={pageStyle}>
@@ -185,7 +187,7 @@ function Home() {
                         Call me Raphaël.
                     </h1>
                 </div>
-                <div style={buttonDivStyle}>
+                <div style={{...buttonDivStyle, position: 'static'}}>
                     <button
                         className="circle-button"
                         onClick={() =>
@@ -202,22 +204,6 @@ function Home() {
                 </div>
             </div>
             <div style={div2Style} id="div2" className="page">
-                <div style={buttonDivStyle} className="up-button-div">
-                    <button
-                        className="up-button circle-button"
-                        onClick={() =>
-                            handleScroll(eventNumbers[1], eventNumbers[0])
-                        }
-                        data-number="0"
-                    >
-                        <img
-                            src="./downArrow.png"
-                            className="button-image"
-                            alt="Scroll Up"
-                            style={{ pointerEvents: 'none' }}
-                        />
-                    </button>
-                </div>
                 <div className="profile-picture-div">
                     <img
                         src="./suitPicture.jpg"
@@ -268,6 +254,22 @@ function Home() {
                         id="aboutme-button-arrow"
                     />
                 </button>
+                <div style={buttonDivStyle} className="up-button-div">
+                    <button
+                        className="up-button circle-button"
+                        onClick={() =>
+                            handleScroll(eventNumbers[1], eventNumbers[0])
+                        }
+                        data-number="0"
+                    >
+                        <img
+                            src="./downArrow.png"
+                            className="button-image"
+                            alt="Scroll Up"
+                            style={{ pointerEvents: 'none' }}
+                        />
+                    </button>
+                </div>
             </div>
             <div style={div3Style} id="div3" className="page">
                 <div className="img-triple">
@@ -281,20 +283,6 @@ function Home() {
                         <img src="./aboutme/v3.jpg" alt="About Me" />
                     </button>
                 </div>
-                <div style={buttonDivStyle} className="up-button-div">
-                    <button
-                        className="up-button circle-button"
-                        onClick={() => handleScroll(eventNumbers[1], '')}
-                        data-number="0"
-                    >
-                        <img
-                            src="./downArrow.png"
-                            className="button-image"
-                            alt="Scroll Up"
-                            style={{ pointerEvents: 'none' }}
-                        />
-                    </button>
-                </div>
                 <div className="img-triple">
                     <button>
                         <img src="./aboutme/norcal.jpg" alt="About Me" />
@@ -306,8 +294,34 @@ function Home() {
                         <img src="./aboutme/sunol.jpg" alt="About Me" />
                     </button>
                 </div>
+                <div style={buttonDivStyle}>
+                    <button
+                        className="up-button circle-button"
+                        onClick={() => handleScroll(eventNumbers[1], '')}
+                        data-number="0"
+                        style={aboutMeButtonStyle}
+                    >
+                        <img
+                            src="./downArrow.png"
+                            className="button-image"
+                            alt="Scroll Up"
+                            style={{ pointerEvents: 'none' }}
+                        />
+                    </button>
+                </div>
             </div>
             <div id="dogs-page" className="page" style={dogsPageStyle}>
+                <div className="img-triple">
+                    <button style={tallTripleStyle}>
+                        <img src="./dogs/bonny.jpg" alt="Dogs" />
+                    </button>
+                    <button style={tallTripleStyle}>
+                        <img src="./dogs/dogs_and_me.jpg" alt="Dogs" />
+                    </button>
+                    <button style={tallTripleStyle}>
+                        <img src="./dogs/kaya.jpg" alt="Dogs" />
+                    </button>
+                </div>
                 <div style={buttonDivStyle} className="right-button-div">
                     <button
                         className="left-button circle-button"
@@ -323,20 +337,9 @@ function Home() {
                         />
                     </button>
                 </div>
-                <div className="dogs-triple">
-                    <button>
-                        <img src="./dogs/bonny.jpg" alt="Dogs" />
-                    </button>
-                    <button>
-                        <img src="./dogs/dogs_and_me.jpg" alt="Dogs" />
-                    </button>
-                    <button>
-                        <img src="./dogs/kaya.jpg" alt="Dogs" />
-                    </button>
-                </div>
             </div>
             <div id="art-page" className="page" style={artPageStyle}>
-                <div style={firstArtStyle} className="img-triple">
+                <div className="img-triple">
                     <button>
                         <img src="./art/art_drop.jpg" alt="Art" id="art-1" />
                     </button>
@@ -345,6 +348,17 @@ function Home() {
                     </button>
                     <button>
                         <img src="./art/art_swirl.jpg" alt="Art" id="art-3" />
+                    </button>
+                </div>
+                <div className="img-triple">
+                    <button>
+                        <img src="./art/art_blue1.jpg" alt="Art" id="art-4" />
+                    </button>
+                    <button>
+                        <img src="./art/art_blue2.jpg" alt="Art" id="art-5" />
+                    </button>
+                    <button>
+                        <img src="./art/art_blue3.jpg" alt="Art" id="art-6" />
                     </button>
                 </div>
                 <div style={buttonDivStyle} className="right-button-div">
@@ -360,17 +374,6 @@ function Home() {
                             alt="Scroll Right"
                             style={{ pointerEvents: 'none' }}
                         />
-                    </button>
-                </div>
-                <div style={blueArtStyle} className="img-triple">
-                    <button>
-                        <img src="./art/art_blue1.jpg" alt="Art" id="art-4" />
-                    </button>
-                    <button>
-                        <img src="./art/art_blue2.jpg" alt="Art" id="art-5" />
-                    </button>
-                    <button>
-                        <img src="./art/art_blue3.jpg" alt="Art" id="art-6" />
                     </button>
                 </div>
             </div>
