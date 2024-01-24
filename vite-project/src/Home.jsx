@@ -275,23 +275,47 @@ function Home() {
                 <div className="img-triple">
                     <button>
                         <img src="./aboutme/mosaic.jpg" alt="About Me" />
+                        <div className="image-text">
+                            <h1>Mosaic Session</h1>
+                            <p>I like going to my local climbing gym, Mosaic Boulders</p>
+                        </div>
                     </button>
                     <button>
                         <img src="./aboutme/heel_hook.jpg" alt="About Me" />
+                        <div className="image-text">
+                            <h1>Benchmark</h1>
+                            <p>When I can, I go to Benchmark, a bit further away than Mosaic</p>
+                        </div>
                     </button>
                     <button>
                         <img src="./aboutme/v3.jpg" alt="About Me" />
+                        <div className="image-text">
+                            <h1>First V3</h1>
+                            <p>After a few sessions, I finally got my first V3!</p>
+                        </div>
                     </button>
                 </div>
                 <div className="img-triple">
                     <button>
                         <img src="./aboutme/norcal.jpg" alt="About Me" />
+                        <div className="image-text">
+                            <h1>Norcal Nature</h1>
+                            <p>Murrelet State Wilderness, during a road trip in June 2023</p>
+                        </div>
                     </button>
                     <button>
                         <img src="./aboutme/henry_cowell.jpg" alt="About Me" />
+                        <div className="image-text">
+                            <h1>Henry Cowell's Garden of Eden</h1>
+                            <p>Even on the go, I like to keep my style sharp</p>
+                        </div>
                     </button>
                     <button>
                         <img src="./aboutme/sunol.jpg" alt="About Me" />
+                        <div className="image-text">
+                            <h1>Sunol Regional Wilderness</h1>
+                            <p>One of my favorite places to hike in the East Bay</p>
+                        </div>
                     </button>
                 </div>
                 <div style={buttonDivStyle}>
@@ -314,12 +338,24 @@ function Home() {
                 <div className="img-triple">
                     <button style={tallTripleStyle}>
                         <img src="./dogs/bonny.jpg" alt="Dogs" />
+                        <div className="image-text">
+                            <h1>Bonny</h1>
+                            <p>The wise one, lounging on my mom's bed</p>
+                        </div>
                     </button>
                     <button style={tallTripleStyle}>
                         <img src="./dogs/dogs_and_me.jpg" alt="Dogs" />
+                        <div className="image-text">
+                            <h1>Walking with Bonny and Kaya</h1>
+                            <p>Who knew dogs liked those?</p>
+                        </div>
                     </button>
                     <button style={tallTripleStyle}>
                         <img src="./dogs/kaya.jpg" alt="Dogs" />
+                        <div className="image-text">
+                            <h1>Kaya</h1>
+                            <p>The silly one, tempting me to give her food with her puppy eyes</p>
+                        </div>
                     </button>
                 </div>
                 <div style={buttonDivStyle} className="right-button-div">
@@ -342,23 +378,47 @@ function Home() {
                 <div className="img-triple">
                     <button>
                         <img src="./art/art_drop.jpg" alt="Art" id="art-1" />
+                        <div className="image-text">
+                            <h1>Drop</h1>
+                            <p>Hours of lokdown well spent</p>
+                        </div>
                     </button>
                     <button>
                         <img src="./art/art_man.jpg" alt="Art" id="art-2" />
+                        <div className="image-text">
+                            <h1>Guy</h1>
+                            <p>My favorite drawing</p>
+                        </div>
                     </button>
                     <button>
                         <img src="./art/art_swirl.jpg" alt="Art" id="art-3" />
+                        <div className="image-text">
+                            <h1>Twisty</h1>
+                            <p>Took hours, but I like the feeling it gives me</p>
+                        </div>
                     </button>
                 </div>
                 <div className="img-triple">
                     <button>
                         <img src="./art/art_blue1.jpg" alt="Art" id="art-4" />
+                        <div className="image-text">
+                            <h1>Pierre #1</h1>
+                            <p>First in my series to Pierre</p>
+                        </div>
                     </button>
                     <button>
                         <img src="./art/art_blue2.jpg" alt="Art" id="art-5" />
+                        <div className="image-text">
+                            <h1>Pierre #2</h1>
+                            <p>Second in my series to Pierre</p>
+                        </div>
                     </button>
                     <button>
                         <img src="./art/art_blue3.jpg" alt="Art" id="art-6" />
+                        <div className="image-text">
+                            <h1>Pierre #3</h1>
+                            <p>Final piece in my series to Pierre</p>
+                        </div>
                     </button>
                 </div>
                 <div style={buttonDivStyle} className="right-button-div">

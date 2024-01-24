@@ -213,6 +213,7 @@ transition: all 0.25s ease;
   background: var(--bg);
   object-fit: cover;
   object-position: center center;
+  transition: all ease 0.5s;
 }
 
 .img-triple > button > img {
@@ -227,8 +228,30 @@ transition: all 0.25s ease;
 }
 
 .img-triple > button:hover > img {
-  width: 95%;
-  height: 95%;
+  opacity: 0.15;
+}
+
+.img-triple > button {
+  position: relative;
+}
+
+
+
+button > .image-text {
+  position: absolute;
+  color: var(--offwhite);
+  bottom: 5vw;
+  left: 4vw;
+  width: 75%;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  z-index: 1;
+  transition: all ease 0.5s;
+  font-family: 'Nunito';
+}
+
+.img-triple > button:hover > .image-text {
+  opacity: 1;
 }
 
 .dogs-triple {
