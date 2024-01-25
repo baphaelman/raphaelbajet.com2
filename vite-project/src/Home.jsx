@@ -393,7 +393,7 @@ function Home() {
                     <button>
                         <img src="./art/art_swirl.jpg" alt="Art" id="art-3" />
                         <div className="image-text">
-                            <h1>Twisty</h1>
+                            <h1>Twirly</h1>
                             <p>Took hours, but I like the feeling it gives me</p>
                         </div>
                     </button>

@@ -204,7 +204,7 @@ transition: all 0.25s ease;
 }
 
 .img-triple > button {
-  border-radius: 1.5vw;
+  border-radius: 0.5vw;
   flex: 1;
   width: 33.3vw;
   height: 50vh;
@@ -220,7 +220,7 @@ transition: all 0.25s ease;
   width: 100%;
   height: 100%;
   padding: 0;
-  border-radius: 1.5vw;
+  border-radius: 0.5vw;
   object-fit: cover;
   object-position: center;
 
@@ -228,7 +228,7 @@ transition: all 0.25s ease;
 }
 
 .img-triple > button:hover > img {
-  opacity: 0.15;
+  opacity: 0.35;
 }
 
 .img-triple > button {
@@ -276,7 +276,7 @@ button > .image-text {
   height: 100%;
   margin: 0;
   padding: 0;
-  border-radius: 1.5vw;
+  border-radius: 0.5vw;
 
   border: none;
 }
