@@ -239,7 +239,7 @@ function Home() {
                         alt="Scroll Right"
                         id="art-button-arrow"
                     />
-                    <h2 id="art-button-text">fArt</h2>
+                    <h2 id="art-button-text">Art</h2>
                 </button>
                 <button
                     id="aboutme-button"
