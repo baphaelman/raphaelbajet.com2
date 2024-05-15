@@ -84,7 +84,7 @@ function Home() {
         alignItems: 'center',
     };
 
-    const div3Style = {
+    const aboutMeStyle = {
         width: '100vw',
         height: '100vh',
         background: 'var(--bg)',
@@ -93,7 +93,7 @@ function Home() {
         justifyContent: 'center',
     };
 
-    const dogsPageStyle = {
+    const projectsPageStyle = {
         height: '100vh',
         width: '100vw',
         background: 'var(--bg)',
@@ -126,15 +126,15 @@ function Home() {
         left: '62vw',
     };
 
-    const dogsButtonStyle = {
+    const projectsButtonStyle = {
         position: 'absolute',
-        bottom: '42vh',
-        left: '28.5vw',
+        left: '3vw',
     };
 
     const aboutMeButtonStyle = {
         position: 'absolute',
         left: '28.5vw',
+        bottom: '42.5vh'
     }
 
     const tallTripleStyle = {
@@ -217,7 +217,7 @@ function Home() {
                     onClick={() => handleScroll(eventNumbers[3], '')}
                     data-string="dogs"
                 >
-                    <h2 id="dogs-button-text">Dogs</h2>
+                    <h2 id="dogs-button-text">Me</h2>
                     <img
                         src="./downArrow.png"
                         alt="Scroll Right"
@@ -247,7 +247,7 @@ function Home() {
                     onClick={() => handleScroll(eventNumbers[0], '')}
                     data-number="2"
                 >
-                    <h2 id="aboutme-button-text">About Me</h2>
+                    <h2 id="aboutme-button-text">Projects</h2>
                     <img
                         src="./downArrow.png"
                         alt="Scroll Right"
@@ -271,7 +271,47 @@ function Home() {
                     </button>
                 </div>
             </div>
-            <div style={div3Style} id="div3" className="page">
+            <div style={aboutMeStyle} className="page"> {/* hererererererererererererere */}
+                <div className="img-triple">
+                    <button style={tallTripleStyle}>
+                        <img src="./dogs/bonny.jpg" alt="Dogs" />
+                        <div className="image-text">
+                            <h1>Bonny</h1>
+                            <p>The wise one, lounging on my mom's bed</p>
+                        </div>
+                    </button>
+                    <button style={tallTripleStyle}>
+                        <img src="./dogs/dogs_and_me.jpg" alt="Dogs" />
+                        <div className="image-text">
+                            <h1>Walking with Bonny and Kaya</h1>
+                            <p>Who knew dogs liked those?</p>
+                        </div>
+                    </button>
+                    <button style={tallTripleStyle}>
+                        <img src="./dogs/kaya.jpg" alt="Dogs" />
+                        <div className="image-text">
+                            <h1>Kaya</h1>
+                            <p>The silly one, tempting me to give her food with her puppy eyes</p>
+                        </div>
+                    </button>
+                </div>
+                <div style={buttonDivStyle} className="up-button-div">
+                    <button
+                        className="up-button circle-button"
+                        onClick={() => handleScroll(eventNumbers[1], '')}
+                        data-number="0"
+                        style={projectsButtonStyle}
+                    >
+                        <img
+                            src="./downArrow.png"
+                            className="button-image"
+                            alt="Scroll Up"
+                            style={{ pointerEvents: 'none' }}
+                        />
+                    </button>
+                </div>
+            </div>
+            <div className="page" style={projectsPageStyle}> {/* hererererererererererererererererererererererere */}
                 <div className="img-triple">
                     <button>
                         <img src="./aboutme/mosaic.jpg" alt="About Me" />
@@ -320,50 +360,10 @@ function Home() {
                 </div>
                 <div style={buttonDivStyle}>
                     <button
-                        className="up-button circle-button"
-                        onClick={() => handleScroll(eventNumbers[1], '')}
-                        data-number="0"
-                        style={aboutMeButtonStyle}
-                    >
-                        <img
-                            src="./downArrow.png"
-                            className="button-image"
-                            alt="Scroll Up"
-                            style={{ pointerEvents: 'none' }}
-                        />
-                    </button>
-                </div>
-            </div>
-            <div id="dogs-page" className="page" style={dogsPageStyle}>
-                <div className="img-triple">
-                    <button style={tallTripleStyle}>
-                        <img src="./dogs/bonny.jpg" alt="Dogs" />
-                        <div className="image-text">
-                            <h1>Bonny</h1>
-                            <p>The wise one, lounging on my mom's bed</p>
-                        </div>
-                    </button>
-                    <button style={tallTripleStyle}>
-                        <img src="./dogs/dogs_and_me.jpg" alt="Dogs" />
-                        <div className="image-text">
-                            <h1>Walking with Bonny and Kaya</h1>
-                            <p>Who knew dogs liked those?</p>
-                        </div>
-                    </button>
-                    <button style={tallTripleStyle}>
-                        <img src="./dogs/kaya.jpg" alt="Dogs" />
-                        <div className="image-text">
-                            <h1>Kaya</h1>
-                            <p>The silly one, tempting me to give her food with her puppy eyes</p>
-                        </div>
-                    </button>
-                </div>
-                <div style={buttonDivStyle} className="right-button-div">
-                    <button
                         className="left-button circle-button"
                         onClick={() => handleScroll(eventNumbers[2], '')}
                         data-number="0"
-                        style={dogsButtonStyle}
+                        style={aboutMeButtonStyle}
                     >
                         <img
                             src="./downArrow.png"
