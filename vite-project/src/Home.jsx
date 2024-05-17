@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 function Home() {
     const [marginTop, setMarginTop] = useState(0);
     const [marginLeft, setMarginLeft] = useState(0);
@@ -84,16 +85,14 @@ function Home() {
         alignItems: 'center',
     };
 
-    const aboutMeStyle = {
+    const projectsStyle = {
         width: '100vw',
         height: '100vh',
-        background: 'var(--bg)',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'center',
     };
 
-    const projectsPageStyle = {
+    const meStyle = {
         height: '100vh',
         width: '100vw',
         background: 'var(--bg)',
@@ -128,8 +127,14 @@ function Home() {
 
     const projectsButtonStyle = {
         position: 'absolute',
-        left: '3vw',
+        top: '2vh',
+        right: '4vw',
     };
+
+    const projectsTitleStyle = {
+        fontSize: '4vw',
+        marginLeft: '12vw',
+    }
 
     const aboutMeButtonStyle = {
         position: 'absolute',
@@ -137,8 +142,21 @@ function Home() {
         bottom: '42.5vh'
     }
 
-    const tallTripleStyle = {
-        height: '100vh',
+    const portfolioStyle = {
+        display: 'flex',
+        width: '100vw',
+        background: 'white',
+    }
+
+    const portfolioTitleStyle = {
+        width: '100vw',
+        display: 'flex',
+        justifyContent: 'center',
+        flexDirection: 'row',
+        background: 'var(--bg)',
+        color: 'white',
+        height: '22vh',
+        position: 'none',
     }
 
     return (
@@ -271,47 +289,31 @@ function Home() {
                     </button>
                 </div>
             </div>
-            <div style={aboutMeStyle} className="page"> {/* hererererererererererererere */}
-                <div className="img-triple">
-                    <button style={tallTripleStyle}>
-                        <img src="./dogs/bonny.jpg" alt="Dogs" />
-                        <div className="image-text">
-                            <h1>Bonny</h1>
-                            <p>The wise one, lounging on my mom's bed</p>
-                        </div>
-                    </button>
-                    <button style={tallTripleStyle}>
-                        <img src="./dogs/dogs_and_me.jpg" alt="Dogs" />
-                        <div className="image-text">
-                            <h1>Walking with Bonny and Kaya</h1>
-                            <p>Who knew dogs liked those?</p>
-                        </div>
-                    </button>
-                    <button style={tallTripleStyle}>
-                        <img src="./dogs/kaya.jpg" alt="Dogs" />
-                        <div className="image-text">
-                            <h1>Kaya</h1>
-                            <p>The silly one, tempting me to give her food with her puppy eyes</p>
-                        </div>
-                    </button>
+            <div style={projectsStyle} className="page"> {/* hererererererererererererere PROJECTSPROJECTSPROJECTS */}
+                <div style={portfolioTitleStyle}>
+                    <h2 style={projectsTitleStyle}>Projects</h2>
+                    <div style={buttonDivStyle}>
+                        <button
+                            className="up-button circle-button"
+                            onClick={() => handleScroll(eventNumbers[1], '')}
+                            style={projectsButtonStyle}
+                        >
+                            <img
+                                src="./downArrow.png"
+                                className="button-image"
+                                alt="Scroll Up"
+                                style={{ pointerEvents: 'none' }}
+                            />
+                        </button>
+                    </div>
                 </div>
-                <div style={buttonDivStyle} className="up-button-div">
-                    <button
-                        className="up-button circle-button"
-                        onClick={() => handleScroll(eventNumbers[1], '')}
-                        data-number="0"
-                        style={projectsButtonStyle}
-                    >
-                        <img
-                            src="./downArrow.png"
-                            className="button-image"
-                            alt="Scroll Up"
-                            style={{ pointerEvents: 'none' }}
-                        />
-                    </button>
+                <div id="portfolio-container" style={portfolioStyle}> 
+                    {/*<PortfolioItem />*/}
+                    <b style={{height: '500px', color: 'black'}} >Portfolio</b>
                 </div>
+                
             </div>
-            <div className="page" style={projectsPageStyle}> {/* hererererererererererererererererererererererere */}
+            <div className="page" style={meStyle}> {/* hererererererererererererere MEMEMEMEMEMEMEMEMEMEMEMEME */}
                 <div className="img-triple">
                     <button>
                         <img src="./aboutme/mosaic.jpg" alt="About Me" />
