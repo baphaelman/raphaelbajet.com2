@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+import PortfolioCard from '/components/PortfolioCard.jsx';
+
 function Home() {
     const [marginTop, setMarginTop] = useState(0);
     const [marginLeft, setMarginLeft] = useState(0);
@@ -141,22 +143,25 @@ function Home() {
         left: '28.5vw',
         bottom: '42.5vh'
     }
-
     const portfolioStyle = {
-        display: 'flex',
+        display: 'grid',
+        gridTemplateRows: 'repeat(100, 1vw',
+        gridTemplateColumns: 'repeat(100, 1vw)',
         width: '100vw',
-        background: 'white',
+        height: '100vh',
+        overflow: 'auto',
     }
 
     const portfolioTitleStyle = {
         width: '100vw',
         display: 'flex',
         justifyContent: 'center',
+        ailgnItems: 'center',
         flexDirection: 'row',
-        background: 'var(--bg)',
+        background: 'var(--lightbg)',
         color: 'white',
-        height: '22vh',
-        position: 'none',
+        height: '25vh',
+        borderBottom: '5px solid var(--lightestblue)',
     }
 
     return (
@@ -265,7 +270,7 @@ function Home() {
                     onClick={() => handleScroll(eventNumbers[0], '')}
                     data-number="2"
                 >
-                    <h2 id="aboutme-button-text">Projects</h2>
+                    <h2 id="aboutme-button-text">Portfolio</h2>
                     <img
                         src="./downArrow.png"
                         alt="Scroll Right"
@@ -291,7 +296,7 @@ function Home() {
             </div>
             <div style={projectsStyle} className="page"> {/* hererererererererererererere PROJECTSPROJECTSPROJECTS */}
                 <div style={portfolioTitleStyle}>
-                    <h2 style={projectsTitleStyle}>Projects</h2>
+                    <h2 style={projectsTitleStyle}>Portfolio</h2>
                     <div style={buttonDivStyle}>
                         <button
                             className="up-button circle-button"
@@ -307,9 +312,15 @@ function Home() {
                         </button>
                     </div>
                 </div>
-                <div id="portfolio-container" style={portfolioStyle}> 
-                    {/*<PortfolioItem />*/}
-                    <b style={{height: '500px', color: 'black'}} >Portfolio</b>
+                <div style={portfolioStyle}> 
+                    <PortfolioCard rStart='5' cStart='5' cEnd='60' rEnd='25' src='suitPicture.jpg' header='On the probability of getting a single edge cycle in a 3x3 blindfolded solve' text='A simplified example that nearly gets us there, and the final complexity step'/>
+                    <PortfolioCard rStart='5' cStart='5' cEnd='60' rEnd='25' src='suitPicture.jpg' header='' text=''/>
+                    <PortfolioCard rStart='5' cStart='65' cEnd='97' rEnd='50' src='dogs/bonny.jpg' header='' text=''/>
+                    <PortfolioCard rStart='30' cStart='5' cEnd='32' rEnd='100' src='dogs/kaya.jpg' header='' text=''/>
+                    <PortfolioCard rStart='30' cStart='37' cEnd='60' rEnd='50' header='' text=''/>
+                    <PortfolioCard rStart='55' cStart='37' cEnd='98' rEnd='75' src='dogs/dogs_and_me.jpg' header='' text=''/>
+                    <PortfolioCard rStart='80' cStart='37' cEnd='73' rEnd='100' src='' header='' text=''/>
+                    <PortfolioCard rStart='80' cStart='78' cEnd='98' rEnd='100' src='' header='' text=''/>
                 </div>
                 
             </div>
