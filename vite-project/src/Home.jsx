@@ -270,7 +270,7 @@ function Home() {
                     onClick={() => handleScroll(eventNumbers[0], '')}
                     data-number="2"
                 >
-                    <h2 id="aboutme-button-text">Portfolio</h2>
+                    <h2 id="aboutme-button-text">Projects</h2>
                     <img
                         src="./downArrow.png"
                         alt="Scroll Right"
