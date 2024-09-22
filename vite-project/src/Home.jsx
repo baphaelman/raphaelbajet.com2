@@ -149,8 +149,7 @@ function Home() {
     const portfolioStyle = {
         display: 'flex',
         flexDirection: 'column',
-        width: '100vw',
-        padding: '2vw',
+        margin: '2vw',
     }
 
     const portfolioTitleStyle = {
@@ -315,7 +314,7 @@ function Home() {
                 </div>
                 <div style={portfolioStyle}>
                     {portfolioText.map((o) => (
-                        <SimplePortfolioCard key={o.id} header={o.header} text={o.text} />
+                        <SimplePortfolioCard key={o.id} header={o.header} description={o.description}/>
                     ))}
                 </div>
                 

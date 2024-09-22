@@ -10,6 +10,16 @@
   --YStart: 0;
 }
 
+.nunito-bold {
+  font-family: "Nunito", sans-serif;
+  font-weight: 800;
+}
+
+* {
+  font-weight: 400;
+  transition: all 0.25s ease;
+}
+
 body {
   margin: 0;
 
@@ -282,3 +292,32 @@ button > .image-text {
 }
 
 /* projects, portfolio */
+.portfolio-box {
+  background: var(--bg);
+  color: var(--white);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border: none;
+  border-radius: 0.5vw;
+}
+
+.portfolio-box:hover {
+  background: var(--lightbg);
+  cursor: pointer;
+}
+
+.portfolio-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.portfolio-header {
+  margin-bottom: 0;
+  margin-left: 1em;
+}
+
+.portfolio-description {
+  margin-top: 0.5em;
+  margin-left: 2.5em;
+}
