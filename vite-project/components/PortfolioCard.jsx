@@ -6,6 +6,7 @@ function PortfolioCard(props) {
         borderRadius: '20px',
         display: 'flex',
         alignItems: 'center',
+        fontSize: '75%',
     }
 
     const imageStyle = {
@@ -43,7 +44,6 @@ function PortfolioCard(props) {
     }   
     
     const textStyle = {
-
         marginTop: '1.5vw',
         width: '85%',
         fontFamily: 'Courier New, Courier, monospace',
