@@ -25,7 +25,7 @@ const portfolioText = [
     },
     {
         id: 3,
-        header: "This Website", 
+        header: "Personal Website", 
         description: "You should visit sometime!",
         href: "https://github.com/baphaelman/raphaelbajet.com2",
     },
