@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
-import PortfolioCard from '/components/PortfolioCard.jsx';
+import SimplePortfolioCard from '/components/SimplePortfolioCard.jsx';
+import portfolioText from '/public/portfolioText.js';
 
 function Home() {
     const [marginTop, setMarginTop] = useState(0);
@@ -123,8 +124,9 @@ function Home() {
     /* the 'left' button in art, not the button that says art */
     const artButtonStyle = {
         position: 'absolute',
-        bottom: '42vh',
-        left: '62vw',
+        bottom: '50vh',
+        left: '66vw',
+        transform: 'translate(-50%, 50%)',
     };
 
     const projectsButtonStyle = {
@@ -140,16 +142,15 @@ function Home() {
 
     const aboutMeButtonStyle = {
         position: 'absolute',
-        left: '28.5vw',
-        bottom: '42.5vh'
+        bottom: '50vh',
+        left: '33vw',
+        transform: 'translate(-50%, 50%)',
     }
     const portfolioStyle = {
-        display: 'grid',
-        gridTemplateRows: 'repeat(100, 1vw',
-        gridTemplateColumns: 'repeat(100, 1vw)',
+        display: 'flex',
+        flexDirection: 'column',
         width: '100vw',
-        height: '100vh',
-        overflow: 'auto',
+        padding: '2vw',
     }
 
     const portfolioTitleStyle = {
@@ -277,7 +278,7 @@ function Home() {
                         id="aboutme-button-arrow"
                     />
                 </button>
-                <div style={buttonDivStyle} className="up-button-div">
+                <div style={{...buttonDivStyle, marginTop: "4vh"}} className="up-button-div">
                     <button
                         className="up-button circle-button"
                         onClick={() =>
@@ -312,15 +313,10 @@ function Home() {
                         </button>
                     </div>
                 </div>
-                <div style={portfolioStyle}> 
-                    <PortfolioCard rStart='5' cStart='5' cEnd='60' rEnd='25' src='suitPicture.jpg' header='On the probability of getting a single edge cycle in a 3x3 blindfolded solve' text='A simplified example that nearly gets us there, and the final complexity step'/>
-                    <PortfolioCard rStart='5' cStart='5' cEnd='60' rEnd='25' src='suitPicture.jpg' header='' text=''/>
-                    <PortfolioCard rStart='5' cStart='65' cEnd='97' rEnd='50' src='dogs/bonny.jpg' header='' text=''/>
-                    <PortfolioCard rStart='30' cStart='5' cEnd='32' rEnd='100' src='dogs/kaya.jpg' header='' text=''/>
-                    <PortfolioCard rStart='30' cStart='37' cEnd='60' rEnd='50' header='' text=''/>
-                    <PortfolioCard rStart='55' cStart='37' cEnd='98' rEnd='75' src='dogs/dogs_and_me.jpg' header='' text=''/>
-                    <PortfolioCard rStart='80' cStart='37' cEnd='73' rEnd='100' src='' header='' text=''/>
-                    <PortfolioCard rStart='80' cStart='78' cEnd='98' rEnd='100' src='' header='' text=''/>
+                <div style={portfolioStyle}>
+                    {portfolioText.map((o) => (
+                        <SimplePortfolioCard key={o.id} header={o.header} text={o.text} />
+                    ))}
                 </div>
                 
             </div>
