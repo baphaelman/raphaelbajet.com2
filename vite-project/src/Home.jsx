@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import SimplePortfolioCard from '/components/SimplePortfolioCard.jsx';
+import SimplePortfolioCard from '../components/SimplePortfolioCard.jsx';
 import portfolioText from '/public/portfolioText.js';
 
 function Home() {
@@ -229,7 +229,7 @@ function Home() {
             <div style={div2Style} id="div2" className="page">
                 <div className="profile-picture-div">
                     <img
-                        src="./suitPicture.jpg"
+                        src="./suitPicture.png"
                         alt="Raphaël Bajet"
                         className="profile-picture"
                     />
@@ -296,7 +296,7 @@ function Home() {
             </div>
             <div style={projectsStyle} className="page"> {/* hererererererererererererere PROJECTSPROJECTSPROJECTS */}
                 <div style={portfolioTitleStyle}>
-                    <h2 style={projectsTitleStyle}>Portfolio</h2>
+                    <h2 style={projectsTitleStyle}>Projects</h2>
                     <div style={buttonDivStyle}>
                         <button
                             className="up-button circle-button"
@@ -314,7 +314,7 @@ function Home() {
                 </div>
                 <div style={portfolioStyle}>
                     {portfolioText.map((o) => (
-                        <SimplePortfolioCard key={o.id} header={o.header} description={o.description}/>
+                        <SimplePortfolioCard key={o.id} header={o.header} description={o.description} href={o.href}/>
                     ))}
                 </div>
                 
@@ -450,15 +450,3 @@ function Home() {
 }
 
 export default Home;
-
-{
-    /*     
-            
-<img
-src="suitPicture.jpg"
-alt="Raphaël Bajet"
-className="profile-picture"
-/>
-
-*/
-}
