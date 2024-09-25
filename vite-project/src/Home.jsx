@@ -147,7 +147,7 @@ function Home() {
 
     const projectsButtonStyle = {
         position: 'absolute',
-        top: '2vh',
+        top: '1.5vh',
         right: '4vw',
     };
 
@@ -166,6 +166,7 @@ function Home() {
         display: 'flex',
         flexDirection: 'column',
         margin: '2vw',
+        marginTop: '22vh',
     }
 
     const portfolioTitleStyle = {
@@ -176,8 +177,9 @@ function Home() {
         flexDirection: 'row',
         background: 'var(--lightbg)',
         color: 'white',
-        height: '25vh',
+        height: '20vh',
         borderBottom: '5px solid var(--lightestblue)',
+        position: 'fixed',
     }
 
     return (
@@ -310,7 +312,7 @@ function Home() {
                     </button>
                 </div>
             </div>
-            <div style={projectsStyle} className="page"> {/* hererererererererererererere PROJECTSPROJECTSPROJECTS */}
+            <div style={projectsStyle} className="page projects"> {/* hererererererererererererere PROJECTSPROJECTSPROJECTS */}
                 <div style={portfolioTitleStyle}>
                     <h2 style={projectsTitleStyle}>Projects</h2>
                     <div style={buttonDivStyle}>

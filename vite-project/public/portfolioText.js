@@ -3,7 +3,7 @@ const portfolioText = [
         id: 0,
         header: "One Cycle", 
         description: "Using combinatorics and coding to answer a question about solving a rubik's cube blindfolded",
-        href: "/one-cycle",
+        href: "https://github.com/baphaelman/one-cycles", //instead of just "/one-cycle"
     },
     {
         id: 1,
@@ -20,7 +20,7 @@ const portfolioText = [
     {
         id: 3,
         header: "Experimenting", 
-        description: "A hodgepodge of small coding projects, most of which to test my answer to probability questions",
+        description: "A hodgepodge of coding files, mostly to test an answer to probability questions",
         href: "https://github.com/baphaelman/experimenting",
     },
     {
@@ -34,6 +34,12 @@ const portfolioText = [
         header: "Terminal Art", 
         description: "Practicing python by printing a bunch of #",
         href: "https://github.com/baphaelman/terminal-art",
+    },
+    {
+        id: 5,
+        header: "Reverse Desmos", 
+        description: "A friend's website I designed that uses Fourier Transforms to draw a picture",
+        href: "https://snhisun.github.io/Fourier_Trace/",
     },
 ];
 

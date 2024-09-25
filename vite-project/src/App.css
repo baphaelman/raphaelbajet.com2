@@ -292,6 +292,10 @@ button > .image-text {
 }
 
 /* projects, portfolio */
+.projects {
+  overflow-y: scroll;
+}
+
 .portfolio-box {
   background: var(--bg);
   color: var(--white);
