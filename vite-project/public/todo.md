@@ -2,6 +2,7 @@
 - [x] include title of files in File, so it's not just the jpg's
 - [x] actual modal after clicking on File in FilePage
 - [ ] flesh out (actually write) One-Cycles, include images in Articles
+- [ ] fix bug with isHovering staying False after closing Modal
 
 # Longer-Term
 - [ ] Compartmentalize Projects, put them in different bins (drop-downs?)

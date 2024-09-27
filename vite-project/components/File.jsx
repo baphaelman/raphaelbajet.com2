@@ -1,8 +1,11 @@
-import { useState }  from 'react';
+import { useState, useEffect, useRef }  from 'react';
 import PdfModal from '/components/PdfModal.jsx';
 
 function File({ image, pdf, title }) {
     const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [isHovering, setIsHovering] = useState(false);
+
+    const overlayRef = useRef(null);
 
     const fileStyle = {
         position: 'relative',
@@ -55,13 +58,30 @@ function File({ image, pdf, title }) {
         setModalIsOpen(false);
     }
 
+    const handleMouseEnter = () => setIsHovering(true);
+    const handleMouseLeave = () => setIsHovering(false);
+
+    useEffect(() => {
+        const overlay = overlayRef.current;
+        if (isHovering) {
+            overlay.classList.add('hovered-file');
+        } else {
+            overlay.classList.remove('hovered-file');
+        }
+    }, [isHovering]);
+
     return (
-        <div style={fileStyle} onClick={openModal} className="file-container">
+        <div
+            style={fileStyle}
+            onClick={openModal}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}  
+        >
             <div style={titleContainerStyle}>
                 <h2>{title}</h2>
             </div>
             <div style={imageContainerStyle}>
-                <div className="file-overlay" style={overlayStyle}></div>
+                <div ref={overlayRef} style={overlayStyle}></div>
                 <img style={imageStyle} src={image}/>
                 <PdfModal isOpen={modalIsOpen} closeModal={closeModal} pdf={pdf} />
             </div>

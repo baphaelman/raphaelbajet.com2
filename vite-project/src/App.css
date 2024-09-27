@@ -340,18 +340,6 @@ button > .image-text {
 }
 
 /* File Styles */
-.file-overlay {
-  background: transparent;
-}
-
-.file-overlay:hover {
+.hovered-file {
   background: var(--lightbghover);
-}
-
-.file-container {
-  transition: all 2s ease;
-}
-
-.file-container:hover {
-  cursor: pointer;
 }
