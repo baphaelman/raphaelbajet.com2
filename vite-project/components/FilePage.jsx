@@ -3,15 +3,13 @@ import FileGrid from "./FileGrid";
 import BackHeader from "/components/BackHeader.jsx";
 
 function FilePage({ file }) {
-    useEffect(() => {
-        // Enable scrolling for this page
+    useEffect(() => { // enable scrolling for this page
         document.body.style.overflow = 'auto';
-
-        // Cleanup function to revert overflow property when component unmounts
         return () => {
             document.body.style.overflow = 'hidden';
         };
     }, []);
+
     const containerStyle = {
         overflow: 'scoll',
         display: 'flex',
@@ -20,11 +18,21 @@ function FilePage({ file }) {
         justifyContent: 'center',
         alignItems: 'center',
     }
+
+    const titleStyle = {
+        fontSize: '2rem',
+        marginBottom: '0.5em',
+    }
+
+    const descriptionStyle = {
+        marginTop: '0',
+        fontSize: '1.1em',
+    }
     return (
         <div style={containerStyle}>
             <BackHeader />
-            <h1>{file.title}</h1>
-            <h2>{file.description}</h2>
+            <h1 style={titleStyle}>{file.title}</h1>
+            <h2 style={descriptionStyle}>{file.description}</h2>
             <FileGrid files={file.pages} />
         </div>
     )

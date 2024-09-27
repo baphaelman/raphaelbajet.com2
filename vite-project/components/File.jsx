@@ -1,10 +1,12 @@
 function File({ file }) {
-    const imageStyle = {
+    const iframeStyle = {
         width: '100%',
-    }
+        height: '400px',
+    };
+
     return (
         <div>
-            <img style={imageStyle} src={file} />
+            <iframe style={iframeStyle} src={file} />
         </div>
     );
 }

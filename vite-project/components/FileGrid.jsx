@@ -4,8 +4,8 @@ function FileGrid({ files }) {
     const gridContainerStyle = {
         display: 'grid',
         width: '80vw',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-        girTemplateRows: 'repeat(auto-fill, minmax(400px, 1fr))',
+        gridTemplateColumns: '1fr 1fr',
+        gridTemplateRows: 'repeat(auto-fill, minmax(400px, 1fr))',
         gap: '1em',
         padding: '1em',
     }
