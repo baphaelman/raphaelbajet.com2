@@ -4,6 +4,7 @@ import PdfModal from '/components/PdfModal.jsx';
 function File({ image, pdf, title }) {
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [isHovering, setIsHovering] = useState(false);
+    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
     const overlayRef = useRef(null);
     const fileRef = useRef(null);
@@ -76,23 +77,27 @@ function File({ image, pdf, title }) {
         }
     }, [isHovering]);
 
-    useEffect(() => { // check if cursor is already hovering over the file on page load
+    useEffect(() => { // find mouse position when file loads
         const handleMouseMove = (e) => {
-            const file = fileRef.current;
-            if (file) {
-                const rect = file.getBoundingClientRect();
-                const x = e.clientX;
-                const y = e.clientY;
-                if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
-                    setIsHovering(true);
-                }
-            }
+            setMousePosition({ x: e.clientX, y: e.clientY });
         };
-        document.addEventListener('mousemove', handleMouseMove);
+
+        document.addEventListener('mousemove', handleMouseMove, { once: true });
         return () => {
             document.removeEventListener('mousemove', handleMouseMove);
         };
     }, []);
+
+    useEffect(() => { // check if cursor is already hovering over the file on page load
+        const file = fileRef.current;
+        if (file) {
+            const rect = file.getBoundingClientRect();
+            const { x, y } = mousePosition;
+            if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+                setIsHovering(true);
+            }
+        }
+    }, [mousePosition]);
 
     return (
         <div

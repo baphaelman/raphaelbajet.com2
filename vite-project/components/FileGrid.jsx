@@ -14,7 +14,7 @@ function FileGrid({ file }) {
     <div style={gridContainerStyle}>
       {images.map((image, index) => {
         return (
-          <File key={index} image={image} pdf={pages[index]} title={fileTitles[index]}/>
+          <File key={index} image={image} pdf={pages[index]} title={fileTitles[index]} />
         )
       })}
     </div>
