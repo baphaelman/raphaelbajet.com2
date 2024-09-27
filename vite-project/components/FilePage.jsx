@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import FileGrid from "./FileGrid";
+import BackHeader from "/components/BackHeader.jsx";
 
 function FilePage({ file }) {
     useEffect(() => {
@@ -21,6 +22,7 @@ function FilePage({ file }) {
     }
     return (
         <div style={containerStyle}>
+            <BackHeader />
             <h1>{file.title}</h1>
             <h2>{file.description}</h2>
             <FileGrid files={file.pages} />

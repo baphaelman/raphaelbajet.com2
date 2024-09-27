@@ -3,7 +3,7 @@ const portfolioText = [
         id: 0,
         header: "One Cycle", 
         description: "Using combinatorics and coding to answer a question about solving a rubik's cube blindfolded",
-        href: "https://github.com/baphaelman/one-cycles", //instead of just "/one-cycle"
+        href: "/one-cycle" // instead of "https://github.com/baphaelman/one-cycles"
     },
     {
         id: 1,
