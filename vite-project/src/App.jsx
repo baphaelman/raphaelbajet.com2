@@ -15,6 +15,9 @@ function App() {
                 {articles.map((article) => (
                     <Route key={article.key} path={article.path} element={<Article article={article} />} />
                 ))}
+                {filePages.map((file) => (
+                    <Route key={file.id} path={file.path} element={<FilePage file={file} />} />
+                ))}
 			</Routes>
 		</Router>
     );
