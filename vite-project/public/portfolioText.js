@@ -38,7 +38,7 @@ const portfolioText = [
     {
         id: 5,
         header: "Reverse Desmos", 
-        description: "A friend's website I designed that uses Fourier Transforms to draw a picture",
+        description: "A friend's website I designed that uses Fourier Transforms to approximate your drawing",
         href: "https://snhisun.github.io/Fourier_Trace/",
     },
 ];

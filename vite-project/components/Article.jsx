@@ -68,6 +68,11 @@ function Article({ article }) {
         right: '7vw',
     };
 
+    const handleCloseTab = (e) => {
+        e.preventDefault();
+        window.close();
+    }
+
     return (
         <div style={articleStyle}>
             <div style={portfolioTitleStyle}>
@@ -77,6 +82,7 @@ function Article({ article }) {
                             className="left-button circle-button"
                             style={projectsButtonStyle}
                             to="/"
+                            onClick={handleCloseTab}
                         >
                             <img
                                 src="./downArrow.png"
