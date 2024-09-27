@@ -14,6 +14,7 @@ function File({ image, pdf, title }) {
         justifyContent: 'center',
         alignItems: 'center',
         height: '300px',
+        // border: 'var(--lightestblue) 5px solid', // uncomment to view borders
     };
     
     const overlayStyle = {
@@ -62,6 +63,10 @@ function File({ image, pdf, title }) {
     const handleMouseLeave = () => setIsHovering(false);
 
     useEffect(() => {
+        setIsHovering(false);
+    }, [modalIsOpen])
+
+    useEffect(() => {
         const overlay = overlayRef.current;
         if (isHovering) {
             overlay.classList.add('hovered-file');
@@ -75,7 +80,8 @@ function File({ image, pdf, title }) {
             style={fileStyle}
             onClick={openModal}
             onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}  
+            onMouseLeave={handleMouseLeave}
+            className="file" 
         >
             <div style={titleContainerStyle}>
                 <h2>{title}</h2>
