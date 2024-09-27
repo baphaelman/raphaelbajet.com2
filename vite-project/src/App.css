@@ -6,6 +6,7 @@
   --lightbg: #1D2D44;
   --darkestblue: #09101E;
   --lightestblue: #748CAB;
+  --lightbghover: rgba(29, 45, 68, 0.4);
 
   --YStart: 0;
 }
@@ -335,5 +336,22 @@ button > .image-text {
 
 .pdf-modal-button:hover {
   background: var(--darkestblue);
+  cursor: pointer;
+}
+
+/* File Styles */
+.file-overlay {
+  background: transparent;
+}
+
+.file-overlay:hover {
+  background: var(--lightbghover);
+}
+
+.file-container {
+  transition: all 2s ease;
+}
+
+.file-container:hover {
   cursor: pointer;
 }

@@ -1,7 +1,7 @@
 import File from "/components/File.jsx";
 
 function FileGrid({ file }) {
-  const { id, path, title, description, images, pages } = file;
+  const { id, path, title, description, fileTitles, images, pages } = file;
     const gridContainerStyle = {
         display: 'grid',
         width: '80vw',
@@ -14,7 +14,7 @@ function FileGrid({ file }) {
     <div style={gridContainerStyle}>
       {images.map((image, index) => {
         return (
-          <File key={index} image={image} pdf={pages[index]} />
+          <File key={index} image={image} pdf={pages[index]} title={fileTitles[index]}/>
         )
       })}
     </div>

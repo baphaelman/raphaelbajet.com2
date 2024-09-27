@@ -1,5 +1,9 @@
 import Modal from 'react-modal';
 
+// Set the app element for react-modal
+Modal.setAppElement('#root');
+
+
 function PdfModal({ isOpen, closeModal, pdf }) {
     const modalStyle = {
         content: {
@@ -56,7 +60,7 @@ function PdfModal({ isOpen, closeModal, pdf }) {
     }
 
     return (
-        <Modal isOpen={isOpen} closeModal={closeModal} style={modalStyle}>
+        <Modal isOpen={isOpen} onRequestClose={closeModal} style={modalStyle}>
             <div style={buttonsStyle}>
                 <button onClick={closeModal} style={buttonStyle} className="pdf-modal-button">Close</button>
                 <a href={pdf} download style={linkStyle}>
