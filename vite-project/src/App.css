@@ -19,6 +19,7 @@
   font-weight: 400;
   transition: all 0.25s ease;
   color: var(--white);
+  box-sizing: border-box;
 }
 
 body {
@@ -325,4 +326,14 @@ button > .image-text {
 .portfolio-description {
   margin-top: 0.5em;
   margin-left: 2.75em;
+}
+
+/* PdfModal Styles */
+.pdf-modal-button {
+  background: var(--lightbg);
+}
+
+.pdf-modal-button:hover {
+  background: var(--darkestblue);
+  cursor: pointer;
 }
