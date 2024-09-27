@@ -18,13 +18,12 @@ function PdfModal({ isOpen, closeModal, pdf }) {
 
             borderLeft: 'none',
             borderRight: 'none',
-            borderBottom: 'var(--lightestblue) 5px solid', // because I couldn't find a way to apply border-bottom to the iframe
         },
     };
 
     const iframeContainerStyle = {
         width: '100%',
-        height: '100%',
+        height: 'calc(100% - 5rem)',
         boxSizing: 'border-box',
     };
 
