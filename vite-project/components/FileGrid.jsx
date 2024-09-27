@@ -1,19 +1,22 @@
 import File from "/components/File.jsx";
 
-function FileGrid({ files }) {
+function FileGrid({ file }) {
+  const { id, path, title, description, images, pages } = file;
     const gridContainerStyle = {
         display: 'grid',
         width: '80vw',
         gridTemplateColumns: '1fr 1fr',
-        gridTemplateRows: '300px',
+        gridTemplateRows: `repeat(${images.length/2}, 300px)`,
         gap: '2em',
         padding: '1em',
     }
   return (
     <div style={gridContainerStyle}>
-      {files.map((file) => (
-        <File key={file.id} file={file} />
-      ))}
+      {images.map((image, index) => {
+        return (
+          <File key={index} image={image} pdf={file[index]} />
+        )
+      })}
     </div>
   );
 }

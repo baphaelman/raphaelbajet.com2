@@ -33,7 +33,7 @@ function FilePage({ file }) {
             <BackHeader />
             <h1 style={titleStyle}>{file.title}</h1>
             <h2 style={descriptionStyle}>{file.description}</h2>
-            <FileGrid files={file.pages} />
+            <FileGrid file={file} />
         </div>
     )
 }

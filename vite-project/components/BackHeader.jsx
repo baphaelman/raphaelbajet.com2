@@ -26,7 +26,6 @@ function BackHeader() {
         alignItems: 'center',
         flex: '1',
         position: 'absolute',
-        zIndex: '100',
     };
 
     const projectsButtonStyle = {
