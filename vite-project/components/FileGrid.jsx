@@ -5,8 +5,8 @@ function FileGrid({ files }) {
         display: 'grid',
         width: '80vw',
         gridTemplateColumns: '1fr 1fr',
-        gridTemplateRows: 'repeat(auto-fill, minmax(400px, 1fr))',
-        gap: '1em',
+        gridTemplateRows: '300px',
+        gap: '2em',
         padding: '1em',
     }
   return (
