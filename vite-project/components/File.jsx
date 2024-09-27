@@ -37,7 +37,7 @@ function File({ image, pdf }) {
         <div style={containerStyle}>
             <img style={imageStyle} src={image} onClick={openModal}/>
             <div style={overlayStyle} onClick={openModal}></div>
-            <PdfModal isOpen={modalIsOpen} closeModal={closeModal} file={pdf} />
+            <PdfModal isOpen={modalIsOpen} closeModal={closeModal} pdf={pdf} />
         </div>
     );
 }
