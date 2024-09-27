@@ -60,22 +60,6 @@ function Home() {
         setLastPageButton(button);
     }
 
-    /* buttons to remember user posiion */
-    useEffect(() => {
-        // Restore scroll position if available
-        const scrollPosition = sessionStorage.getItem('scrollPosition');
-        if (scrollPosition) {
-            window.scrollTo(0, parseInt(scrollPosition, 10));
-            sessionStorage.removeItem('scrollPosition');
-        }
-    }, []);
-
-    const handleLinkClick = () => {
-        // Store the current scroll position
-        sessionStorage.setItem('scrollPosition', window.scrollY);
-        console.log('scroll position stored as: ', window.scrollY);
-    };
-
     const nameStyle = {
         fontSize: '10vw',
         margin: '0',
@@ -332,7 +316,7 @@ function Home() {
                 </div>
                 <div style={portfolioStyle}>
                     {portfolioText.map((o) => (
-                        <SimplePortfolioCard key={o.id} header={o.header} description={o.description} href={o.href} onLinkClick={handleLinkClick}/>
+                        <SimplePortfolioCard key={o.id} header={o.header} description={o.description} href={o.href} />
                     ))}
                 </div>
                 
