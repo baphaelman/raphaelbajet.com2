@@ -39,7 +39,7 @@ function PdfModal({ isOpen, closeModal, pdf }) {
     const buttonsStyle = {
         display: 'flex',
         justifyContent: 'space-between',
-        gap: '10%',
+        gap: '1em',
         padding: '0',
         marginBottom: '1em',
     }
@@ -62,10 +62,10 @@ function PdfModal({ isOpen, closeModal, pdf }) {
     return (
         <Modal isOpen={isOpen} onRequestClose={closeModal} style={modalStyle}>
             <div style={buttonsStyle}>
-                <button onClick={closeModal} style={buttonStyle} className="pdf-modal-button">Close</button>
                 <a href={pdf} download style={linkStyle}>
                     <button style={{...buttonStyle, width: '100%'}} className="pdf-modal-button">Download PDF</button>
                 </a>
+                <button onClick={closeModal} style={buttonStyle} className="pdf-modal-button">Close</button>
             </div>
             <div style={iframeContainerStyle}>
                 <iframe

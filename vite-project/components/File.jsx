@@ -6,6 +6,7 @@ function File({ image, pdf, title }) {
     const [isHovering, setIsHovering] = useState(false);
 
     const overlayRef = useRef(null);
+    const fileRef = useRef(null);
 
     const fileStyle = {
         position: 'relative',
@@ -62,11 +63,11 @@ function File({ image, pdf, title }) {
     const handleMouseEnter = () => setIsHovering(true);
     const handleMouseLeave = () => setIsHovering(false);
 
-    useEffect(() => {
+    useEffect(() => { // fixes bug where overlay would remain hovered after closing modal
         setIsHovering(false);
     }, [modalIsOpen])
 
-    useEffect(() => {
+    useEffect(() => { // changes overlay color when hovering
         const overlay = overlayRef.current;
         if (isHovering) {
             overlay.classList.add('hovered-file');
@@ -75,8 +76,27 @@ function File({ image, pdf, title }) {
         }
     }, [isHovering]);
 
+    useEffect(() => { // check if cursor is already hovering over the file on page load
+        const handleMouseMove = (e) => {
+            const file = fileRef.current;
+            if (file) {
+                const rect = file.getBoundingClientRect();
+                const x = e.clientX;
+                const y = e.clientY;
+                if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+                    setIsHovering(true);
+                }
+            }
+        };
+        document.addEventListener('mousemove', handleMouseMove);
+        return () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+        };
+    }, []);
+
     return (
         <div
+            ref={fileRef}
             style={fileStyle}
             onClick={openModal}
             onMouseEnter={handleMouseEnter}
