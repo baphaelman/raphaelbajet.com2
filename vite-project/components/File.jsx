@@ -8,7 +8,7 @@ function File({ image, pdf }) {
         position: 'relative',
         width: '100%',
         height: '300px',
-        borderRadius: '0.5em',
+        borderRadius: '1em',
         border: 'var(--lightestblue) 5px solid',
         cursor: 'pointer',
     };
@@ -16,7 +16,7 @@ function File({ image, pdf }) {
     const imageStyle = {
         width: '100%',
         height: '100%',
-        borderRadius: '0.5em',
+        borderRadius: '0.7em',
         cursor: 'pointer',
     };
 
