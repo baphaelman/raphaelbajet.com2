@@ -3,6 +3,7 @@
 - [x] actual modal after clicking on File in FilePage
 - [ ] flesh out (actually write) One-Cycles, include images in Articles
 - [x] fix bug with isHovering staying False after closing Modal
+- [ ] import crossNumbers
 
 # Longer-Term
 - [ ] Compartmentalize Projects, put them in different bins (drop-downs?)
