@@ -22,24 +22,28 @@ const portfolioText = [
         header: "Experimenting", 
         description: "A hodgepodge of coding files, mostly to test an answer to probability questions",
         href: "https://github.com/baphaelman/experimenting",
+        target:'_blank',
     },
     {
         id: 3,
         header: "Personal Website", 
         description: "You should visit sometime!",
         href: "https://github.com/baphaelman/raphaelbajet.com2",
+        target:'_blank',
     },
     {
         id: 4,
         header: "Terminal Art", 
         description: "Practicing python by printing a bunch of #",
         href: "https://github.com/baphaelman/terminal-art",
+        target:'_blank',
     },
     {
         id: 5,
         header: "Reverse Desmos", 
         description: "A friend's website I designed that uses Fourier Transforms to approximate your drawing",
         href: "https://snhisun.github.io/Fourier_Trace/",
+        target:'_blank',
     },
 ];
 

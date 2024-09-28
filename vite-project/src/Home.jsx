@@ -4,40 +4,53 @@ import SimplePortfolioCard from '../components/SimplePortfolioCard.jsx';
 import portfolioText from '/public/portfolioText.js';
 
 function Home() {
-    const [marginTop, setMarginTop] = useState(0);
-    const [marginLeft, setMarginLeft] = useState(0);
-    const [textMarginLeft, setTextMarginLeft] = useState(0);
+    // looks bad but needed for projects to open in the same tab
+    const [marginTop, setMarginTop] = useState(() => {
+        const saved = localStorage.getItem('marginTop');
+        return saved !== null ? parseInt(saved, 10) : 0;
+    });
+    const [marginLeft, setMarginLeft] = useState(() => {
+        const saved = localStorage.getItem('marginLeft');
+        return saved !== null ? parseInt(saved, 10) : 0;
+    });
+    const [textMarginLeft, setTextMarginLeft] = useState(() => {
+        const saved = localStorage.getItem('textMarginLeft');
+        return saved !== null ? parseInt(saved, 10) : 0;
+    });
     const firstTextMarginLeft = textMarginLeft * (3 / 4);
     const secondTextMarginLeft = -1 * textMarginLeft;
     const thirdTextMarginLeft = textMarginLeft;
 
+    // save where you are on the page
+    useEffect(() => {
+        console.log('Margins updated:', marginTop, marginLeft, textMarginLeft);
+        localStorage.setItem('marginTop', marginTop);
+        localStorage.setItem('marginLeft', marginLeft);
+        localStorage.setItem('textMarginLeft', textMarginLeft);
+    }, [marginTop, marginLeft, textMarginLeft]);
+
+
     function handleScroll(x, y) {
         if (x === 'down') {
-            const newMarginTop = marginTop - 100;
-            setMarginTop(newMarginTop);
+            setMarginTop((prev) => prev - 100);
         } else if (x === 'up') {
-            const newMarginTop = marginTop + 100;
-            setMarginTop(newMarginTop);
+            setMarginTop((prev) => prev + 100);
         } else if (x === 'left') {
-            const newMarginRight = marginLeft + 100;
-            setMarginLeft(newMarginRight);
+            setMarginLeft((prev) => prev + 100);
         } else if (x === 'right') {
-            const newMarginRight = marginLeft - 100;
-            setMarginLeft(newMarginRight);
+            setMarginLeft((prev) => prev - 100);
         }
 
         if (y === 'down') {
-            const newTextMarginLeft = textMarginLeft + 80;
-            setTextMarginLeft(newTextMarginLeft);
+            setTextMarginLeft((prev) => prev + 80);
         } else if (y === 'up') {
-            const newTextMarginLeft = textMarginLeft - 80;
-            setTextMarginLeft(newTextMarginLeft);
+            setTextMarginLeft((prev) => prev - 80);
         }
     }
 
     const pageStyle = {
-        marginTop: marginTop + 'vh',
-        marginLeft: marginLeft + 'vw',
+        marginTop: `${marginTop}vh`,
+        marginLeft: `${marginLeft}vw`,
         transition: 'all 1.5s ease',
     };
 
@@ -316,7 +329,7 @@ function Home() {
                 </div>
                 <div style={portfolioStyle}>
                     {portfolioText.map((o) => (
-                        <SimplePortfolioCard key={o.id} header={o.header} description={o.description} href={o.href} />
+                        <SimplePortfolioCard key={o.id} header={o.header} description={o.description} href={o.href} target={o.target}/>
                     ))}
                 </div>
                 

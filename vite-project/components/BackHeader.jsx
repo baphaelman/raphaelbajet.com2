@@ -46,7 +46,6 @@ function BackHeader() {
                     className="left-button circle-button"
                     style={projectsButtonStyle}
                     to="/"
-                    onClick={handleCloseTab}
                 >
                     <img
                         src="./downArrow.png"
