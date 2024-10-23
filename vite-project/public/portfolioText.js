@@ -45,6 +45,13 @@ const portfolioText = [
         href: "https://snhisun.github.io/Fourier_Trace/",
         target:'_blank',
     },
+    {
+        id: 6,
+        header: "ChipotleBot", 
+        description: "A chess computer inspired heavily by Sebastian Lague I intend to win a bet with",
+        href: "https://github.com/baphaelman/chessbot",
+        target:'_blank',
+    },
 ];
 
 export default portfolioText;

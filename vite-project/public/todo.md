@@ -4,6 +4,8 @@
 - [x] fix bug with isHovering staying False after closing Modal
 - [x] import crossNumbers
 - [ ] flesh out (actually write) One-Cycles, include images in Articles
+- [ ] componentize scroll buttons
+- [ ] add dropshadow to PdfModal
 
 # Longer-Term
 - [ ] Compartmentalize Projects, put them in different bins (drop-downs?)
