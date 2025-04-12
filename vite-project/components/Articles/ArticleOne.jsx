@@ -90,6 +90,19 @@ function ArticleOne() {
                         <p>The next edge is similar—we have k-1 choices, though one of them, the edge that belongs in the first position, cannot be chosen (otherwise our cycle would end with these first two edges). So there are (k-1) * (k-2) choices for the first two positions. We can keep going until the end, where there will be 2! choices for the third-to-last, 1! for the second-to-last, and 0!=1 for the last. Therefore in total, there are C(12, k) * (k-1)! ways to get a cycle of length k.</p>
                         <p>Since all edges not in the cycle must be solved, there is 1 possibility for their positions, and they can be ignored in counting the total (or, if you’d rather, you can imagine multiplying each result by 1). So the table of cycles of length k for the naive problem is:</p>
                     </div>
+                    <img style={imgStyle} src="/singleCycles/naive_table.png" alt="Naive Table" />
+                    <div>
+                        <h4 className="nunito-bold" style={h3Style}>Naive Answer</h4>
+                        <p>This leads us to the answer to the naive problem. We simply sum up these expressions as k varies from 1 to 12, representing the cycles of all possible lengths. Since the values for k = 0 and k = 1 are 1 and 0 respectively, we get the following as the total number of appropriate cycles ignoring edge orientation:</p>
+                    </div>
+                    <img style={imgStyle} src="/singleCycles/naive_solution.png" alt="Naive Answer" />
+                    <div>
+                        <p>Computing this result and dividing by 12!, which represents the number of total edge permutations, gives us the answer to the naive problem of ~24.94%.</p>
+                        <h3 className="nunito-bold" style={h3Style}>Complex Problem</h3>
+                        <p>We are now ready to tackle the entire problem. Thankfully, this is basically identical to the naive problem, though we need to also consider edge orientation at every step. Since we will account for orientation for the edges in the cycle, this means all edges not in the cycle will have to be in their places (as in the naive case) and oriented properly. Because an edge has two orientations, I will denote “correct orientation” as a number being positive, and “incorrect orientation” as a number being negative, and I will refer to swapping the sign of one of these numbers as “flipping the edge”. </p>
+                        <p>I have to mention one more thing—in the same way you must swap an edge with another edge, you must flip the orientation of two edges at once. This means the number of correctly- and incorrectly- oriented edges must always both be even, as a solved cube has 12 correctly- and 0 incorrectly-oriented edges, and any swap that changes the totals must preserve both parities. The diagram below should answer some questions about what is and isn’t allowed:</p>
+                        {/* INCLUDE LINK TO THING ABOVE */}
+                    </div>
                     <p>This page is a WIP! I'll finish uploading everything soon.</p>
                 </div>
             </div>
