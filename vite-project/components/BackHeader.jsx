@@ -9,14 +9,13 @@ function BackHeader() {
         flexDirection: 'row',
         background: 'var(--lightbg)',
         color: 'white',
-        height: '21.5vh',
+        padding: '10px 40px',
         borderBottom: '5px solid var(--lightestblue)',
+        gap: '20px',
     }
 
     const projectsTitleStyle = {
         fontSize: '4vw',
-        marginLeft: "15vw",
-        marginBottom: "0",
     }
 
     const buttonDivStyle = {
@@ -24,23 +23,20 @@ function BackHeader() {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        flex: '1',
-        position: 'absolute',
     };
 
+    {/*}
     const projectsButtonStyle = {
         position: 'absolute',
         top: '2vh',
         right: '7vw',
     };
-
-    const handleCloseTab = (e) => {
-        e.preventDefault();
-        window.close();
+    */}
+    const projectsButtonStyle = {
     }
+
     return (
         <div style={portfolioTitleStyle}>
-            <h2 style={projectsTitleStyle}>Return Home</h2>
             <div style={buttonDivStyle}>
                 <Link
                     className="left-button circle-button"
@@ -55,6 +51,7 @@ function BackHeader() {
                     />
                 </Link>
             </div>
+            <h2 style={projectsTitleStyle}>Return Home</h2>
         </div>
     )
 }
