@@ -65,6 +65,7 @@ function ArticleOne() {
         <div style={articleStyle}>
             <BackHeader />
             <div style={contentStyle}>
+            <p>Click <a href="https://github.com/baphaelman/one-cycles">here</a> if you’d like to play with or see the code that calculated and verified this result</p>
                 <div style={headerStyle}>
                     <h1 style={titleStyle} className="nunito-bold">Single Cycles</h1>
                     <h2 style={descriptionStyle}>A Story of Math, Coding, and Solving Rubik's Cubes Blindfolded</h2>
