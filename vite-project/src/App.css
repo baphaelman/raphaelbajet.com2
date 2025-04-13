@@ -346,3 +346,8 @@ button > .image-text {
 .hovered-file {
   background: var(--lightbghover);
 }
+
+/* Articles */
+.external-link {
+  color: rgb(186, 137, 255);
+}

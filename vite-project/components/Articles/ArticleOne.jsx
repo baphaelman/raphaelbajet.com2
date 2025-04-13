@@ -1,5 +1,6 @@
 import React from 'react';
 import BackHeader from '/components/BackHeader.jsx';
+import ExternalLink from '/components/ExternalLink.jsx';
 
 function ArticleOne() {
     const articleStyle = {
@@ -62,14 +63,15 @@ function ArticleOne() {
     }
 
     const linkStyle = {
-        color: 'rgb(186, 137, 255)'
+        color: 'rgb(186, 137, 255)',
     }
 
     return (
         <div style={articleStyle}>
             <BackHeader />
             <div style={contentStyle}>
-            <p>Click <a style={linkStyle} href="https://github.com/baphaelman/one-cycles">here</a> if you’d like to see or play with the code that calculated and verified this result</p>
+            <p> Click <ExternalLink href="https://github.com/baphaelman/one-cycles" children="here"/> if you’d like to see or play with the code that calculated and verified this result
+            </p>
                 <div style={headerStyle}>
                     <h1 style={titleStyle} className="nunito-bold">Single Cycles</h1>
                     <h2 style={descriptionStyle}>A Story of Math, Coding, and Solving Rubik's Cubes Blindfolded</h2>
@@ -81,7 +83,8 @@ function ArticleOne() {
                         <p>A rubik’s cube is made up of 12 edges, 8 corners, and 6 centers, though this article will only look at edges. In this article, ‘edge position’ will be one of the 12 places an edge can be on the cube. An edge’s solved position is the edge position it occupies in a solved cube. An edge will also ‘belong’ in its solved position.</p>
                     </div>
                     <img style={imgStyle} src="/singleCycles/cube_pieces_diagram.png" alt="Cube Peices Diagram" />
-                    <p>Each edge can be moved to any edge position and (for the purposes of this article) any two edges can be swapped at will. If you were crazy enough to try to solve a rubik’s cube blindfolded, this introduces a simple beginner-level strategy, called <a style={linkStyle} href="https://www.speedcubereview.com/blind-solving-algorithms.html">Old Pochman</a>: choose an edge and solve it by swapping it with the edge in its solved position.  Now solve that edge by swapping it with the edge in its solved position, on and on until all the edges are solved. If we denote the 12 edges by the numbers (1), (2), …, (12), we can imagine simplifying these swaps to a cycle, as below:</p>
+                    <p>Each edge can be moved to any edge position and (for the purposes of this article) any two edges can be swapped at will. If you were crazy enough to try to solve a rubik’s cube blindfolded, this introduces a simple beginner-level strategy, called <ExternalLink href="https://www.speedcubereview.com/blind-solving-algorithms.html" children="Old Pochman"/>
+                        : choose an edge and solve it by swapping it with the edge in its solved position.  Now solve that edge by swapping it with the edge in its solved position, on and on until all the edges are solved. If we denote the 12 edges by the numbers (1), (2), …, (12), we can imagine simplifying these swaps to a cycle, as below:</p>
                     <img style={imgStyle} src="/singleCycles/simple_chain.png" alt="Simple Chain" />
                     <div>
                         <p>However, a problem arises if the cycle doesn’t involve every edge. In the diagram above, say the arrow from 8 points back to 1 instead. Then edges 9-12 may not be solved! So we need to start a new cycle to solve the remaining pieces—and if that cycle isn’t enough again, we may need to start a third, and so on. The question this article will answer is: what’s the probability that, given a scrambled rubik’s cube, there will only be a single cycle required to solve the edges?</p>
@@ -113,14 +116,14 @@ function ArticleOne() {
                         <p>Computing this result and dividing by 12!, which represents the number of total edge permutations, gives us the answer to the naive problem of ~24.94%.</p>
                         <h3 className="nunito-bold" style={h3Style}>Complex Problem</h3>
                         <p>We are now ready to tackle the entire problem. Thankfully, this is basically identical to the naive problem, though we need to also consider edge orientation at every step. Since we will account for orientation for the edges in the cycle, this means all edges not in the cycle will have to be in their places (as in the naive case) and oriented properly. Because an edge has two orientations, I will denote “correct orientation” as a number being positive, and “incorrect orientation” as a number being negative, and I will refer to swapping the sign of one of these numbers as “flipping the edge”. </p>
-                        <p>I have to mention one more thing—in the same way you must swap an edge with another edge, <a style={linkStyle} href="https://puzzling.stackexchange.com/questions/521/why-cant-i-have-only-one-edge-piece-flipped-on-a-3x3-rubiks-cube">you must flip the orientation of two edges at once</a>. This means the number of correctly- and incorrectly- oriented edges must always both be even, as a solved cube has 12 correctly- and 0 incorrectly-oriented edges, and any swap that changes the totals must preserve both parities. The diagram below should answer some questions about what is and isn’t allowed:</p>
+                        <p>I have to mention one more thing—in the same way you must swap an edge with another edge, <ExternalLink href="https://puzzling.stackexchange.com/questions/521/why-cant-i-have-only-one-edge-piece-flipped-on-a-3x3-rubiks-cube" children="you must flip an even number of edges at once"/> . This means the number of correctly- and incorrectly- oriented edges must always both be even, as a solved cube has 12 correctly- and 0 incorrectly-oriented edges, and any swap that changes the totals must preserve both parities. The diagram below should answer some questions about what is and isn’t allowed:</p>
                     </div>
                     <img style={imgStyle} src="/singleCycles/illustrative_examples.png" alt="Orientation Diagram" />
                     <div>
                         <h4 className="nunito-bold" style={h4Style}>Reasoning Through the Complex Problem</h4>
                         <p>The calculations are very similar, though we now of course have to account for orientation. We know how to find the naive number of cycles of length k, and for a given cycle we can flip any even number of edges in the cycle. As it turns out, for a given cycle of length k, there are 2^(k-1) possible different ways of legally flipping the edges.</p>
                         <p>One way to see this is to set aside one edge, then go through the others. For every edge you flip, also flip the edge put aside, so that you always flip 2 edges at the same time to keep everything legal. Since there are k-1 other edges, and each of them presents two possibilities (to flip,, or not to flip), and the orientation of the edge put aside is uniquely determined by the orientations of the other edges, there must be 2^(k-1) legal ways to flip k edges.</p>
-                        <p>Another fancier way to see this is to consider all subsets (edges to be flipped) of a set of k elements (edges in the cycle). In total, there are 2^k such subsets, since every edge presents two possibilities (to flip,, or not to flip), and it is known that for any set <a style={linkStyle} href="https://math.stackexchange.com/questions/483457/the-number-of-odd-size-subsets-is-equal-to-the-number-of-even-size-subsets">the number of even subsets is equal to the number of odd subsets</a>. We care about even subsets, since at all times the number of flipped edges must be even, so we take half the total, or 2^(k-1).</p>
+                        <p>Another fancier way to see this is to consider all subsets (edges to be flipped) of a set of k elements (edges in the cycle). In total, there are 2^k such subsets, since every edge presents two possibilities (to flip,, or not to flip), and it is known that for any set <ExternalLink href="https://math.stackexchange.com/questions/483457/the-number-of-odd-size-subsets-is-equal-to-the-number-of-even-size-subsets" children="the number of even subsets is equal to the number of odd subsets"/>. We care about even subsets, since at all times the number of flipped edges must be even, so we take half the total, or 2^(k-1).</p>
                         <p>Either way, this very cleanly extends what we found in the naive version. We simply need to multiply the numbers we found in the naive example by 2^(k-1) for k &gt; 1. I’ve again written out the number of possible cycles of length k:</p>
                     </div>
                     <img style={imgStyle} src="/singleCycles/complex_table.png" alt="Complex Table" />
