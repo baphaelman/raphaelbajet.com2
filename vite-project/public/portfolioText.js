@@ -1,4 +1,3 @@
-Portfoliotext · JS
 const portfolioText = [
     {
         id: 0,
