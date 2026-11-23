@@ -4,10 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "predev": "node scripts/slop-stats.mjs",
+    "predev": "node scripts/slop-stats.mjs && node scripts/slop-play.mjs",
     "dev": "vite",
     "slop-stats": "node scripts/slop-stats.mjs",
-    "edit": "node scripts/slop-stats.mjs && vite --mode edit --open /#slop-zone",
+    "slop-play": "node scripts/slop-play.mjs",
+    "edit": "node scripts/slop-stats.mjs && node scripts/slop-play.mjs && vite --mode edit --open /#slop-zone",
+    "prebuild": "node scripts/slop-play.mjs",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
