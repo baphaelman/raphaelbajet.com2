@@ -1,13 +1,20 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import ExternalLink from '/components/ExternalLink.jsx';
-import SlopEditor from '/components/SlopEditor.jsx';
 import Words from '/components/SlopWords.jsx';
-import { plain, readable, share, unslop, allTexts, percent } from '/components/slopText.js';
+import Slop, { textAt, readable, keysOf, useMeter } from '/components/slop.js';
 import slopStats from '/src/slopStats.json';
 
-// `npm run edit` (vite --mode edit): the Edit text panel, how much of the text is mine, and the parts still to write
+// `npm run edit` (vite --mode edit): the slop editor, how much of the text is mine, and the parts still to write
 const EDITING = import.meta.env.MODE === 'edit';
+
+// Each project, game and article's words are in src/slopText.json under its id (a game or article's under its
+// section's, then its own), and the rest (its color, addresses, pictures) in src/slopProjects.json. Its labels are
+// label1, label2…; its links' labels link1, link2… and its pull requests' titles pr1, pr2…, in the order of `links`
+// and `prs`; each part of its story is paragraphs p1, p2…
+const LABEL = /^label\d+$/;
+const PARAGRAPH = /^p\d+$/;
+const labelPaths = (base) => keysOf(base, LABEL).map((key) => `${base}.${key}`);
 
 // the clip's controls, drawn in currentColor
 const CLIP_ICONS = {
@@ -32,7 +39,7 @@ const CLIP_ICONS = {
 // off, or come back on after the viewer pauses it.
 // A video's own sound skips when it starts over, so a clip with an `audio` file exactly one loop long plays that
 // through Web Audio instead, which loops without a gap, and the picture keeps time with it
-function Clip({ entry }) {
+function Clip({ entry, base }) {
     const ref = useRef(null);
     const fillRef = useRef(null);
     const held = useRef(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -151,7 +158,7 @@ function Clip({ entry }) {
                 onPlay={() => setPlaying(true)}
                 onPause={() => setPlaying(false)}
                 onClick={togglePlay}
-                aria-label={readable(entry.imageAlt)}
+                aria-label={Slop.words(`${base}.imageAlt`)}
             />
             <div className="slop-clip-controls">
                 <button className="slop-clip-button" onClick={togglePlay} aria-label={playing ? 'Pause' : 'Play'}>
@@ -173,11 +180,11 @@ function Clip({ entry }) {
 }
 
 // A screenshot in the viewer's color scheme: dark unless their system asks for light
-function Shot({ entry, className }) {
+function Shot({ entry, base, className }) {
     return (
         <picture>
             {entry.imageLight && <source srcSet={entry.imageLight} media="(prefers-color-scheme: light)" />}
-            <img className={className} src={entry.image} alt={readable(entry.imageAlt)} loading="lazy" />
+            <img className={className} src={entry.image} alt={Slop.words(`${base}.imageAlt`)} loading="lazy" />
         </picture>
     );
 }
@@ -185,16 +192,16 @@ function Shot({ entry, className }) {
 function Visual({ project }) {
     switch (project.visual) {
         case 'image':
-            return <Shot entry={project} className="slop-shot" />;
+            return <Shot entry={project} base={project.id} className="slop-shot" />;
         case 'video':
-            return <Clip entry={project} />;
+            return <Clip entry={project} base={project.id} />;
         case 'prs':
             return (
                 <ul className="slop-prs">
-                    {project.prs.map((pr) => (
+                    {project.prs.map((pr, i) => (
                         <li key={pr.href}>
                             <span className="slop-pr-state">Open</span>
-                            <ExternalLink href={pr.href}><Words value={pr.title} /></ExternalLink>
+                            <ExternalLink href={pr.href}><Words path={`${project.id}.pr${i + 1}`} /></ExternalLink>
                         </li>
                     ))}
                 </ul>
@@ -250,6 +257,13 @@ const SKETCHES = {
             <circle cx="25" cy="35" r="3" className="slop-thumb-ink" />
         </>
     ),
+    // a pie of who wrote what
+    pie: (
+        <>
+            <circle cx="30" cy="30" r="20" className="slop-thumb-faint" />
+            <path d="M30 30 V10 A20 20 0 1 1 13.8 41.8 Z" className="slop-thumb-fill" />
+        </>
+    ),
     pr: (
         <>
             <circle cx="18" cy="16" r="4" />
@@ -264,30 +278,36 @@ function Thumb({ project }) {
     const sketch = SKETCHES[project.thumb];
     return (
         <span className="slop-thumb" aria-hidden="true">
-            {sketch ? <svg viewBox="0 0 60 60">{sketch}</svg> : <span className="slop-thumb-letter">{readable(project.title).charAt(0)}</span>}
+            {sketch ? <svg viewBox="0 0 60 60">{sketch}</svg> : <span className="slop-thumb-letter">{readable(`${project.id}.title`).charAt(0)}</span>}
         </span>
     );
 }
 
-function Labels({ labels, picked }) {
-    if (!labels?.length) return null;
+function Labels({ base, picked }) {
+    const labels = labelPaths(base);
+    if (!labels.length) return null;
     return (
         <ul className="slop-labels" aria-label="Labels">
-            {labels.map((label, i) => (
-                <li key={i} className={picked?.has(labelKey(label)) ? 'slop-label-on' : undefined}><Words value={label} /></li>
+            {labels.map((label) => (
+                <li key={label} className={picked?.has(labelKey(label)) ? 'slop-label-on' : undefined}><Words path={label} /></li>
             ))}
         </ul>
     );
 }
 
-// a label by its words, case aside, so "Math" on one card and "math" on another are one label
+// a label (by its path) by its words, case aside, so "Math" on one card and "math" on another are one label
 const labelKey = (label) => readable(label).trim().toLowerCase();
+
+// where an entry's words are: a project's under its id, a game or article's under its section's, then its own
+const entries = (projects) => projects.flatMap((project) => (project.items
+    ? project.items.map((item) => ({ entry: item, base: `${project.id}.${item.id}` }))
+    : [{ entry: project, base: project.id }]));
 
 // every label in the zone, in the order they first appear, with how many projects, games and articles carry it
 function allLabels(projects) {
     const found = new Map();
-    projects.flatMap((project) => project.items ?? [project]).forEach((entry) => {
-        const own = new Map((entry.labels ?? []).map((label) => [labelKey(label), readable(label).trim()]));
+    entries(projects).forEach(({ base }) => {
+        const own = new Map(labelPaths(base).map((label) => [labelKey(label), readable(label).trim()]));
         own.forEach((name, key) => {
             if (!key) return;
             if (found.has(key)) found.get(key).count++;
@@ -297,23 +317,28 @@ function allLabels(projects) {
     return [...found.values()];
 }
 
-// whether a project, game or article carries a picked label (a section of games or articles: any of them)
-const carries = (entry, picked) => (entry.labels ?? []).some((label) => picked.has(labelKey(label)))
-    || (entry.items ?? []).some((item) => carries(item, picked));
+// whether a project, game or article (by where its words are) carries a picked label
+const carriesAt = (base, picked) => labelPaths(base).some((label) => picked.has(labelKey(label)));
+// the same for a project, or a section of games or articles: any of them
+const carries = (project, picked) => entries([project]).some(({ base }) => carriesAt(base, picked));
 
 // "What is it?", "How did it do it?" (the agents' part) and "What did I do?" (mine). A part with nothing in it
-// is left out of the site, and marked as still to write while running `npm run edit`
-function Story({ entry, headings }) {
+// is left out of the site. While running `npm run edit`, an empty paragraph shows as still to write, to fill in
+// from the editor
+function Story({ base }) {
     return ['what', 'how', 'role'].map((part) => {
-        const written = entry[part].filter((paragraph) => plain(paragraph).trim());
-        if (!written.length && !EDITING) return null;
+        const paragraphs = keysOf(`${base}.${part}`, PARAGRAPH).map((key) => `${base}.${part}.${key}`);
+        const written = (path) => Slop.plain(Slop.get(path)).trim();
+        const shown = EDITING ? paragraphs : paragraphs.filter(written);
+        if (!shown.length) return null;
         // a heading is an agent's until you write anything in its section: then it's yours, in that card alone
-        const heading = share(entry[part]).fraction > 0 ? unslop(headings[part]) : headings[part];
+        const yours = Slop.share(paragraphs.map((path) => Slop.get(path))).fraction > 0;
         return (
             <section className="slop-story" key={part}>
-                <h4><Words value={heading} /></h4>
-                {written.map((paragraph, i) => <p key={i}><Words value={paragraph} links /></p>)}
-                {!written.length && <p className="slop-story-empty">Not written yet</p>}
+                <h4><Words path={`headings.${part}`} approved={yours} /></h4>
+                {shown.map((path) => (
+                    <p key={path} className={written(path) ? undefined : 'slop-story-empty'}><Words path={path} links /></p>
+                ))}
             </section>
         );
     });
@@ -363,9 +388,9 @@ const ICONS = {
 };
 
 // A link out of a card: an icon where it has one (its label is then read aloud and shown on hover), else its label
-function CardLink({ link }) {
+function CardLink({ link, path }) {
     if (link.icon) {
-        const label = readable(link.label);
+        const label = Slop.words(path);
         return (
             <a href={link.href} target="_blank" rel="noopener noreferrer" className="slop-icon-link" aria-label={label} title={label}>
                 {ICONS[link.icon]}
@@ -373,13 +398,22 @@ function CardLink({ link }) {
         );
     }
     return link.internal ? (
-        <Link to={link.href} className="external-link"><Words value={link.label} /></Link>
+        <Link to={link.href} className="external-link"><Words path={path} /></Link>
     ) : (
-        <ExternalLink href={link.href}><Words value={link.label} /> ↗</ExternalLink>
+        <ExternalLink href={link.href}><Words path={path} /> ↗</ExternalLink>
     );
 }
 
-function ProjectCard({ project, headings, lit, picked }) {
+function CardLinks({ links, base }) {
+    return (
+        <div className="slop-card-links">
+            {links.map((link, i) => <CardLink key={link.href} link={link} path={`${base}.link${i + 1}`} />)}
+        </div>
+    );
+}
+
+function ProjectCard({ project, lit, picked }) {
+    const base = project.id;
     return (
         <article
             className={`slop-card${lit ? ' slop-card-lit' : ''}${picked.size && carries(project, picked) ? ' slop-picked' : ''}`}
@@ -388,25 +422,21 @@ function ProjectCard({ project, headings, lit, picked }) {
         >
             <header className="slop-card-head">
                 <div>
-                    <h3><span className="slop-card-tab" aria-hidden="true" /><Words value={project.title} /></h3>
-                    <p className="slop-card-sub"><Words value={project.when} /> · <Words value={project.status} /></p>
-                    <Labels labels={project.labels} picked={picked} />
+                    <h3><span className="slop-card-tab" aria-hidden="true" /><Words path={`${base}.title`} /></h3>
+                    <p className="slop-card-sub"><Words path={`${base}.when`} /> · <Words path={`${base}.status`} /></p>
+                    <Labels base={base} picked={picked} />
                 </div>
-                {project.links.length > 0 && (
-                    <div className="slop-card-links">
-                        {project.links.map((link) => <CardLink key={link.href} link={link} />)}
-                    </div>
-                )}
+                {project.links.length > 0 && <CardLinks links={project.links} base={base} />}
             </header>
             <div className="slop-card-body">
                 <div className="slop-card-text">
-                    <p className="slop-card-lede"><Words value={project.tagline} links /></p>
-                    <Story entry={project} headings={headings} />
+                    <p className="slop-card-lede"><Words path={`${base}.tagline`} links /></p>
+                    <Story base={base} />
                     <Stats id={project.id} />
                 </div>
                 <figure className={`slop-card-visual slop-visual-${project.visual}`}>
                     <Visual project={project} />
-                    {plain(project.caption ?? '') && <figcaption><Words value={project.caption} links /></figcaption>}
+                    {Slop.plain(textAt(`${base}.caption`) ?? '') && <figcaption><Words path={`${base}.caption`} links /></figcaption>}
                 </figure>
             </div>
         </article>
@@ -415,45 +445,63 @@ function ProjectCard({ project, headings, lit, picked }) {
 
 // A game or an article, in its section's grid: a preview, its name and its short description, which open on a click
 // into the same story as a project's, and the button to the page itself
-function EntryCard({ item, color, headings, lit, picked }) {
+function EntryCard({ item, base, color, lit, picked }) {
     const [open, setOpen] = useState(false);
+    const openRef = useRef(open);
+    openRef.current = open;
     const more = `slop-${item.id}-more`;
     const opens = { href: item.href, target: '_blank', rel: 'noopener noreferrer' };
+
+    // what's inside is only on the page while the card's open, so the editor opens it to show a text in there
+    useEffect(() => {
+        const inside = [
+            ...['what', 'how', 'role'].flatMap((part) => keysOf(`${base}.${part}`, PARAGRAPH).map((key) => `${base}.${part}.${key}`)),
+            ...item.links.map((_, i) => `${base}.link${i + 1}`),
+        ];
+        inside.forEach((path) => Slop.reveal(path, () => {
+            const was = openRef.current;
+            setOpen(true);
+            return () => setOpen(was);
+        }));
+    }, [base, item]);
+
     return (
         <article
-            className={`slop-card slop-entry${open ? ' slop-entry-open' : ''}${lit ? ' slop-card-lit' : ''}${picked.size && carries(item, picked) ? ' slop-picked' : ''}`}
+            className={`slop-card slop-entry${open ? ' slop-entry-open' : ''}${lit ? ' slop-card-lit' : ''}${picked.size && carriesAt(base, picked) ? ' slop-picked' : ''}`}
             id={`slop-${item.id}`}
             style={{ '--c': item.color ?? color }}
         >
             {/* the whole face is the button's to click (see .slop-entry-toggle::after), except the way in: that's
                 there from the start, no opening or scrolling needed */}
             <div className="slop-entry-face">
-                <div className="slop-entry-preview"><Shot entry={item} /></div>
+                <div className="slop-entry-preview"><Shot entry={item} base={base} /></div>
                 <div className="slop-entry-text">
                     <header>
                         <h3>
                             <span className="slop-card-tab" aria-hidden="true" />
                             <button className="slop-entry-toggle" aria-expanded={open} aria-controls={more} onClick={() => setOpen(!open)}>
-                                <Words value={item.title} />
+                                <Words path={`${base}.title`} />
                             </button>
                             <span className="slop-entry-chevron" aria-hidden="true" />
                         </h3>
-                        <p className="slop-card-sub"><Words value={item.when} /></p>
-                        <Labels labels={item.labels} picked={picked} />
+                        <p className="slop-card-sub"><Words path={`${base}.when`} /></p>
+                        <Labels base={base} picked={picked} />
                     </header>
-                    <p className="slop-card-lede"><Words value={item.tagline} /></p>
-                    <a className="slop-button slop-button-primary slop-entry-go" {...opens}><Words value={item.open} /> ↗</a>
+                    <p className="slop-card-lede"><Words path={`${base}.tagline`} /></p>
+                    <a className="slop-button slop-button-primary slop-entry-go" {...opens}><Words path={`${base}.open`} /> ↗</a>
                 </div>
             </div>
             <div className="slop-entry-text slop-entry-more" id={more} hidden={!open}>
-                <Story entry={item} headings={headings} />
-                <Stats id={item.id} />
-                {item.links.length > 0 && (
-                    <div className="slop-entry-actions">
-                        <div className="slop-card-links">
-                            {item.links.map((link) => <CardLink key={link.href} link={link} />)}
-                        </div>
-                    </div>
+                {open && (
+                    <>
+                        <Story base={base} />
+                        <Stats id={item.id} />
+                        {item.links.length > 0 && (
+                            <div className="slop-entry-actions">
+                                <CardLinks links={item.links} base={base} />
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </article>
@@ -469,10 +517,10 @@ function sections(projects) {
             out.push({ key: `collection-${project.id}`, collection: project, projects: [project] });
             return;
         }
-        const name = plain(project.category);
+        const name = readable(`${project.id}.category`);
         const section = out.find((s) => !s.collection && s.name === name);
         if (section) section.projects.push(project);
-        else out.push({ key: `category-${name}`, name, label: project.category, projects: [project] });
+        else out.push({ key: `category-${name}`, name, label: `${project.id}.category`, projects: [project] });
     });
     return out;
 }
@@ -492,30 +540,29 @@ function LabelPicker({ labels, picked, onPick, onClear }) {
     );
 }
 
-function SlopZone({ text, savedText, onEdit, onLeave, leaveRef }) {
+function SlopZone({ projects, onLeave, leaveRef }) {
     const [lit, setLit] = useState(null); // the card a tile just jumped to
     const [picked, setPicked] = useState(() => new Set()); // labels picked in the bar: their projects light up
-    const [editing, setEditing] = useState(false);
     const [pastBar, setPastBar] = useState(false); // scrolled below the bar, so the top row needs its own edge
     const barRef = useRef(null);
     const topbarRef = useRef(null);
     const dockRef = useRef(null);
     const innerRef = useRef(null);
-    const { intro, headings, projects } = text;
+    const meterRef = useMeter();
     const groups = sections(projects);
     const labels = allLabels(projects);
-    const yours = share(allTexts(text));
     const pick = (key) => setPicked((now) => {
         const next = new Set(now);
         if (!next.delete(key)) next.add(key);
         return next;
     });
 
-    useEffect(() => { // Esc closes the text panel first, then leaves
+    useEffect(() => { // Esc closes the slop editor first (unless it's for something in there), then leaves
         const handleKey = (e) => {
             if (e.key !== 'Escape') return;
-            if (editing) setEditing(false);
-            else onLeave();
+            const editor = document.querySelector('.slop-panel:not([hidden])');
+            if (!editor) onLeave();
+            else if (!editor.contains(e.target)) editor.querySelector('.sp-close')?.click();
         };
         document.addEventListener('keydown', handleKey);
         return () => document.removeEventListener('keydown', handleKey);
@@ -560,18 +607,13 @@ function SlopZone({ text, savedText, onEdit, onLeave, leaveRef }) {
     }
 
     return (
-        <div className={`slop-inner${editing ? ' slop-inner-editing' : ''}${picked.size ? ' slop-picking' : ''}`} ref={innerRef}>
+        <div className={`slop-inner${picked.size ? ' slop-picking' : ''}`} ref={innerRef}>
             <div className={`slop-topbar${pastBar ? ' slop-topbar-edge' : ''}`} ref={topbarRef}>
                 <div className="slop-topbar-row">
-                    <span className="slop-wordmark"><Words value={intro.title} /></span>
+                    <span className="slop-wordmark"><Words path="intro.title" /></span>
                     <div className="slop-topbar-actions">
-                        {EDITING && (
-                            <button className="slop-button" onClick={() => setEditing(!editing)} aria-pressed={editing}>
-                                Edit text
-                            </button>
-                        )}
                         <button ref={leaveRef} className="slop-button slop-leave" onClick={onLeave}>
-                            <span aria-hidden="true">←</span> Leave <Words value={intro.title} /> <kbd>Esc</kbd>
+                            <span aria-hidden="true">←</span> Leave <Words path="intro.title" /> <kbd>Esc</kbd>
                         </button>
                     </div>
                 </div>
@@ -580,7 +622,7 @@ function SlopZone({ text, savedText, onEdit, onLeave, leaveRef }) {
                 <div className={`slop-dock${pastBar ? ' slop-dock-on' : ''}`} ref={dockRef} aria-hidden={!pastBar}>
                     <div className="slop-dock-inner">
                         <div className="slop-dock-row">
-                            <span className="slop-dock-title"><Words value={intro.overviewTitle} /></span>
+                            <span className="slop-dock-title"><Words path="intro.overviewTitle" /></span>
                             <ol className="slop-dock-tiles">
                                 {groups.flatMap((group) => group.projects).map((project) => (
                                     <li
@@ -590,7 +632,7 @@ function SlopZone({ text, savedText, onEdit, onLeave, leaveRef }) {
                                     >
                                         <button className="slop-dock-tile" onClick={() => jumpTo(project.id)} tabIndex={pastBar ? 0 : -1}>
                                             <Thumb project={project} />
-                                            <Words value={project.title} />
+                                            <Words path={`${project.id}.title`} />
                                         </button>
                                     </li>
                                 ))}
@@ -602,21 +644,17 @@ function SlopZone({ text, savedText, onEdit, onLeave, leaveRef }) {
             </div>
 
             {/* the bar: part of the top band, every project at a glance, by category */}
-            <nav className="slop-bar" ref={barRef} aria-label={readable(intro.overviewTitle)}>
+            <nav className="slop-bar" ref={barRef} aria-label={Slop.words('intro.overviewTitle')}>
                 <div className="slop-bar-inner">
                     {/* what the zone is and which color is whose, set apart from the jump-to tiles below by a rule */}
                     <div className="slop-intro">
-                        <p className="slop-disclaimer"><Words value={intro.disclaimer} links /></p>
-                        <p className="slop-color-key"><Words value={intro.colorKey} links /></p>
+                        <p className="slop-disclaimer"><Words path="intro.disclaimer" links /></p>
+                        <p className="slop-color-key"><Words path="intro.colorKey" links /></p>
+                        <div className="slop-reader-meter" ref={meterRef} />
                     </div>
                     <div className="slop-bar-head">
-                        <h2><Words value={intro.overviewTitle} /></h2>
-                        <span><Words value={intro.overviewNote} /></span>
-                        <span className="slop-legend">
-                            <span className="slop-mine">My words</span>
-                            <span className="slop-ai">AI-generated</span>
-                            {EDITING && <span>{percent(yours.fraction)} mine so far</span>}
-                        </span>
+                        <h2><Words path="intro.overviewTitle" /></h2>
+                        <span><Words path="intro.overviewNote" /></span>
                     </div>
                     <LabelPicker labels={labels} picked={picked} onPick={pick} onClear={() => setPicked(new Set())} />
                     <div className="slop-bar-groups">
@@ -627,7 +665,7 @@ function SlopZone({ text, savedText, onEdit, onLeave, leaveRef }) {
                                 style={{ flexGrow: group.projects.length, flexBasis: `${group.projects.length * 170}px`, '--n': group.projects.length }}
                             >
                                 {/* a section of games or articles is a tile of its own, named on the tile */}
-                                <span className="slop-bar-label">{group.label ? <Words value={group.label} /> : '\u00a0'}</span>
+                                <span className="slop-bar-label">{group.label ? <Words path={group.label} /> : '\u00a0'}</span>
                                 <ol className="slop-tiles">
                                     {group.projects.map((project) => (
                                         <li
@@ -638,8 +676,8 @@ function SlopZone({ text, savedText, onEdit, onLeave, leaveRef }) {
                                             <button className="slop-tile" onClick={() => jumpTo(project.id)}>
                                                 <Thumb project={project} />
                                                 <span className="slop-tile-who">
-                                                    <span className="slop-tile-name"><Words value={project.title} /></span>
-                                                    <span className="slop-tile-by"><Words value={project.tagline} /></span>
+                                                    <span className="slop-tile-name"><Words path={`${project.id}.title`} /></span>
+                                                    <span className="slop-tile-by"><Words path={`${project.id}.tagline`} /></span>
                                                 </span>
                                             </button>
                                         </li>
@@ -657,17 +695,17 @@ function SlopZone({ text, savedText, onEdit, onLeave, leaveRef }) {
                         className="slop-category slop-collection"
                         key={group.key}
                         id={`slop-${group.collection.id}`}
-                        aria-label={readable(group.collection.title)}
+                        aria-label={Slop.words(`${group.collection.id}.title`)}
                     >
-                        <h2 className="slop-category-title"><Words value={group.collection.title} /></h2>
-                        <p className="slop-collection-lede"><Words value={group.collection.tagline} links /></p>
+                        <h2 className="slop-category-title"><Words path={`${group.collection.id}.title`} /></h2>
+                        <p className="slop-collection-lede"><Words path={`${group.collection.id}.tagline`} links /></p>
                         <div className="slop-grid">
                             {group.collection.items.map((item) => (
                                 <EntryCard
                                     key={item.id}
                                     item={item}
+                                    base={`${group.collection.id}.${item.id}`}
                                     color={group.collection.color}
-                                    headings={headings}
                                     lit={lit === item.id}
                                     picked={picked}
                                 />
@@ -677,11 +715,11 @@ function SlopZone({ text, savedText, onEdit, onLeave, leaveRef }) {
                 ) : (
                     <section className="slop-category" key={group.key} aria-label={group.name}>
                         <h2 className="slop-category-title">
-                            <Words value={group.label} />
+                            <Words path={group.label} />
                             <span className="slop-category-count">{group.projects.length === 1 ? '1 project' : `${group.projects.length} projects`}</span>
                         </h2>
                         {group.projects.map((project) => (
-                            <ProjectCard key={project.id} project={project} headings={headings} lit={lit === project.id} picked={picked} />
+                            <ProjectCard key={project.id} project={project} lit={lit === project.id} picked={picked} />
                         ))}
                     </section>
                 ))}
@@ -689,20 +727,10 @@ function SlopZone({ text, savedText, onEdit, onLeave, leaveRef }) {
                 <footer className="slop-footer">
                     <p>That’s everything in the rupture, for now.</p>
                     <button className="slop-button slop-leave" onClick={onLeave}>
-                        <span aria-hidden="true">←</span> Leave <Words value={intro.title} />
+                        <span aria-hidden="true">←</span> Leave <Words path="intro.title" />
                     </button>
                 </footer>
             </main>
-
-            {editing && (
-                <SlopEditor
-                    text={text}
-                    savedText={savedText}
-                    onEdit={onEdit}
-                    onClose={() => setEditing(false)}
-                    onShowProject={jumpTo}
-                />
-            )}
         </div>
     );
 }

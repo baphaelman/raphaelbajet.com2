@@ -2736,11 +2736,11 @@
     "04967627-e193-45f4-80ad-d763e8567b21": {
         "project": "algorhythms",
         "started": "2026-11-22",
-        "bytes": 3583462,
+        "bytes": 11887506,
         "agents": [
             {
                 "project": "algorhythms",
-                "hours": 0.805
+                "hours": 11.108
             }
         ]
     },
@@ -2769,15 +2769,19 @@
     "440418cf-15cc-4442-8b77-5f083aeb0f36": {
         "project": "algorhythms",
         "started": "2026-11-22",
-        "bytes": 5359166,
+        "bytes": 6751560,
         "agents": [
             {
                 "project": "algorhythms",
-                "hours": 1.631
+                "hours": 3.245
             },
             {
                 "project": "algorhythms",
                 "hours": 0.287
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.86
             },
             {
                 "project": "algorhythms",
@@ -3304,48 +3308,617 @@
     "79286257-dd31-4381-9ee6-e5c61260152b": {
         "project": "slop-zone",
         "started": "2026-11-22",
-        "bytes": 14857680,
+        "bytes": 38003831,
         "agents": [
             {
                 "project": "slop-zone",
-                "hours": 1.13
+                "hours": 2.555
             }
         ]
     },
     "71943993-68ac-4518-8df4-8f2f08ca7065": {
         "project": "algorhythms",
         "started": "2026-11-22",
-        "bytes": 1588937,
+        "bytes": 1637110,
         "agents": [
             {
                 "project": "algorhythms",
-                "hours": 0.472
+                "hours": 0.723
             }
         ]
     },
     "57ec4fc2-b19b-48d9-a2e8-19db36005a52": {
         "project": "algorhythms",
         "started": "2026-11-22",
-        "bytes": 1558963,
+        "bytes": 1600615,
         "agents": [
             {
                 "project": "algorhythms",
-                "hours": 0.438
+                "hours": 0.699
             }
         ]
     },
     "e167d72d-305c-41db-aba2-fe9daf358fcd": {
         "project": "comma-pump",
         "started": "2026-11-22",
-        "bytes": 6295437,
+        "bytes": 21908721,
         "agents": [
             {
                 "project": "comma-pump",
-                "hours": 0.305
+                "hours": 0.843
             },
             {
                 "project": "single-cycles",
-                "hours": 0.152
+                "hours": 0.336
+            }
+        ]
+    },
+    "484c5875-309c-4ec2-a5e4-f942e5f59f49": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 15026764,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 2.237
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.008
+            }
+        ]
+    },
+    "1c9206d2-5f97-4434-9421-a070b9da457a": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 2244454,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.805
+            }
+        ]
+    },
+    "17e0a688-b529-4398-8f64-931da160c17e": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 4056103,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.947
+            }
+        ]
+    },
+    "e7ba4f77-0180-4255-a70b-75c26f36bea9": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 584075,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.087
+            }
+        ]
+    },
+    "c1866a22-b983-4f8d-82f3-8d0aabb2a5a2": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 533676,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.392
+            }
+        ]
+    },
+    "183e4484-3a83-4fdc-a417-1cc7c717e403": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 2650692,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.935
+            }
+        ]
+    },
+    "591764b5-a6c1-4365-a209-595ef00ae20d": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 8525354,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.648
+            }
+        ]
+    },
+    "c844d2fa-0f82-4644-bd7e-d83da2219daf": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 478622,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.043
+            }
+        ]
+    },
+    "ec11b917-86ad-4cbb-99f6-c25e1acc3add": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 869708,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.079
+            }
+        ]
+    },
+    "d1ba074d-0649-4741-8c61-2eb1e85b632d": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 665302,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.056
+            }
+        ]
+    },
+    "855e1022-8951-4ed9-8737-f0d673079926": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 1914798,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.269
+            }
+        ]
+    },
+    "128f8429-64f3-4fbc-99e6-a7d37b7d6b60": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 448432,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.126
+            }
+        ]
+    },
+    "36c90a21-b703-4dd7-81c1-8f14b31e77e4": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 1053639,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.373
+            }
+        ]
+    },
+    "a3e23b41-6935-41ed-aaf9-7b4771c65e0c": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 1554880,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.468
+            }
+        ]
+    },
+    "56354a97-4b95-48bb-b06d-4ebb610491db": {
+        "project": "algorhythms",
+        "started": "2026-11-22",
+        "bytes": 1596743,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.658
+            }
+        ]
+    },
+    "f75e8b3c-f544-4da7-8cf9-736b52703dbc": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 1712163,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.45
+            }
+        ]
+    },
+    "8eb0de09-b256-4274-94f0-231342acfa1f": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 624392,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.041
+            }
+        ]
+    },
+    "5ad7a826-6c6a-4339-a9c2-b715598951c8": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 1982441,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.646
+            }
+        ]
+    },
+    "bffc0d62-9ef4-4de5-acc0-c79aaf1b6688": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 3261772,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.803
+            }
+        ]
+    },
+    "fc6ec930-2286-483e-829d-fbd80b9e7115": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 482952,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.089
+            }
+        ]
+    },
+    "6524a8cd-2c12-47dd-8c8d-bdfcca6859db": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 694581,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.47
+            }
+        ]
+    },
+    "0e2a333f-25b9-427b-812f-6fbd03ed6d49": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 1851726,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.876
+            }
+        ]
+    },
+    "a0ff9feb-ec19-4ffb-96d5-6f23beed2511": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 2563745,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.742
+            }
+        ]
+    },
+    "a2eccf88-1c8b-4663-8975-d7b63d8c2422": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 1296721,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.263
+            }
+        ]
+    },
+    "35793f16-8ba5-427b-9528-4eb0ad8e7817": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 1873036,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.852
+            }
+        ]
+    },
+    "fa96aa03-142b-4108-898a-528441ca8bdc": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 977065,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.137
+            }
+        ]
+    },
+    "ae0fb4af-6b69-4e2e-a7a2-2ecc953965a8": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 7613550,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 1.401
+            }
+        ]
+    },
+    "19af88da-b8d8-4dd3-b9ea-890269f7cf0c": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 515395,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.173
+            }
+        ]
+    },
+    "d01a728a-ce68-4b47-86ea-6c438c236b63": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 4406973,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.497
+            }
+        ]
+    },
+    "b2506700-650b-46bc-b5e7-6ef0cafa5370": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 1429873,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.289
+            }
+        ]
+    },
+    "67342891-56b0-49c5-98b4-e8c4fbb6174f": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 4687597,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.512
+            }
+        ]
+    },
+    "dbb602bc-b0a7-483a-93b5-bbc808c0cb6f": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 1018527,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.175
+            }
+        ]
+    },
+    "1db5f247-480b-4bf0-91e0-d27c4d4192d6": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 835705,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.222
+            }
+        ]
+    },
+    "61d7131c-932e-429a-bb34-904e1ccf5117": {
+        "project": "algorhythms",
+        "started": "2026-11-22",
+        "bytes": 1514532,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.662
+            }
+        ]
+    },
+    "72150579-ae7a-4b32-9ab2-1129322d4ce9": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 3610673,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 1.06
+            }
+        ]
+    },
+    "a6c346bf-7dee-4cd2-bf5f-caf3e860127c": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 3147023,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.766
+            }
+        ]
+    },
+    "b19361fd-496f-49f8-becf-bbfbe3f61c4f": {
+        "project": "slop-zone",
+        "started": "2026-11-23",
+        "bytes": 7487985,
+        "agents": [
+            {
+                "project": "slop-zone",
+                "hours": 0.199
+            }
+        ]
+    },
+    "58edc656-c613-457e-a32d-b78b3e462b88": {
+        "project": "craft-prs",
+        "started": "2026-11-22",
+        "bytes": 416891,
+        "agents": [
+            {
+                "project": "craft-prs",
+                "hours": 0.004
+            }
+        ]
+    },
+    "a80b6858-5abe-494d-861d-7b46051aa44f": {
+        "project": "craft-prs",
+        "started": "2026-11-23",
+        "bytes": 739649,
+        "agents": [
+            {
+                "project": "craft-prs",
+                "hours": 0.286
+            }
+        ]
+    },
+    "472a9b60-835a-443d-9e8b-c6a79fe88268": {
+        "project": "slop-zone",
+        "started": "2026-11-23",
+        "bytes": 532757,
+        "agents": [
+            {
+                "project": "slop-zone",
+                "hours": 0.04
+            }
+        ]
+    },
+    "65edab0f-3e96-4f05-bcdb-5f714f6d865b": {
+        "project": "slop-zone",
+        "started": "2026-11-23",
+        "bytes": 101014823,
+        "agents": [
+            {
+                "project": "slop-zone",
+                "hours": 2.915
+            }
+        ]
+    },
+    "6689f5cb-f7dc-4598-a8d1-0c5a4f0291a6": {
+        "project": "slop-zone",
+        "started": "2026-11-23",
+        "bytes": 620675,
+        "agents": [
+            {
+                "project": "slop-zone",
+                "hours": 0.04
+            }
+        ]
+    },
+    "063245a1-0f74-426c-82a0-24fd57303510": {
+        "project": "single-cycles",
+        "started": "2026-11-23",
+        "bytes": 597913,
+        "agents": [
+            {
+                "project": "single-cycles",
+                "hours": 0.012
+            }
+        ]
+    },
+    "11a9698c-b72c-4675-9a52-e366676b29ed": {
+        "project": "rhyme-xray",
+        "started": "2026-11-23",
+        "bytes": 1589281,
+        "agents": [
+            {
+                "project": "rhyme-xray",
+                "hours": 0.229
+            }
+        ]
+    },
+    "9c27b0f7-9b9b-48ae-a568-f4049acd6cc3": {
+        "project": "single-cycles",
+        "started": "2026-11-23",
+        "bytes": 9609113,
+        "agents": [
+            {
+                "project": "single-cycles",
+                "hours": 1.367
+            }
+        ]
+    },
+    "1199fe90-f469-4bcb-88b2-6948d9cc64ab": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 10304151,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 1.996
+            }
+        ]
+    },
+    "2e84ea3c-05eb-49f4-86e0-bd54bfecca37": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 4789165,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 1.409
+            }
+        ]
+    },
+    "6f85fca7-6f01-463c-b7ec-65597f563dfd": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 5519006,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 1.173
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.002
+            }
+        ]
+    },
+    "951f45a2-1c57-415a-9d6d-493f043f6843": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 5305507,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.887
+            }
+        ]
+    },
+    "a1db1532-89d5-42b0-979f-902b821f8ddb": {
+        "project": "algorhythms",
+        "started": "2026-11-22",
+        "bytes": 553992,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.081
+            }
+        ]
+    },
+    "ffb7c32a-de7e-4ef2-8ad7-b1d6b4f47c25": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 10343864,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 1.082
             }
         ]
     }

@@ -5,8 +5,8 @@ import Backdrop from '/components/SlopBackdrop.jsx';
 import { PAD, crackShape, tearAt, tearReach, tearOutline, tearStrands, tearDrops, sealStep, turnedToSeal, TEAR_MS, SEAL_FROM, smoothstep } from '/components/slopCrack.js';
 import { gooRenderer } from '/components/slopGooGL.js';
 import Words from '/components/SlopWords.jsx';
-import { readable } from '/components/slopText.js';
-import savedText from '/src/slopProjects.json';
+import Slop, { useSlop } from '/components/slop.js';
+import { projects } from '/src/slopProjects.json';
 
 function toPolygon(points, dx = 0, dy = 0) {
     return `polygon(${points.map(([x, y]) => `${(x + dx).toFixed(1)}px ${(y + dy).toFixed(1)}px`).join(', ')})`;
@@ -16,54 +16,6 @@ function toPolygon(points, dx = 0, dy = 0) {
 const ZONE_HASH = '#slop-zone';
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-const isObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
-
-// `ours` (the page's text) after the file it came from went from `base` to `theirs`: the file's changes come in,
-// edits made on the page stay, and where both changed the same thing, the page's wins
-function merge(base, ours, theirs) {
-    if (same(ours, base)) return theirs;
-    if (same(theirs, base) || same(ours, theirs)) return ours;
-    if ([base, ours, theirs].every(isObject)) {
-        const out = {};
-        new Set([...Object.keys(ours), ...Object.keys(theirs)]).forEach((key) => {
-            const value = merge(base[key], ours[key], theirs[key]);
-            if (value !== undefined) out[key] = value;
-        });
-        return out;
-    }
-    if (![base, ours, theirs].every(Array.isArray)) return ours;
-    // projects, and the games or articles in a section, are matched by id, in the page's order unless only the
-    // file reordered them
-    if ([base, ours, theirs].every((list) => list.every((item) => isObject(item) && 'id' in item))) {
-        const ids = (list) => list.map((item) => item.id);
-        const find = (list, id) => list.find((item) => item.id === id);
-        const order = same(ids(ours), ids(base)) ? [...ids(theirs), ...ids(ours)] : [...ids(ours), ...ids(theirs)];
-        return [...new Set(order)].flatMap((id) => {
-            const value = merge(find(base, id), find(ours, id), find(theirs, id));
-            return value === undefined ? [] : [value];
-        });
-    }
-    if (ours.length === base.length && theirs.length === base.length) {
-        return ours.map((item, i) => merge(base[i], item, theirs[i]));
-    }
-    return ours;
-}
-
-// In dev, a change to slopProjects.json (saved from this page or another tab, or edited directly) reaches the page
-// as a hot update. This takes it in, so the panel never saves an older copy over it
-function FollowFile({ file, onEdit }) {
-    const seen = useRef(file);
-    useEffect(() => {
-        if (file === seen.current) return;
-        const base = seen.current;
-        seen.current = file;
-        onEdit((text) => merge(base, text, file));
-    }, [file, onEdit]);
-    return null;
-}
-
 
 // the canvas's device px to a css px: as sharp as the screen at rest, a little softer for the tear, which fills it
 const restScale = () => Math.min(2, window.devicePixelRatio || 1);
@@ -76,7 +28,7 @@ function SlopRupture() {
     const [phase, setPhase] = useState(() => (window.location.hash === ZONE_HASH ? 'open' : 'closed'));
     const [hovered, setHovered] = useState(false);
     const [painted, setPainted] = useState(false);
-    const [text, setText] = useState(savedText); // edited live by the text panel in dev
+    useSlop(); // the text is edited live by the slop editor, in `npm run edit`
 
     const wasOpened = useRef(false);
     const pushedHash = useRef(false); // whether Back will take the zone's address off again
@@ -343,8 +295,8 @@ function SlopRupture() {
                     </span>
                 </span>
                 <span className="rupture-label">
-                    <span className="rupture-title"><Words value={text.rupture.title} /></span>
-                    <span className="rupture-disclaimer"><Words value={text.rupture.disclaimer} /></span>
+                    <span className="rupture-title"><Words path="rupture.title" /></span>
+                    <span className="rupture-disclaimer"><Words path="rupture.disclaimer" /></span>
                 </span>
             </button>
             {isOpen && createPortal(
@@ -354,13 +306,11 @@ function SlopRupture() {
                         className={`slop-zone slop-zone-${phase}`}
                         role="dialog"
                         aria-modal="true"
-                        aria-label={readable(text.intro.title)}
+                        aria-label={Slop.words('intro.title')}
                     >
                         <Backdrop />
                         <SlopZone
-                            text={text}
-                            savedText={savedText}
-                            onEdit={setText}
+                            projects={projects}
                             onLeave={leave}
                             leaveRef={leaveRef}
                         />
@@ -369,7 +319,6 @@ function SlopRupture() {
                 </>,
                 document.body
             )}
-            <FollowFile file={savedText} onEdit={setText} />
         </>
     );
 }
