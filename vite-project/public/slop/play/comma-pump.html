@@ -1,0 +1,1454 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The Comma Pump</title>
+<meta name="description" content="A playable, scroll-driven explainer on musical tuning: pure ratios, the commas that keep them from fitting, the comma pump, and the temperaments that hide it.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Scrollytelling: text steps on the left, a sticky stage on the right.
+   On phones the stage sits on top and the text flows underneath it.
+   Arrow keys / Space step between screens; each step can have several builds. */
+:root {
+  --bg: #f4f5f8; --panel: #ffffff; --stage: #e8ebf1; --stage-hi: #f8f9fb;
+  --ink: #14161b; --ink-2: #4a4f5a; --ink-3: #7b8190; --rule: #d9dde5;
+  --accent: #2a78d6; --accent-ink: #1c5cab;
+  --lo: #2a78d6; --hi: #e0602c; --sum: #14161b;
+  --just: #c4384f; --et: #7b8190; --good: #0f7a3c; --warn: #c27a00;
+  --f-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --stage-h: 58svh;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101217; --panel: #191c23; --stage: #151920; --stage-hi: #222935;
+    --ink: #eceef2; --ink-2: #b7bcc7; --ink-3: #8a909c; --rule: #2b303a;
+    --accent: #5598e7; --accent-ink: #86b6ef;
+    --lo: #5598e7; --hi: #f07c4a; --sum: #eceef2;
+    --just: #ff6b84; --et: #8a909c; --good: #4cc27a; --warn: #e5a530;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101217; --panel: #191c23; --stage: #151920; --stage-hi: #222935;
+  --ink: #eceef2; --ink-2: #b7bcc7; --ink-3: #8a909c; --rule: #2b303a;
+  --accent: #5598e7; --accent-ink: #86b6ef;
+  --lo: #5598e7; --hi: #f07c4a; --sum: #eceef2;
+  --just: #ff6b84; --et: #8a909c; --good: #4cc27a; --warn: #e5a530;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scrollbar-width: none; }
+html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; height: 0; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--f-body); font-size: 1.1rem; line-height: 1.62;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; line-height: 1.08; letter-spacing: -0.01em; margin: 0 0 0.7rem; }
+h1 { font-size: clamp(2.6rem, 6.5vw, 4.4rem); font-weight: 800; letter-spacing: -0.035em; }
+h2 { font-size: 1.65rem; font-weight: 700; }
+h3 { font-size: 1.15rem; font-weight: 700; margin-top: 1.6rem; }
+p { margin: 0 0 0.9rem; }
+b.n, .num { font-variant-numeric: tabular-nums; }
+.eyebrow { font-family: var(--f-mono); font-size: 0.76rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 10px; }
+.note { font-size: 0.93rem; color: var(--ink-2); }
+kbd { font-family: var(--f-mono); font-size: 0.78rem; font-weight: 600; color: var(--ink); background: var(--panel); border: 1px solid var(--rule); border-bottom-width: 3px; border-radius: 6px; padding: 1px 7px; }
+.r { font-family: var(--f-mono); font-size: 0.86em; white-space: nowrap; }
+.lo { color: var(--lo); font-weight: 600; } .hi { color: var(--hi); font-weight: 600; } .ju { color: var(--just); font-weight: 600; }
+sup { line-height: 0; }
+a { color: var(--accent-ink); text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Scrolly frame */
+.scrolly { position: relative; display: grid; grid-template-columns: minmax(0, 29rem) minmax(0, 1fr); column-gap: clamp(24px, 4vw, 60px); max-width: 1360px; margin: 0 auto; }
+.steps { grid-column: 1; grid-row: 1; padding-bottom: 40vh; min-width: 0; }
+.stage-col { grid-column: 2; grid-row: 1; position: relative; min-width: 0; }
+.stage { position: sticky; top: 0; height: 100vh; padding-block: 18px; }
+.stage-inner { position: relative; height: 100%; border-radius: 22px; overflow: hidden; border: 1px solid var(--rule); background: radial-gradient(120% 90% at 50% 40%, var(--stage-hi), var(--stage)); }
+.step { min-height: 92vh; display: flex; align-items: center; }
+.step.tall { min-height: calc(var(--n, 2) * 80vh); align-items: flex-start; }
+.step.tall .card { position: sticky; top: 14vh; }
+.step:first-child { min-height: 100vh; }
+.card { max-width: 29rem; width: 100%; min-width: 0; padding-block: 24px; }
+.step .card { opacity: 0; visibility: hidden; transition: opacity .45s ease, visibility 0s linear .45s; }
+.step.cur .card { opacity: 1; visibility: visible; transition: opacity .55s ease .1s, visibility 0s; }
+/* Builds inside a card: one paragraph at a time */
+.card [data-b].fut, .card [data-b].past { display: none; }
+.card [data-b].now { animation: rise .5s ease both; }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* Stage chrome */
+.nav { position: absolute; top: 12px; left: 14px; right: 14px; display: flex; align-items: center; gap: 10px; z-index: 5; }
+.segs { flex: 1; display: flex; gap: 3px; min-width: 0; }
+.seg { flex: 1; height: 16px; padding: 0; border: 0; background: none; cursor: pointer; position: relative; min-width: 0; }
+.seg::before { content: ""; position: absolute; left: 0; right: 0; top: 6px; height: 4px; border-radius: 2px; background: var(--rule); transition: background .3s, transform .3s; }
+.seg.done::before { background: color-mix(in srgb, var(--accent) 45%, var(--rule)); }
+.seg.cur::before { background: var(--accent); transform: scaleY(1.6); }
+.key { font-family: var(--f-mono); font-size: 0.9rem; font-weight: 600; min-width: 34px; height: 30px; padding: 0 8px; border-radius: 8px; border: 1px solid var(--rule); border-bottom-width: 3px; background: var(--panel); color: var(--ink); cursor: pointer; }
+.key:hover { border-color: var(--accent); }
+.key.press, .key:active { transform: translateY(2px); border-bottom-width: 1px; }
+.subnav { position: absolute; top: 48px; left: 16px; right: 14px; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 6px 12px; flex-wrap: wrap; }
+.chapters { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+.chapter { font-family: var(--f-display); font-size: 0.74rem; font-weight: 600; white-space: nowrap; padding: 3px 9px; border-radius: 99px; border: 1px solid var(--rule); background: color-mix(in srgb, var(--panel) 80%, transparent); color: var(--ink-2); cursor: pointer; }
+.chapter:hover { border-color: var(--accent); }
+.chapter[aria-current="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.slideno { display: flex; align-items: center; gap: 10px; font-family: var(--f-mono); font-size: 0.78rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.slideno b { color: var(--ink); font-weight: 600; }
+.pips { display: inline-flex; gap: 5px; }
+.pip { width: 7px; height: 7px; border-radius: 50%; border: 1.5px solid var(--ink-3); transition: background .25s, border-color .25s; }
+.pip.on { background: var(--accent); border-color: var(--accent); }
+
+/* Layers */
+.layer { position: absolute; inset: 0; padding: 86px clamp(14px, 3vw, 30px) 18px; display: flex; flex-direction: column; gap: 10px; opacity: 0; transform: scale(0.97); visibility: hidden; pointer-events: none; transition: opacity .5s ease, transform .5s ease, visibility 0s linear .5s; }
+.layer.on { opacity: 1; transform: none; visibility: visible; pointer-events: auto; transition: opacity .5s ease, transform .5s ease, visibility 0s; }
+.lay-head { display: grid; gap: 2px; }
+.lay-title { font-family: var(--f-display); font-weight: 700; font-size: 1.1rem; }
+.lay-sub { font-size: 0.9rem; color: var(--ink-2); line-height: 1.4; }
+.viz { position: relative; flex: 1 1 auto; min-height: 120px; }
+.viz > canvas, .viz > svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.ctrls { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; }
+.btn { font-family: var(--f-display); font-weight: 600; font-size: 0.86rem; line-height: 1; border-radius: 99px; padding: 8px 13px; cursor: pointer; border: 1px solid var(--rule); background: var(--panel); color: var(--ink); white-space: nowrap; }
+.btn:hover { border-color: var(--accent); }
+.btn.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.primary { border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary.on { color: #fff; }
+.btn small { font-family: var(--f-mono); font-weight: 400; opacity: .8; margin-left: 4px; }
+.seg-ctl { display: inline-flex; border: 1px solid var(--rule); border-radius: 99px; padding: 2px; background: var(--panel); gap: 2px; flex-wrap: wrap; }
+.seg-ctl .btn { border: 0; padding: 7px 11px; }
+.seg-ctl .lbl { font-family: var(--f-mono); font-size: 0.68rem; color: var(--ink-3); align-self: center; padding: 0 4px 0 8px; }
+.chk { font-family: var(--f-display); font-size: 0.84rem; display: inline-flex; gap: 6px; align-items: center; color: var(--ink-2); cursor: pointer; }
+.chk input { accent-color: var(--accent); }
+.spacer { flex: 1; }
+
+/* Hero */
+#L-hero { align-items: center; justify-content: center; text-align: center; }
+#L-hero .viz { width: min(100%, 460px); flex: 0 1 auto; aspect-ratio: 1; min-height: 0; }
+.cta { font-size: 1.05rem; padding: 13px 22px; }
+.cta-sub { font-size: 0.9rem; color: var(--ink-2); max-width: 26rem; }
+
+/* Pump */
+.chain { display: flex; align-items: stretch; }
+.chip { flex: 1 1 0; min-width: 0; border: 1px solid var(--rule); border-radius: 12px; background: var(--panel); padding: 6px 4px; text-align: center; transition: border-color .2s, box-shadow .2s, transform .2s; }
+.chip .rn { font-family: var(--f-display); font-weight: 700; font-size: 1rem; line-height: 1.1; }
+.chip .cn { font-size: 0.78rem; color: var(--ink-2); line-height: 1.2; }
+.chip .rq { font-family: var(--f-mono); font-size: 0.7rem; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chip.lit { border-color: var(--mc, var(--just)); box-shadow: 0 0 0 2px color-mix(in srgb, var(--mc, var(--just)) 35%, transparent); transform: translateY(-2px); }
+.link { flex: 0 0 auto; width: 48px; display: grid; place-items: center; align-content: center; font-family: var(--f-mono); font-size: 0.62rem; color: var(--ink-3); text-align: center; line-height: 1.15; }
+.link b { color: var(--ink-2); font-size: 0.7rem; }
+.link.jump b { color: var(--warn); }
+.readout { display: flex; gap: 6px 20px; flex-wrap: wrap; align-items: baseline; }
+.readout div { display: grid; }
+.readout .lbl { font-family: var(--f-mono); font-size: 0.66rem; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-3); }
+.readout b { font-family: var(--f-display); font-size: 1.5rem; line-height: 1.05; font-variant-numeric: tabular-nums; }
+.readout b.sm { font-size: 0.95rem; font-family: var(--f-mono); font-weight: 600; padding-top: 6px; }
+.readout b.txt { font-size: 0.95rem; font-family: var(--f-display); font-weight: 600; padding-top: 6px; }
+#pr-c.flat { color: var(--just); }
+.eqbox { position: absolute; left: 50%; top: 6px; transform: translateX(-50%); width: min(94%, 430px); background: color-mix(in srgb, var(--panel) 94%, transparent); border: 1px solid var(--rule); border-radius: 14px; padding: 9px 14px; font-size: 0.9rem; line-height: 1.5; text-align: center; opacity: 0; transition: opacity .4s; pointer-events: none; }
+.eqbox.on { opacity: 1; }
+.legend { display: flex; flex-wrap: wrap; gap: 2px 14px; font-family: var(--f-mono); font-size: 0.72rem; color: var(--ink-2); min-height: 1.2em; }
+.legend i { display: inline-block; width: 12px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 5px; }
+
+/* Temperaments */
+.ttab { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 0.86rem; }
+.ttab th, .ttab td { padding: 5px 6px; border-bottom: 1px solid var(--rule); text-align: right; white-space: nowrap; }
+.ttab th { font-family: var(--f-display); font-weight: 600; font-size: 0.76rem; color: var(--ink-2); }
+.ttab td:first-child, .ttab th:first-child { text-align: left; font-family: var(--f-display); font-weight: 600; }
+.ttab td.mono { font-family: var(--f-mono); font-size: 0.8rem; }
+.ttab tr.wolf td { color: var(--just); }
+.ttab tr.dim td { opacity: 0.45; }
+.lamp { display: inline-block; width: 11px; height: 11px; border-radius: 50%; background: var(--warn); vertical-align: -1px; margin-left: 6px; }
+#L-temper.keys #te-cv, #L-temper:not(.keys) #te-ring { display: none; }
+.wedge { cursor: pointer; }
+.wedge:focus { outline: none; }
+.wedge:focus-visible path { stroke: var(--accent); stroke-width: 3; }
+
+/* Lattice */
+#lat-read { font-family: var(--f-mono); font-size: 0.8rem; color: var(--ink-2); min-height: 2.9em; line-height: 1.45; }
+#lat-read b { color: var(--ink); }
+.lnode { cursor: pointer; }
+.lnode:focus { outline: none; }
+.lnode:focus-visible circle { stroke: var(--accent); stroke-width: 3.5; }
+.ltri { cursor: pointer; }
+
+/* Sound bar */
+.soundbar { position: fixed; left: max(16px, env(safe-area-inset-left, 0px)); bottom: max(14px, env(safe-area-inset-bottom, 0px)); z-index: 20; display: flex; gap: 8px; align-items: center; background: color-mix(in srgb, var(--panel) 94%, transparent); border: 1px solid var(--rule); border-radius: 99px; padding: 6px; box-shadow: 0 6px 24px rgba(0,0,0,.12); backdrop-filter: blur(6px); }
+.soundbar .btn { padding: 8px 12px; }
+.soundbar .vol { display: inline-flex; align-items: center; gap: 6px; font-family: var(--f-mono); font-size: 0.72rem; color: var(--ink-3); padding-left: 4px; }
+.soundbar input[type=range] { width: 90px; accent-color: var(--accent); }
+.soundbar [hidden] { display: none !important; }
+#snd-on.live { background: var(--good); border-color: var(--good); color: #fff; }
+
+/* Appendix */
+.after { max-width: 54rem; margin: 0 auto; padding: 10vh 0 140px; }
+.after .lede { color: var(--ink-2); max-width: 40rem; }
+.tablewrap { overflow-x: auto; margin: 0.4rem 0 1.4rem; }
+.ntab { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 0.95rem; }
+.ntab th, .ntab td { padding: 7px 10px; border-bottom: 1px solid var(--rule); text-align: right; white-space: nowrap; }
+.ntab th:first-child, .ntab td:first-child { text-align: left; }
+.ntab th { font-family: var(--f-display); font-size: .82rem; color: var(--ink-2); font-weight: 600; }
+.ntab td.mono { font-family: var(--f-mono); font-size: .86rem; }
+.ntab td.l { text-align: left; color: var(--ink-2); font-size: .9rem; white-space: normal; }
+.after ul { padding-left: 1.2rem; }
+.after li { margin-bottom: .4rem; }
+
+/* Phones: stage pinned on top, text flows underneath it, one build per paragraph */
+@media (max-width: 900px) {
+  body { font-size: 1.02rem; }
+  .scrolly { display: flex; flex-direction: column; }
+  .stage-col { order: -1; position: sticky; top: 0; z-index: 3; height: 58vh; height: var(--stage-h); background: var(--bg); }
+  .stage { position: relative; height: 100%; padding-block: 8px 6px; }
+  .stage-inner { border-radius: 16px; }
+  .layer { padding: 74px 12px 10px; gap: 7px; }
+  .lay-sub, .chapters, .hide-phone { display: none !important; }
+  .subnav { top: 46px; }
+  .step, .step:first-child, .step.tall { min-height: 0; display: block; padding-bottom: 16vh; }
+  .step .card, .step.tall .card { position: static; padding-block: 18px 0; max-width: none; opacity: .35; visibility: visible; transition: opacity .35s; }
+  .step.cur .card { opacity: 1; }
+  .card [data-b] { margin-bottom: 38vh; transition: opacity .35s; }
+  .card [data-b]:last-child { margin-bottom: 0; }
+  .card [data-b].fut, .card [data-b].past { display: block; opacity: .38; }
+  .card [data-b].now { animation: none; }
+  .steps { padding-bottom: 20vh; }
+  h1 { font-size: 2.3rem; }
+  h2 { font-size: 1.35rem; }
+  .readout { gap: 2px 14px; }
+  .readout b { font-size: 1.15rem; }
+  .readout b.sm, .readout b.txt { font-size: 0.8rem; padding-top: 3px; }
+  .link { width: 31px; font-size: 0.52rem; }
+  .legend { font-size: 0.62rem; gap: 0 10px; }
+  .link span { display: none; }
+  .chip .rq { font-size: 0.6rem; }
+  .btn { font-size: 0.8rem; padding: 7px 10px; }
+  .ttab { font-size: 0.74rem; }
+  .ttab th, .ttab td { padding: 3px 4px; }
+  #L-temper.keys .ttab { display: none; }
+  .soundbar { left: 12px; right: 12px; justify-content: center; border-radius: 16px; }
+  .soundbar input[type=range] { width: 70px; }
+  #L-hero .viz { width: min(70%, 260px); }
+  .after { padding-top: 6vh; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .layer, .step .card, .card [data-b] { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="scrolly">
+  <div class="steps">
+
+    <section class="step" data-scene="hero">
+      <div class="card">
+        <div class="eyebrow">An interactive explainer</div>
+        <h1>The Comma Pump</h1>
+        <p>Why every keyboard you have ever played is slightly out of tune, on purpose.</p>
+        <p>The intervals that sound purest are simple frequency ratios. The trouble is that simple ratios refuse to fit together, and the clearest way to hear it is to sing four chords in perfect tune and arrive somewhere you didn't start.</p>
+        <p class="note">Every note here is synthesized live from exact ratios. Turn the sound on, then scroll or press <kbd>→</kbd> / <kbd>Space</kbd> to step through and <kbd>←</kbd> to go back. <kbd>P</kbd> plays the example on screen and <kbd>S</kbd> stops everything. Headphones help with the beating.</p>
+      </div>
+    </section>
+
+    <section class="step tall" data-scene="pure" data-n="4" style="--n:4">
+      <div class="card">
+        <div class="eyebrow">1 · Pure intervals</div>
+        <h2>Simple ratios sound smooth</h2>
+        <p data-b="0">Two notes blend when their frequencies form a simple ratio. An <b>octave</b> is <span class="r">2:1</span>: the <span class="hi">upper note</span> vibrates exactly twice for every vibration of the <span class="lo">lower</span> one. Add the two waves and the sum repeats after every cycle of the lower note.</p>
+        <p data-b="1">A <b>perfect fifth</b> is <span class="r">3:2</span>. The sum is more intricate but still repeats, every two cycles. Below the waves, each note's overtones form a ladder: real instruments sound a whole series of harmonics, and with <span class="r">3:2</span> the lower note's 3rd harmonic lands exactly on the upper note's 2nd. Musicians measure intervals in <i>cents</i>, 1/1200 of an octave; this fifth is <b class="n" data-k="fifthC"></b>&nbsp;¢.</p>
+        <p data-b="2">A <b>major third</b> is <span class="r">5:4</span>, <b class="n" data-k="thirdC"></b>&nbsp;¢. The pattern takes four cycles to repeat, and the 5th harmonic of one note meets the 4th of the other. The simpler the ratio, the more overtones coincide, which is roughly why the octave sounds smoothest and the third most colorful.</p>
+        <p data-b="3">Nudge a ratio and the overtones stop meeting. They sit a few hertz apart and the sound pulses, or <b>beats</b>, at the difference. This is the major third on a piano, <b class="n" data-k="etThirdC"></b>&nbsp;¢ instead of <b class="n" data-k="thirdC"></b>: listen for a shimmer of about <b class="n" data-k="etThirdBeat"></b> beats a second, and watch the summed wave keep changing shape.</p>
+      </div>
+    </section>
+
+    <section class="step tall" data-scene="stack" data-n="3" style="--n:3">
+      <div class="card">
+        <div class="eyebrow">2 · They don't fit</div>
+        <h2>Stack them and the circle won't close</h2>
+        <p data-b="0">Stack twelve pure fifths, C, G, D, A and on, and you visit every note of the chromatic scale. On the spiral one full turn is an octave, so every note sits at its pitch class and the stack climbs outward. Twelve fifths span about seven octaves, so the last note ought to land back on C.</p>
+        <p data-b="1">It misses. <span class="r">(3/2)<sup>12</sup> = <span data-k="f12"></span></span>, while seven octaves are <span class="r">2<sup>7</sup> = 128</span>. The stack overshoots by <span class="r" data-k="pythFrac"></span>, the <b>Pythagorean comma</b>: <b class="n" data-k="pythC"></b>&nbsp;cents. Press <i>Compare</i> to hear the starting C against the B♯ that should have been C.</p>
+        <p data-b="2">Pure major thirds fail the other way. Three of them, C–E–G♯–B♯, make <span class="r">(5/4)<sup>3</sup> = <span data-k="t3"></span></span>, short of the octave <span class="r">2/1</span> by <span class="r" data-k="diesisFrac"></span>: <b class="n" data-k="diesisC"></b>&nbsp;cents, nearly half a semitone.</p>
+      </div>
+    </section>
+
+    <section class="step tall" data-scene="pump" data-n="5" style="--n:5">
+      <div class="card">
+        <div class="eyebrow">3 · The comma pump</div>
+        <h2>Four perfect chords, and the floor gives way</h2>
+        <p data-b="0">Take a common progression: C major, A minor, D minor, G major and back to C, or <b>I–vi–ii–V–I</b>. Tune each chord purely, and keep any note it shares with the chord before exactly where it was, the way a choir or string quartet tunes by ear. The chain follows the roots: each one is fixed by the note it keeps.</p>
+        <p data-b="1">Play it. Each chord is perfectly in tune and every shared note holds still, yet the C that comes back sits at <span class="r ju" data-k="pumpFrac"></span> of where it started: <b class="n ju" data-k="pumpC"></b>&nbsp;cents flat. Let it loop and the whole progression sinks by the same step each time; after <b class="n" data-k="semiLoops"></b> loops it has dropped more than a semitone. Leave <i>Reference C</i> on to hear the gap open against the original pitch.</p>
+        <p data-b="2">A choir that refuses to sink has to put the comma somewhere else. Keep C where it is and tune every chord purely on its home note, and the shared notes can no longer all hold still: when D minor arrives, its <span data-k="jumpNote"></span> must be <span class="r" data-k="jumpFrac"></span> higher than the <span data-k="jumpNote"></span> just sung. Press <i>Pure, fixed C</i> and listen for the held note sliding up <b class="n" data-k="jumpC"></b>&nbsp;cents.</p>
+        <p data-b="3">Or tune nothing purely. In <b>equal temperament</b> every semitone is exactly <span class="r">2<sup>1/12</sup></span>, so the loop comes home every time and nothing jumps. The comma is spread out instead: every major third is <b class="n" data-k="etThirdOff"></b>&nbsp;¢ wide and every fifth <b class="n" data-k="etFifthOff"></b>&nbsp;¢ narrow, in every chord, all the time.</p>
+        <p data-b="4">Where does <span class="r" data-k="pumpFrac"></span> come from? Follow the roots: C→A is down a fifth and up a pure third, then A→D, D→G and G→C are three more fifths down. Four pure fifths are <span class="r" data-k="f4"></span>, but two octaves and a pure third are <span class="r" data-k="o2t"></span>. The difference, the <b>syntonic comma</b>, has to go somewhere: into the pitch, into a held note, or into every chord.</p>
+      </div>
+    </section>
+
+    <section class="step tall" data-scene="temper" data-n="5" style="--n:5">
+      <div class="card">
+        <div class="eyebrow">4 · Temperaments</div>
+        <h2>Every tuning is a compromise</h2>
+        <p data-b="0">A temperament bends the ratios so they fit, and chooses where the error goes. Here is one C major triad in <b>just intonation</b>: every interval pure and nothing beats. Lovely, but as the pump showed, you can't keep it up as the harmony moves.</p>
+        <p data-b="1"><b>Quarter-comma meantone</b>, the Renaissance favorite, narrows every fifth by a quarter of the syntonic comma so that four fifths make a pure major third. Thirds are perfect; each fifth is <b class="n" data-k="mtFifthOff"></b>&nbsp;¢ narrow and beats slowly.</p>
+        <p data-b="2"><b>Equal temperament</b> shares the Pythagorean comma out across all twelve fifths. Fifths are only <b class="n" data-k="etFifthOff"></b>&nbsp;¢ narrow, but major thirds are <b class="n" data-k="etThirdOff"></b>&nbsp;¢ wide and beat fast. Every key is equally good and equally impure.</p>
+        <p data-b="3">Meantone's narrow fifths can't close the circle either. Eleven good fifths leave one leftover, from <span data-k="wolfName"></span>, that is <b class="n" data-k="wolfC"></b>&nbsp;¢, <b class="n" data-k="wolfOff"></b>&nbsp;¢ wider than pure: the <b>wolf fifth</b>, named for how it howls. Play it, then the triad's own fifth for contrast.</p>
+        <p data-b="4">Here is every major triad at once, around the circle of fifths, colored by how far it is from pure; click one to hear it. Meantone has <b class="n" data-k="mtGood"></b> sweet keys and <b class="n" data-k="mtBad"></b> unusable ones. Just intonation, tuned to C, is perfect in <b class="n" data-k="jiGood"></b> keys and unusable in the other <b class="n" data-k="jiBad"></b>, <span data-k="jiD"></span>. Equal temperament is mildly off everywhere. Two historical in-betweens are here too: <b>Pythagorean</b> tuning, with pure fifths and thirds <b class="n" data-k="pythThirdOff"></b>&nbsp;¢ wide (except <b class="n" data-k="pythSchis"></b> distant triads whose thirds come out almost pure by accident), and <b>Werckmeister III</b>, a well temperament in which every key is usable and each has its own color.</p>
+      </div>
+    </section>
+
+    <section class="step tall" data-scene="lattice" data-n="2" style="--n:2">
+      <div class="card">
+        <div class="eyebrow">5 · Playground</div>
+        <h2>A map of pure pitches</h2>
+        <p data-b="0">Every pure pitch is a product of 3s and 5s (with 2s to move by octaves). Put fifths across and major thirds up, and every major triad becomes an upward triangle and every minor triad a downward one. Click a node to hear it and see its ratio; click a triangle to hear its chord, and <i>Same in ET</i> to hear it tempered. A ↓ marks a note a syntonic comma lower than the same name reached by fifths alone. <i>Just scale</i> rings the twelve notes section 4 used for just intonation.</p>
+        <p data-b="1">The comma pump is a walk on this map. Each chord shares an edge or a corner with the last, but four steps later you are one row up and four columns left: a different C, <span class="r" data-k="pumpFrac"></span> of the first. Press <i>Walk the pump</i>. Equal temperament's trick is to pretend those two Cs are the same point, and with them every pair of notes a comma apart.</p>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="stage-col" id="stagecol">
+    <div class="stage">
+      <div class="stage-inner" id="stage">
+        <div class="nav">
+          <button class="key" id="k-prev" aria-label="Previous">←</button>
+          <div class="segs" id="segs"></div>
+          <button class="key" id="k-next" aria-label="Next">→</button>
+        </div>
+        <div class="subnav">
+          <div class="slideno" id="slideno"></div>
+          <div class="chapters" id="chapters"></div>
+        </div>
+
+        <!-- Front page -->
+        <div class="layer" id="L-hero">
+          <div class="viz"><svg id="hero-svg" viewBox="-108 -108 216 216" role="img" aria-label="Twelve pure fifths drawn on a spiral, one turn per octave; the last one overshoots C"></svg></div>
+          <button class="btn primary cta" id="hero-snd">🔊 Enable sound</button>
+          <div class="cta-sub">Twelve pure fifths, one turn per octave. They almost come back to C.</div>
+        </div>
+
+        <!-- 1 Pure intervals -->
+        <div class="layer" id="L-pure">
+          <div class="lay-head"><div class="lay-title" id="pu-title">Octave 2:1</div><div class="lay-sub" id="pu-sub"></div></div>
+          <div class="viz"><canvas id="pu-cv" role="img" aria-label="The two waves, their sum, and both overtone ladders with coinciding harmonics joined"></canvas></div>
+          <div class="ctrls">
+            <div class="seg-ctl" id="pu-ints"></div>
+            <span class="spacer"></span>
+            <button class="btn primary" data-act="pu-play">▶ Together</button>
+            <button class="btn" data-act="pu-apart">▶ Apart</button>
+          </div>
+        </div>
+
+        <!-- 2 Stacking -->
+        <div class="layer" id="L-stack">
+          <div class="lay-head"><div class="lay-title" id="st-title"></div><div class="lay-sub" id="st-sub"></div></div>
+          <div class="viz"><svg id="st-svg" viewBox="-110 -112 220 262" preserveAspectRatio="xMidYMid meet" role="img" aria-label="A spiral of stacked intervals and the gap where it misses the octave"></svg></div>
+          <div class="ctrls">
+            <div class="seg-ctl"><button class="btn" data-act="st-mode" data-v="fifths">12 fifths</button><button class="btn" data-act="st-mode" data-v="thirds">3 thirds</button></div>
+            <span class="spacer"></span>
+            <button class="btn primary" data-act="st-play">▶ Play the stack</button>
+            <button class="btn" data-act="st-cmp">▶ Compare</button>
+          </div>
+        </div>
+
+        <!-- 3 Pump -->
+        <div class="layer" id="L-pump">
+          <div class="chain" id="chain"></div>
+          <div class="readout">
+            <div><span class="lbl">Tonic vs. start</span><b id="pr-c">0.0 ¢</b></div>
+            <div><span class="lbl">Ratio to first C</span><b class="sm" id="pr-r">1/1</b></div>
+            <div class="hide-phone"><span class="lbl">Loop</span><b class="sm" id="pr-l">–</b></div>
+            <div><span class="lbl">The comma goes</span><b class="txt" id="pr-g">–</b></div>
+          </div>
+          <div class="viz"><canvas id="pump-cv" role="img" aria-label="Chart of each chord's root in cents against equal temperament: the pure-tuned loop steps down a comma every time around"></canvas><div class="eqbox" id="eqbox"></div></div>
+          <div class="legend" id="pump-legend"></div>
+          <div class="ctrls">
+            <button class="btn primary" data-act="pump" data-v="just">▶ Pure, held<span class="hide-phone"> notes</span></button>
+            <button class="btn" data-act="pump" data-v="fixed">▶ Pure, fixed C</button>
+            <button class="btn" data-act="pump" data-v="et">▶ Equal</button>
+          </div>
+          <div class="ctrls">
+            <label class="chk"><input type="checkbox" id="drone" checked> Reference C</label>
+            <span class="spacer"></span>
+            <div class="seg-ctl hide-phone" id="tempo"><span class="lbl">tempo</span><button class="btn" data-act="pump-tempo" data-v="1.6">slow</button><button class="btn on" data-act="pump-tempo" data-v="1.15">medium</button><button class="btn" data-act="pump-tempo" data-v="0.75">fast</button></div>
+            <button class="btn" data-act="pump-stop" aria-label="Stop the loop">■ Stop</button>
+          </div>
+        </div>
+
+        <!-- 4 Temperaments -->
+        <div class="layer" id="L-temper">
+          <div class="lay-head"><div class="lay-title" id="te-title"></div><div class="lay-sub" id="te-sub"></div></div>
+          <div class="ctrls"><div class="seg-ctl" id="te-tabs"></div><div class="seg-ctl"><button class="btn" data-act="te-view" data-v="triad">One triad</button><button class="btn" data-act="te-view" data-v="keys">All keys</button></div></div>
+          <table class="ttab" id="te-tab"></table>
+          <div class="viz"><canvas id="te-cv" role="img" aria-label="Beating of each interval drawn as an amplitude envelope over two seconds"></canvas><svg id="te-ring" viewBox="-112 -112 224 238" preserveAspectRatio="xMidYMid meet" aria-label="Every major triad around the circle of fifths, colored by how far it is from pure"></svg></div>
+          <div class="ctrls">
+            <button class="btn primary" data-act="te-triad">▶ Triad</button>
+            <button class="btn" data-act="te-arp">▶ Arpeggio</button>
+            <button class="btn" data-act="te-fifth" id="te-fifth">▶ C–G</button>
+            <button class="btn" data-act="te-wolf" id="te-wolf">▶ G♯–E♭</button>
+          </div>
+        </div>
+
+        <!-- 5 Lattice -->
+        <div class="layer" id="L-lattice">
+          <div class="lay-head"><div class="lay-title">Fifths across, major thirds up</div><div class="lay-sub">Click nodes and triangles, or Tab to a node and press Enter.</div></div>
+          <div class="viz"><svg id="lat-svg" preserveAspectRatio="xMidYMid meet" aria-label="Lattice of pure pitches: fifths across, major thirds up"></svg></div>
+          <div id="lat-read" aria-live="polite"></div>
+          <div class="ctrls">
+            <button class="btn primary" data-act="lat-walk">▶ Walk the pump</button>
+            <button class="btn" data-act="lat-play">▶ Play</button>
+            <button class="btn" data-act="lat-et">▶ Same in ET</button>
+            <button class="btn" data-act="lat-clear">Clear</button>
+            <label class="chk"><input type="checkbox" id="lat-ji"> Just scale</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="after" id="after">
+  <div class="eyebrow">Appendix</div>
+  <h2>The numbers</h2>
+  <p class="lede">Every figure on this page is computed in your browser from exact fractions; nothing is typed in. These are the ratios it starts from and what they come to.</p>
+  <h3>Pure intervals</h3>
+  <div class="tablewrap"><table class="ntab" id="tab-ivs"></table></div>
+  <h3>Commas: where the ratios fail to meet</h3>
+  <div class="tablewrap"><table class="ntab" id="tab-commas"></table></div>
+  <h3>The five tunings, note by note (cents above C)</h3>
+  <div class="tablewrap"><table class="ntab" id="tab-tunings"></table></div>
+  <h3>How the sound is made</h3>
+  <p id="snd-notes"></p>
+  <h3>Further reading</h3>
+  <ul>
+    <li>Hermann von Helmholtz, <i>On the Sensations of Tone</i> (1863). The classic account of overtones and beating as the physics of consonance.</li>
+    <li>Harry Partch, <i>Genesis of a Music</i> (1949). A composer's case for just intonation, lattice diagrams included.</li>
+    <li>Ross W. Duffin, <i>How Equal Temperament Ruined Harmony (and Why You Should Care)</i> (2007). A lively history of meantone, well temperaments and the victory of 12-TET.</li>
+  </ul>
+</section>
+
+<div class="soundbar" role="group" aria-label="Sound controls">
+  <button class="btn primary" id="snd-on">🔊 Enable sound</button>
+  <label class="vol" id="vol-wrap" hidden>vol <input type="range" id="vol" min="0" max="1" step="0.01" value="0.6" aria-label="Master volume"></label>
+  <button class="btn" id="stop-all" hidden>■ Stop all</button>
+  <button class="btn" id="theme" title="Switch light / dark" aria-label="Switch light or dark theme">◐</button>
+</div>
+
+<script>
+'use strict';
+/* =====================================================================
+   Exact arithmetic. Every ratio is a BigInt fraction; every cents figure
+   on the page is computed from these, never typed in.
+   ===================================================================== */
+const gcd = (a, b) => { a = a < 0n ? -a : a; b = b < 0n ? -b : b; while (b) [a, b] = [b, a % b]; return a; };
+class Q {
+  constructor(n, d = 1n) { n = BigInt(n); d = BigInt(d); if (d < 0n) { n = -n; d = -d; } const g = gcd(n, d) || 1n; this.n = n / g; this.d = d / g; }
+  mul(o) { return new Q(this.n * o.n, this.d * o.d); }
+  div(o) { return new Q(this.n * o.d, this.d * o.n); }
+  pow(k) { return k >= 0 ? new Q(this.n ** BigInt(k), this.d ** BigInt(k)) : new Q(this.d ** BigInt(-k), this.n ** BigInt(-k)); }
+  get v() { return Number(this.n) / Number(this.d); }
+  get c() { return 1200 * (Math.log2(Number(this.n)) - Math.log2(Number(this.d))); }
+  eq(o) { return this.n === o.n && this.d === o.d; }
+  fold() { let n = this.n, d = this.d; while (n >= 2n * d) d *= 2n; while (n < d) n *= 2n; return new Q(n, d); } // into [1, 2)
+  foldNear() { const q = this.fold(); return q.v >= Math.SQRT2 ? q.div(R(2)) : q; }               // into [√½, √2)
+  toString() { return `${this.n}/${this.d}`; }
+}
+const R = (n, d = 1) => new Q(n, d);
+const centsOf = x => 1200 * Math.log2(x);
+const MINUS = '−';
+const fmt = (x, dp = 1) => { const s = Math.abs(x).toFixed(dp); return (x < 0 && +s !== 0 ? MINUS : '') + s; };
+const fmtS = (x, dp = 1) => { const s = Math.abs(x).toFixed(dp); return +s === 0 ? s : (x < 0 ? MINUS : '+') + s; };
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const ease = t => t * t * (3 - 2 * t);
+const mod = (a, m) => ((a % m) + m) % m;
+const etF = m => 440 * 2 ** ((m - 69) / 12);       // equal-tempered MIDI note → Hz (A4 = 440)
+const C3 = etF(48), C4 = etF(60);
+const ET_SEMI = 1200 / 12;
+
+const OCT = R(2), FIFTH = R(3, 2), THIRD = R(5, 4), MIN3 = R(6, 5);
+const PYTH = FIFTH.pow(12).div(OCT.pow(7));                    // 12 fifths over 7 octaves
+const DIESIS = OCT.div(THIRD.pow(3));                          // octave over 3 major thirds
+const SYNT = FIFTH.pow(4).div(OCT.pow(2).mul(THIRD));          // 4 fifths over 2 octaves + a third
+const SCHISMA = PYTH.div(SYNT);
+const GDIESIS = MIN3.pow(4).div(OCT);                          // 4 minor thirds over an octave
+
+// Note names on the line of fifths: k fifths above C.
+const LETTERS = 'FCGDAEB';
+function nameOf(k) {
+  const i = k + 1, L = LETTERS[mod(i, 7)], acc = Math.floor(i / 7);
+  return L + (acc > 0 ? '♯'.repeat(acc) : acc < 0 ? '♭'.repeat(-acc) : '');
+}
+
+/* ---------- The 5-limit lattice: a fifths, b major thirds ---------- */
+const latQ = (a, b) => FIFTH.pow(a).mul(THIRD.pow(b));          // unfolded pure pitch relative to C
+const latPc = (a, b) => mod(7 * a + 4 * b, 12);
+// Just intonation's twelve notes: the 4 × 3 block of the lattice around C (a −1…2, b −1…1).
+const JI_PC = [];
+for (let b = -1; b <= 1; b++) for (let a = -1; a <= 2; a++) JI_PC[latPc(a, b)] = {a, b, q: latQ(a, b).fold(), name: nameOf(a + 4 * b)};
+
+/* ---------- The comma pump, derived chord by chord ---------- */
+const PC = {C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11};
+const PCN = {0: 'C', 2: 'D', 4: 'E', 5: 'F', 7: 'G', 9: 'A', 11: 'B'};
+const TRI = {maj: [[0, R(1)], [4, THIRD], [7, FIFTH]], min: [[0, R(1)], [3, MIN3], [7, FIFTH]]};
+const PROG = [
+  {rn: 'I', root: 'C', q: 'maj', cn: 'C'}, {rn: 'vi', root: 'A', q: 'min', cn: 'Am'},
+  {rn: 'ii', root: 'D', q: 'min', cn: 'Dm'}, {rn: 'V', root: 'G', q: 'maj', cn: 'G'},
+  {rn: 'I', root: 'C', q: 'maj', cn: 'C'},
+];
+const tonesOf = (ch, root) => TRI[ch.q].map(([iv, q]) => ({pc: (PC[ch.root] + iv) % 12, q: root.mul(q)}));
+// Held notes: each chord's root is fixed by the note it shares with the chord before.
+const CHAIN = [];
+for (const ch of PROG) {
+  const tpl = TRI[ch.q].map(([iv, q]) => ({pc: (PC[ch.root] + iv) % 12, q}));
+  let root = R(1), keeps = [];
+  const prev = CHAIN[CHAIN.length - 1];
+  if (prev) {
+    const common = tpl.filter(t => prev.tones.some(p => p.pc === t.pc));
+    if (!common.length) throw new Error('pump: no common tone');
+    const roots = common.map(t => prev.tones.find(p => p.pc === t.pc).q.div(t.q));
+    if (!roots.every(r => r.fold().eq(roots[0].fold()))) console.warn('pump: common tones disagree');
+    root = roots[0]; keeps = common.map(t => PCN[t.pc]);
+  }
+  CHAIN.push({...ch, root, keeps, tones: tonesOf(ch, root)});
+}
+// Fixed C: every chord tuned purely on its root's place in the just scale of C.
+const CHAIN_FIX = PROG.map(ch => { const root = JI_PC[PC[ch.root]].q; return {...ch, root, tones: tonesOf(ch, root)}; });
+const PUMP = CHAIN[4].root.foldNear();               // the C that comes back, relative to the first
+const PUMP_C = PUMP.c;
+if (!PUMP.eq(SYNT.pow(-1))) console.warn('pump ratio is not the syntonic comma');
+// Voicing: bass + three voices; each shared tone stays in the same voice so it can be held.
+const VOICING = [[48, 60, 64, 67], [45, 60, 64, 69], [50, 62, 65, 69], [43, 62, 59, 67]];
+const voiceQs = chain => [0, 1, 2, 3, 4].map(c => VOICING[c % 4].map(m => {
+  const t = chain[c].tones.find(x => x.pc === m % 12);
+  const k = Math.round((m - 48) / 12 - Math.log2(t.q.v));
+  return t.q.mul(R(2).pow(k));                         // ratio to the starting C3
+}));
+const VQ = {just: voiceQs(CHAIN), fixed: voiceQs(CHAIN_FIX)};
+// In fixed-C mode, which voice has to move although its note name stays (the comma jump)?
+const JUMPS = [];
+for (let c = 1; c <= 4; c++) VOICING[c % 4].forEach((m, v) => { if (VOICING[(c - 1) % 4][v] === m && !VQ.fixed[c][v].eq(VQ.fixed[c - 1][v])) JUMPS.push({c, v, name: PCN[m % 12], q: VQ.fixed[c][v].div(VQ.fixed[c - 1][v])}); });
+const JUMP = JUMPS[0];
+const LOOPS = 8, MAXK = LOOPS * 4;
+const pumpCache = new Map();
+function pumpEvent(mode, k) {
+  const key = mode + k; if (pumpCache.has(key)) return pumpCache.get(key);
+  const L = Math.floor(k / 4), ci = k % 4, mids = VOICING[ci], pm = VOICING[(k + 3) % 4];
+  let ev;
+  if (mode === 'et') {
+    ev = {f: mids.map(etF), held: mids.map((m, v) => k > 0 && pm[v] === m), shift: [false, false, false, false], dev: [0, 0, 0, 0], root: null};
+  } else {
+    const drift = mode === 'just' ? PUMP.pow(L) : R(1), qs = VQ[mode][ci].map(q => q.mul(drift));
+    const pq = k > 0 ? pumpEvent(mode, k - 1).qs : null;
+    ev = {qs, f: qs.map(q => C3 * q.v), root: (mode === 'just' ? CHAIN : CHAIN_FIX)[ci].root.mul(drift)};
+    ev.held = qs.map((q, v) => !!pq && pm[v] === mids[v] && pq[v].eq(q));
+    ev.shift = qs.map((q, v) => !!pq && pm[v] === mids[v] && !pq[v].eq(q));
+    ev.dev = ev.f.map((f, v) => centsOf(f / etF(mids[v])));
+  }
+  ev.k = k; ev.L = L; ev.ci = ci;
+  pumpCache.set(key, ev); return ev;
+}
+
+/* ---------- Tunings: cents above C for each of the 12 pitch classes ---------- */
+const P5C = FIFTH.c;
+function chainTuning(fifthC) {                       // a chain of fifths from E♭ (−3) to G♯ (+8)
+  const cents = [], names = [];
+  for (let k = -3; k <= 8; k++) {
+    let c = 0; if (k > 0) for (let j = 0; j < k; j++) c += fifthC(j); else for (let j = k; j < 0; j++) c -= fifthC(j);
+    const pc = mod(7 * k, 12); cents[pc] = mod(c, 1200); names[pc] = nameOf(k);
+  }
+  return {cents, names};
+}
+const TUNINGS = {
+  just: {name: 'Just', long: 'Just intonation on C', cents: JI_PC.map(x => x.q.c), names: JI_PC.map(x => x.name)},
+  pyth: {name: 'Pythagorean', long: 'Pythagorean tuning', ...chainTuning(() => P5C)},
+  mean: {name: 'Meantone', long: 'Quarter-comma meantone', ...chainTuning(() => P5C - SYNT.c / 4)},
+  well: {name: 'Werckmeister III', long: 'Werckmeister III (a well temperament)', ...chainTuning(j => [0, 1, 2, 5].includes(j) ? P5C - PYTH.c / 4 : P5C)},
+  et:   {name: 'Equal', long: 'Twelve-tone equal temperament', ...chainTuning(() => 7 * ET_SEMI)},
+};
+const TUNE_ORDER = ['just', 'pyth', 'mean', 'well', 'et'];
+const tfs = (t, s) => C4 * 2 ** ((TUNINGS[t].cents[mod(s, 12)] + 1200 * Math.floor(s / 12)) / 1200);  // semitone index from C4
+function triadInfo(t, r) {
+  const s0 = r >= 6 ? r - 12 : r, f = [s0, s0 + 4, s0 + 7].map(s => tfs(t, s));
+  const M3 = centsOf(f[1] / f[0]), m3 = centsOf(f[2] / f[1]), P5 = centsOf(f[2] / f[0]);
+  return {f, r, M3, m3, P5, M3off: M3 - THIRD.c, m3off: m3 - MIN3.c, P5off: P5 - P5C,
+    bM3: Math.abs(5 * f[0] - 4 * f[1]), bm3: Math.abs(6 * f[1] - 5 * f[2]), bP5: Math.abs(3 * f[0] - 2 * f[2])};
+}
+function worstFifth(t, avoid = -1) {        // ties: prefer G♯–E♭, then any fifth other than `avoid`
+  const offs = [...Array(12).keys()].map(i => centsOf(tfs(t, i + 7) / tfs(t, i)) - P5C);
+  const mx = Math.max(...offs.map(Math.abs)), mn = Math.min(...offs.map(Math.abs));
+  const cand = offs.map((o, i) => Math.abs(Math.abs(o) - mx) < 0.01 ? i : -1).filter(i => i >= 0);
+  const i = cand.includes(8) ? 8 : (cand.find(c => c !== avoid) ?? cand[0]), n = TUNINGS[t].names, s0 = i >= 6 ? i - 12 : i;
+  const fl = tfs(t, s0), fh = tfs(t, s0 + 7);
+  return {i, all: mx - mn < 0.01, ties: cand.length, c: P5C + offs[i], off: offs[i], name: `${n[i]}–${n[(i + 7) % 12]}`, fl, fh, beat: Math.abs(3 * fl - 2 * fh)};
+}
+// 0 = pure, 1 = unusable. Fifths tolerate less error than thirds: a comma-wide third (Pythagorean) is harsh but usable,
+// a comma-wrong fifth or a diesis-wide third is not.
+const badness = ti => clamp(Math.max(Math.abs(ti.M3off) / 34, Math.abs(ti.P5off) / 18));
+
+/* ---------- Numbers quoted in the text ---------- */
+const etThird = 2 ** (4 / 12), mtWolf = worstFifth('mean');
+const countKeys = (t, f) => [...Array(12).keys()].filter(r => f(triadInfo(t, r))).length;
+const mtBad = countKeys('mean', ti => badness(ti) >= 0.5), jiBad = countKeys('just', ti => badness(ti) >= 0.5);
+const NUM = {
+  fifthC: fmt(FIFTH.c), thirdC: fmt(THIRD.c), etThirdC: fmt(centsOf(etThird)),
+  etThirdBeat: fmt(Math.abs(5 * 220 - 4 * 220 * etThird)),
+  f12: FIFTH.pow(12).toString(), pythFrac: PYTH.toString(), pythC: fmt(PYTH.c),
+  t3: THIRD.pow(3).toString(), diesisFrac: DIESIS.toString(), diesisC: fmt(DIESIS.c),
+  pumpFrac: PUMP.toString(), pumpC: fmt(Math.abs(PUMP_C)),
+  semiLoops: String(Math.ceil(ET_SEMI / Math.abs(PUMP_C))),
+  jumpNote: JUMP.name, jumpFrac: JUMP.q.toString(), jumpC: fmt(JUMP.q.c),
+  etThirdOff: fmt(centsOf(etThird) - THIRD.c), etFifthOff: fmt(P5C - 7 * ET_SEMI),
+  f4: `(3/2)⁴ = ${FIFTH.pow(4)}`,
+  o2t: (() => { const q = OCT.pow(2).mul(THIRD); return `2² × 5/4 = ${q.d === 1n ? q.n : q} = ${q.n * 16n / q.d}/16`; })(),
+  mtFifthOff: fmt(SYNT.c / 4), wolfName: mtWolf.name.replace('–', ' up to '), wolfC: fmt(mtWolf.c), wolfOff: fmt(mtWolf.off),
+  mtGood: String(12 - mtBad), mtBad: String(mtBad), jiGood: String(12 - jiBad), jiBad: String(jiBad),
+  jiD: badness(triadInfo('just', 2)) >= 0.5 ? 'D major among them' : 'D major not among them', pythSchis: String(countKeys('pyth', ti => Math.abs(ti.M3off) < 3)), pythThirdOff: fmt(FIFTH.pow(4).fold().c - THIRD.c),
+};
+document.querySelectorAll('[data-k]').forEach(el => { if (NUM[el.dataset.k] != null) el.textContent = NUM[el.dataset.k]; else console.warn('missing number', el.dataset.k); });
+
+/* =====================================================================
+   Audio. One context, created on the first gesture. A harmonic-rich
+   periodic wave (sines would hide the beating) with soft envelopes.
+   ===================================================================== */
+const HARMONICS = 14, ROLLOFF = 1.05;
+const A = {ctx: null, bus: null, wave: null, vol: 0.6, voices: new Set(), timers: new Set(), stoppers: new Set()};
+const $ = id => document.getElementById(id);
+const store = {get(k) { try { return localStorage.getItem('tuning-' + k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem('tuning-' + k, v); } catch (e) {} }};
+{ const v = parseFloat(store.get('vol')); if (v >= 0 && v <= 1) { A.vol = v; $('vol').value = v; } }
+const masterGain = () => A.vol * A.vol * 1.4;
+function ensureAudio() {
+  if (!A.ctx) {
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null;
+    const ctx = new AC();
+    const comp = ctx.createDynamicsCompressor();
+    comp.threshold.value = -16; comp.knee.value = 10; comp.ratio.value = 4; comp.attack.value = 0.004; comp.release.value = 0.25;
+    const master = ctx.createGain(); master.gain.value = masterGain();
+    master.connect(comp).connect(ctx.destination);
+    const re = new Float32Array(HARMONICS + 1), im = new Float32Array(HARMONICS + 1);
+    for (let n = 1; n <= HARMONICS; n++) im[n] = 1 / n ** ROLLOFF;   // sawtooth-like, gently rolled off
+    A.ctx = ctx; A.bus = master; A.wave = ctx.createPeriodicWave(re, im);
+  }
+  if (A.ctx.state !== 'running') A.ctx.resume();
+  soundUI(); return A.ctx;
+}
+function addVoice(f) {
+  const ctx = A.ctx, o = ctx.createOscillator(), g = ctx.createGain();
+  o.setPeriodicWave(A.wave); o.frequency.value = f; g.gain.value = 0;
+  o.connect(g).connect(A.bus);
+  const v = {o, g}; A.voices.add(v);
+  o.onended = () => { A.voices.delete(v); try { g.disconnect(); } catch (e) {} };
+  return v;
+}
+// One note: quick attack, settle to a steady sustain (steady so beats stay audible), soft release.
+function note(f, t, dur, vel = 1) {
+  const ctx = ensureAudio(); if (!ctx) return;
+  t = Math.max(t, ctx.currentTime + 0.005);
+  const peak = 0.13 * vel, v = addVoice(f), gg = v.g.gain;
+  gg.setValueAtTime(0, t); gg.linearRampToValueAtTime(peak, t + 0.03);
+  gg.setTargetAtTime(peak * 0.72, t + 0.03, 0.35);
+  gg.setTargetAtTime(0, t + dur, 0.09);
+  v.o.start(t); v.o.stop(t + dur + 0.8);
+}
+const chord = (fs, t, dur, vel = 1) => fs.forEach(f => note(f, t, dur, vel));
+function fadeVoice(v, when, tc = 0.04) {
+  const g = v.g.gain;
+  try { if (g.cancelAndHoldAtTime) g.cancelAndHoldAtTime(when); else { g.cancelScheduledValues(when); g.setValueAtTime(g.value, when); } } catch (e) {}
+  g.setTargetAtTime(0, when, tc);
+  try { v.o.stop(when + tc * 10); } catch (e) {}
+}
+function later(fn, ms) { const id = setTimeout(() => { A.timers.delete(id); fn(); }, ms); A.timers.add(id); return id; }
+function stopSequences() { A.timers.forEach(clearTimeout); A.timers.clear(); A.stoppers.forEach(f => f()); }
+function stopAll() {
+  stopSequences();
+  if (A.ctx) { const t = A.ctx.currentTime; A.voices.forEach(v => fadeVoice(v, t)); }
+}
+const nowA = () => (A.ctx ? A.ctx.currentTime : 0);
+
+// Sound bar
+const sndBtn = $('snd-on'), volWrap = $('vol-wrap'), stopBtn = $('stop-all');
+function soundUI() {
+  const live = !!A.ctx;
+  sndBtn.classList.toggle('live', live); sndBtn.textContent = live ? '🔊 Sound on' : '🔊 Enable sound';
+  volWrap.hidden = !live; stopBtn.hidden = !live;
+  $('hero-snd').textContent = live ? '▶ Hear the twelve fifths' : '🔊 Enable sound';
+}
+const chime = () => { ensureAudio(); note(C4, nowA() + 0.02, 0.6, 0.7); note(C4 * FIFTH.v, nowA() + 0.02, 0.6, 0.7); };
+sndBtn.addEventListener('click', chime);
+stopBtn.addEventListener('click', stopAll);
+$('vol').addEventListener('input', e => {
+  A.vol = +e.target.value; store.set('vol', A.vol);
+  if (A.bus) A.bus.gain.setTargetAtTime(masterGain(), A.ctx.currentTime, 0.03);
+});
+{ const th = store.get('theme'); if (th === 'light' || th === 'dark') document.documentElement.dataset.theme = th; }
+$('theme').addEventListener('click', () => {
+  const r = document.documentElement, dark = getComputedStyle(r).colorScheme.includes('dark');
+  r.dataset.theme = dark ? 'light' : 'dark'; store.set('theme', r.dataset.theme); readColors();
+});
+
+/* ---------- Colors from CSS tokens (for canvas / SVG drawing) ---------- */
+const COL = {};
+function readColors() {
+  const s = getComputedStyle(document.documentElement);
+  for (const k of ['ink', 'ink-2', 'ink-3', 'rule', 'panel', 'accent', 'lo', 'hi', 'sum', 'just', 'et', 'good', 'warn', 'stage', 'stage-hi'])
+    COL[k] = s.getPropertyValue('--' + k).trim();
+  COL.key = Object.values(COL).join();
+}
+readColors();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readColors);
+const hexRgb = h => { const m = /^#?([0-9a-f]{6})$/i.exec(h); const n = m ? parseInt(m[1], 16) : 0x888888; return [n >> 16, (n >> 8) & 255, n & 255]; };
+const mixHex = (a, b, t) => { const x = hexRgb(a), y = hexRgb(b); return `rgb(${x.map((v, i) => Math.round(lerp(v, y[i], t))).join(',')})`; };
+const badColor = s => s < 0.5 ? mixHex(COL.good, COL.warn, s * 2) : mixHex(COL.warn, COL.just, (s - 0.5) * 2);
+function fitCanvas(cv) {
+  const r = cv.getBoundingClientRect(), d = Math.min(2.5, devicePixelRatio || 1);
+  const w = Math.max(1, Math.round(r.width * d)), h = Math.max(1, Math.round(r.height * d));
+  if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+  const c = cv.getContext('2d'); c.setTransform(d, 0, 0, d, 0, 0); c.clearRect(0, 0, r.width, r.height);
+  return {c, W: r.width, H: r.height};
+}
+const MONO = 'ui-monospace, "SF Mono", Menlo, monospace';
+// Re-rendering an SVG with innerHTML drops keyboard focus; put it back on the same item.
+function keepFocus(svg, attr, fn) {
+  const a = document.activeElement, k = a && svg.contains(a) ? a.getAttribute(attr) : null;
+  fn();
+  if (k != null) { const el = [...svg.querySelectorAll(`[${attr}]`)].find(e => e.getAttribute(attr) === k); if (el) el.focus({preventScroll: true}); }
+}
+// Enter / Space on an SVG "button"
+document.addEventListener('keydown', e => {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('svg [role=button]')) {
+    e.preventDefault(); e.stopImmediatePropagation(); e.target.dispatchEvent(new MouseEvent('click', {bubbles: true}));
+  }
+}, true);
+
+/* =====================================================================
+   Spiral (section 2, and the front page)
+   ===================================================================== */
+const SPIRAL = {
+  fifths: {n: 12, step: FIFTH, r0: 26, dr: 9.7, name: k => nameOf(k), target: 7, total: FIFTH.pow(12), gap: PYTH, what: '12 fifths vs 7 octaves', ref: '2⁷ = 128'},
+  thirds: {n: 3, step: THIRD, r0: 32, dr: 52, name: k => nameOf(4 * k), target: 1, total: THIRD.pow(3), gap: DIESIS, what: '3 thirds vs 1 octave', ref: '2/1'},
+};
+function spiralSVG(mode, p, detail) {
+  const S = SPIRAL[mode], stepC = S.step.c, F = 'style="font-family:var(--f-mono)"', FD = 'style="font-family:var(--f-display)"';
+  const rad = c => S.r0 + S.dr * c / 1200, pt = c => { const a = 2 * Math.PI * c / 1200, r = rad(c); return [r * Math.sin(a), -r * Math.cos(a)]; };
+  const kf = clamp(p, 0, S.n), k0 = Math.floor(kf), cc = (k0 + ease(kf - k0)) * stepC;
+  let o = '';
+  o += `<circle r="98" fill="none" stroke="${COL.rule}" stroke-width="0.6"/>`;
+  for (let i = 0; i < 12; i++) { const a = i * Math.PI / 6; o += `<line x1="${94 * Math.sin(a)}" y1="${-94 * Math.cos(a)}" x2="${101 * Math.sin(a)}" y2="${-101 * Math.cos(a)}" stroke="${COL['ink-3']}" stroke-width="${i ? 0.6 : 1.4}"/>`; }
+  o += `<text x="0" y="-103" font-size="6.5" text-anchor="middle" fill="${COL['ink-2']}" ${F}>C</text>`;
+  for (let j = 0; j <= S.target; j++) {
+    const [x, y] = pt(1200 * j), last = j === S.target;
+    o += `<circle cx="${x}" cy="${y}" r="${last ? 3.2 : 1.6}" fill="none" stroke="${last ? COL.ink : COL['ink-3']}" stroke-width="${last ? 1 : 0.6}" ${last ? 'stroke-dasharray="1.6 1.2"' : ''}/>`;
+  }
+  let d = ''; for (let c = 0; c <= cc + 0.01; c += 6) { const [x, y] = pt(Math.min(c, cc)); d += (d ? 'L' : 'M') + x.toFixed(2) + ' ' + y.toFixed(2); }
+  { const [x, y] = pt(cc); d += 'L' + x.toFixed(2) + ' ' + y.toFixed(2); }
+  o += `<path d="${d}" fill="none" stroke="${COL.accent}" stroke-width="1.3" stroke-linecap="round"/>`;
+  for (let k = 0; k <= k0; k++) {
+    const c = k * stepC, [x, y] = pt(c), end = k === S.n, a = 2 * Math.PI * c / 1200;
+    const lr = rad(c) + 7.5, lx = lr * Math.sin(a), ly = -lr * Math.cos(a) + 2.2;
+    o += `<circle cx="${x}" cy="${y}" r="${end ? 3 : 2.4}" fill="${end ? COL.just : k ? COL.accent : COL.ink}"/>`;
+    o += `<text x="${lx}" y="${ly}" font-size="${end ? 7.5 : 6.2}" font-weight="${end ? 700 : 600}" text-anchor="middle" fill="${end ? COL.just : COL['ink-2']}" ${FD}>${S.name(k)}</text>`;
+  }
+  if (kf >= S.n) {
+    const cEnd = S.n * stepC, cT = 1200 * S.target, r = rad(cT), gc = cEnd - cT;
+    const a0 = 2 * Math.PI * cT / 1200, a1 = 2 * Math.PI * cEnd / 1200, sweep = a1 > a0 ? 1 : 0;
+    o += `<path d="M${r * Math.sin(a0)} ${-r * Math.cos(a0)} A${r} ${r} 0 0 ${sweep} ${rad(cEnd) * Math.sin(a1)} ${-rad(cEnd) * Math.cos(a1)}" fill="none" stroke="${COL.just}" stroke-width="2.4" stroke-linecap="round"/>`;
+    o += `<rect x="-24" y="-9" width="48" height="16" rx="8" fill="${COL['stage-hi']}" fill-opacity="0.92" stroke="${COL.just}" stroke-width="0.6"/>`;
+    o += `<text x="0" y="3.4" font-size="10" font-weight="800" text-anchor="middle" fill="${COL.just}" ${FD}>${fmtS(gc)} ¢</text>`;
+  }
+  if (detail && kf >= S.n) {   // zoomed number line under the spiral
+    const y0 = 128, half = 50, sc = 90 / half, gc = S.n * stepC - 1200 * S.target;
+    o += `<line x1="-92" y1="${y0}" x2="92" y2="${y0}" stroke="${COL['ink-3']}" stroke-width="0.6"/>`;
+    for (let c = -half; c <= half; c += 10) o += `<line x1="${c * sc}" y1="${y0 - 2}" x2="${c * sc}" y2="${y0 + 2}" stroke="${COL['ink-3']}" stroke-width="0.5"/><text x="${c * sc}" y="${y0 + 9}" font-size="4.6" text-anchor="middle" fill="${COL['ink-3']}" ${F}>${fmtS(c, 0)}</text>`;
+    o += `<rect x="${Math.min(0, gc) * sc}" y="${y0 - 3}" width="${Math.abs(gc) * sc}" height="6" fill="${COL.just}" opacity="0.25"/>`;
+    o += `<line x1="0" y1="${y0 - 9}" x2="0" y2="${y0 + 3}" stroke="${COL.ink}" stroke-width="1"/><text x="0" y="${y0 - 11}" font-size="5.2" text-anchor="middle" fill="${COL.ink}" ${F}>${S.ref}</text>`;
+    o += `<line x1="${gc * sc}" y1="${y0 - 9}" x2="${gc * sc}" y2="${y0 + 3}" stroke="${COL.just}" stroke-width="1.2"/><text x="${gc * sc}" y="${y0 - 17}" font-size="5.2" text-anchor="middle" fill="${COL.just}" ${F}>${S.total}</text>`;
+    o += `<text x="0" y="${y0 + 19}" font-size="5" text-anchor="middle" fill="${COL['ink-2']}" ${F}>cents near the octave · ${S.what}: ${S.gap} = ${fmt(Math.abs(gc), 2)} ¢</text>`;
+  }
+  return o;
+}
+
+/* =====================================================================
+   Scenes: each has a stage layer, set(build) and frame(now).
+   primary() is what P plays.
+   ===================================================================== */
+const SC = {};
+
+/* ---------- Front page ---------- */
+SC.hero = {
+  layer: 'L-hero',
+  frame() { if (COL.key !== this.ck) { this.ck = COL.key; $('hero-svg').innerHTML = spiralSVG('fifths', 12, false); } },
+  primary() { if (A.ctx) playStack('fifths', false); else chime(); },
+};
+$('hero-snd').addEventListener('click', () => SC.hero.primary());
+
+/* ---------- 1 · Pure intervals ---------- */
+const F1 = 220;
+const INTS = [
+  {name: 'Octave', tag: '2:1', q: R(2)},
+  {name: 'Fifth', tag: '3:2', q: R(3, 2)},
+  {name: 'Third', long: 'Major third', tag: '5:4', q: R(5, 4)},
+  {name: 'Piano third', tag: '12-TET', r: etThird, ref: R(5, 4)},
+];
+INTS.forEach(iv => { iv.r = iv.r || iv.q.v; });
+SC.pure = {
+  layer: 'L-pure', iv: 0, t0: 0,
+  set(b) { this.pick(b); },
+  pick(i) {
+    this.iv = i; this.t0 = performance.now() / 1000;
+    document.querySelectorAll('#pu-ints .btn').forEach((b, j) => b.classList.toggle('on', j === i));
+    const iv = INTS[i];
+    $('pu-title').textContent = `${iv.long || iv.name} ${iv.q ? iv.tag : '2^(4/12) ≈ ' + iv.r.toFixed(4)}`;
+    $('pu-sub').textContent = iv.q
+      ? `${fmt(iv.q.c)} cents. ${F1} Hz and ${fmt(F1 * iv.r, 1)} Hz. The sum repeats every ${iv.q.d} cycle${iv.q.d > 1n ? 's' : ''} of the lower note.`
+      : `${fmt(centsOf(iv.r))} cents, ${fmtS(centsOf(iv.r) - iv.ref.c)} ¢ from pure 5:4. The sum never quite repeats (its drift is slowed down here).`;
+  },
+  frame(now) {
+    const {c, W, H} = fitCanvas($('pu-cv')), iv = INTS[this.iv], t = now - this.t0;
+    const f2 = F1 * iv.r, waveH = H * 0.56, rowH = waveH / 3.3, x0 = 4, x1 = W - 4, per = 4; // window: 4 cycles of the lower note
+    const phi = iv.ref ? 2 * Math.PI * (iv.r / iv.ref.v - 1) * F1 * 0.1 * t : 0;
+    const rows = [
+      {y: rowH * 0.55, col: COL.lo, f: x => Math.sin(x), lab: `lower · ${F1} Hz`},
+      {y: rowH * 1.55, col: COL.hi, f: x => Math.sin(iv.r * x + phi), lab: `upper · ${fmt(f2, 1)} Hz`},
+      {y: rowH * 2.75, col: COL.sum, f: x => (Math.sin(x) + Math.sin(iv.r * x + phi)) / 2, lab: 'sum', amp: 1.6},
+    ];
+    if (iv.q) {
+      const rep = Number(iv.q.d);
+      for (let j = rep; j < per; j += rep) {
+        const x = x0 + (x1 - x0) * j / per;
+        c.strokeStyle = COL['ink-3']; c.setLineDash([3, 4]); c.lineWidth = 1;
+        c.beginPath(); c.moveTo(x, 4); c.lineTo(x, waveH); c.stroke(); c.setLineDash([]);
+      }
+      const xr = x0 + (x1 - x0) * Math.min(rep, per) / per, yb = rows[2].y + rowH * 0.62;
+      c.strokeStyle = COL.accent; c.lineWidth = 1.5;
+      c.beginPath(); c.moveTo(x0, yb - 4); c.lineTo(x0, yb); c.lineTo(xr, yb); c.lineTo(xr, yb - 4); c.stroke();
+      c.fillStyle = COL.accent; c.font = '600 11px ' + MONO; c.textAlign = 'center';
+      c.fillText(`repeats every ${rep} cycle${rep > 1 ? 's' : ''}`, (x0 + xr) / 2, yb + 13);
+    }
+    c.textAlign = 'left';
+    for (const r of rows) {
+      const amp = rowH * 0.36 * (r.amp || 1);
+      c.strokeStyle = COL.rule; c.lineWidth = 1; c.beginPath(); c.moveTo(x0, r.y); c.lineTo(x1, r.y); c.stroke();
+      c.strokeStyle = r.col; c.lineWidth = r.amp ? 2.2 : 1.7; c.beginPath();
+      for (let px = x0; px <= x1; px += 1) { const x = (px - x0) / (x1 - x0) * per * 2 * Math.PI, y = r.y - amp * r.f(x); px === x0 ? c.moveTo(px, y) : c.lineTo(px, y); }
+      c.stroke();
+      c.fillStyle = r.col; c.font = '600 10.5px ' + MONO; c.fillText(r.lab, x0 + 2, r.y - amp - 3);
+    }
+    // overtone ladders
+    const ly0 = waveH + (H - waveH) * 0.28, ly1 = waveH + (H - waveH) * 0.72, fMax = F1 * 10.6;
+    const X = f => x0 + 10 + (x1 - x0 - 20) * f / fMax;
+    c.font = '10px ' + MONO; c.fillStyle = COL['ink-3']; c.fillText('overtones', x0, waveH + 4);
+    const pairs = [];
+    for (let i = 1; i <= 10; i++) for (let j = 1; j * f2 < fMax; j++) { const dlt = i * F1 - j * f2; if (Math.abs(dlt) < 30) pairs.push({i, j, dlt}); }
+    for (const p of pairs) {
+      const xa = X(p.i * F1), xb = X(p.j * f2), exact = Math.abs(p.dlt) < 0.01;
+      c.strokeStyle = exact ? COL.good : COL.warn; c.lineWidth = exact ? 3 : 2;
+      c.globalAlpha = exact ? 0.85 : 0.5 + 0.5 * Math.cos(2 * Math.PI * Math.abs(p.dlt) * t * 0.25);
+      c.beginPath(); c.moveTo(xa, ly0); c.lineTo(xb, ly1); c.stroke(); c.globalAlpha = 1;
+      c.fillStyle = exact ? COL.good : COL.warn; c.textAlign = exact ? 'left' : 'right';
+      c.fillText(exact ? '✓' : `${fmt(Math.abs(p.dlt), 1)} beats/s`, (xa + xb) / 2 + (exact ? 6 : -6), (ly0 + ly1) / 2 + 4);
+    }
+    for (const [y, f, col, n] of [[ly0, F1, COL.lo, 10], [ly1, f2, COL.hi, Math.floor(fMax / f2)]]) {
+      c.strokeStyle = COL.rule; c.lineWidth = 1; c.beginPath(); c.moveTo(x0, y); c.lineTo(x1, y); c.stroke();
+      for (let i = 1; i <= n; i++) {
+        const x = X(i * f); c.fillStyle = col; c.beginPath(); c.arc(x, y, i === 1 ? 5 : 3.4, 0, 7); c.fill();
+        c.fillStyle = COL['ink-3']; c.textAlign = 'center'; c.fillText(String(i), x, y === ly0 ? y - 8 : y + 15);
+      }
+    }
+    c.textAlign = 'left';
+  },
+  primary() { playInterval(false); },
+};
+INTS.forEach((iv, i) => {
+  const b = document.createElement('button'); b.className = 'btn'; b.innerHTML = `${iv.name} <small>${iv.tag}</small>`;
+  b.addEventListener('click', () => { SC.pure.pick(i); playInterval(false); }); $('pu-ints').appendChild(b);
+});
+function playInterval(apart) {
+  ensureAudio(); stopSequences();
+  const iv = INTS[SC.pure.iv], t = nowA() + 0.03;
+  if (apart) { note(F1, t, 0.7); note(F1 * iv.r, t + 0.8, 0.7); note(F1, t + 1.7, 2.6); note(F1 * iv.r, t + 1.7, 2.6); }
+  else { note(F1, t, 3); note(F1 * iv.r, t, 3); }
+}
+
+/* ---------- 2 · Stacking ---------- */
+SC.stack = {
+  layer: 'L-stack', mode: 'fifths', t0: -99, detail: false,
+  set(b) { const m = b === 2 ? 'thirds' : 'fifths'; this.detail = b >= 1; if (m !== this.mode || b === 0) this.setMode(m, b === 1 ? 'done' : 'reveal'); else this.ui(); },
+  setMode(m, how) { stopSequences(); this.mode = m; this.t0 = how === 'done' ? -99 : performance.now() / 1000; this.ui(); },
+  ui() {
+    document.querySelectorAll('[data-act=st-mode]').forEach(b => b.classList.toggle('on', b.dataset.v === this.mode));
+    const S = SPIRAL[this.mode];
+    $('st-title').textContent = this.mode === 'fifths' ? 'Twelve pure fifths vs. seven octaves' : 'Three pure major thirds vs. one octave';
+    $('st-sub').textContent = `Each step ×${S.step} (${fmt(S.step.c)} ¢). One turn of the spiral = one octave.`;
+  },
+  dur() { return this.mode === 'fifths' ? 0.42 : 0.7; },
+  frame(now) {
+    const p = (now - this.t0) / this.dur();
+    const key = [this.mode, clamp(p, -1, SPIRAL[this.mode].n).toFixed(3), this.detail, COL.key].join();
+    if (key !== this.key) { this.key = key; $('st-svg').innerHTML = spiralSVG(this.mode, p, this.detail); }
+  },
+  primary() { playStack(this.mode); },
+};
+function playStack(mode, sync = true) {
+  ensureAudio(); stopSequences();
+  const S = SPIRAL[mode], t = nowA() + 0.08, dt = mode === 'fifths' ? 0.42 : 0.7;
+  if (sync) { SC.stack.mode = mode; SC.stack.ui(); SC.stack.t0 = performance.now() / 1000 + 0.08; }
+  for (let k = 0; k <= S.n; k++) {
+    const c = k * S.step.c;
+    const f = mode === 'fifths' ? C3 * 2 ** ((c % 1200) / 1200) : C4 * 2 ** (c / 1200);   // fifths folded into one octave
+    note(f, t + k * dt, dt * 0.95, 0.9);
+  }
+  later(() => playCompare(mode), (S.n + 1) * dt * 1000 + 250);
+}
+function playCompare(mode) {
+  ensureAudio();
+  const S = SPIRAL[mode], t = nowA() + 0.03, c = S.n * S.step.c;
+  const ref = mode === 'fifths' ? C3 : C4 * 2, f = mode === 'fifths' ? C3 * 2 ** ((c % 1200) / 1200) : C4 * 2 ** (c / 1200);
+  note(ref, t, 0.8); note(f, t + 0.9, 0.8); note(ref, t + 1.9, 3.2); note(f, t + 1.9, 3.2);
+}
+
+/* ---------- 3 · The comma pump ---------- */
+const PMODE = {
+  just:  {col: 'just',   goes: 'into the pitch, which sinks', name: 'root, held notes'},
+  fixed: {col: 'accent', goes: `into the held ${JUMP.name}, which jumps`, name: 'root, fixed C'},
+  et:    {col: 'et',     goes: 'into every chord, a little', name: 'equal temperament'},
+};
+const BUILD_MODE = ['just', 'just', 'fixed', 'et', 'just'];
+const SHOWN = [['just'], ['just'], ['just', 'fixed'], ['just', 'et'], ['just', 'et']];
+const pump = {mode: null, t0: 0, k: 0, dur: 1.15, timer: null, vo: null, drone: null, viewMode: null, viewK: -1, endT: 0};
+const lookahead = () => document.hidden ? 1.4 : 0.4;   // background tabs throttle timers to ~1 s
+function pumpStart(mode) {
+  const ctx = ensureAudio(); if (!ctx) return;
+  pumpStop(0.06);
+  pump.mode = mode; pump.viewMode = mode; pump.t0 = ctx.currentTime + 0.12; pump.k = 0;
+  pump.endT = pump.t0 + MAXK * pump.dur + 2.4;
+  const lev = [0.15, 0.1, 0.1, 0.1];
+  pump.vo = lev.map((l, i) => { const v = addVoice(pumpEvent(mode, 0).f[i]); v.lev = l; v.o.start(pump.t0); return v; });
+  if ($('drone').checked) droneOn(pump.t0);
+  pumpTick(); pump.timer = setInterval(pumpTick, 40);
+  pumpButtons();
+}
+function pumpTick() {
+  const ctx = A.ctx; if (!pump.mode || !ctx) return;
+  while (pump.k <= MAXK && pump.t0 + pump.k * pump.dur < ctx.currentTime + lookahead()) {
+    const k = pump.k, t = pump.t0 + k * pump.dur, ev = pumpEvent(pump.mode, k), pv = k ? pumpEvent(pump.mode, k - 1) : null;
+    pump.vo.forEach((v, i) => {
+      const g = v.g.gain, fq = v.o.frequency;
+      if (k === 0) { g.setValueAtTime(0, t); g.linearRampToValueAtTime(v.lev, t + 0.04); g.setTargetAtTime(v.lev * 0.7, t + 0.05, 0.5); }
+      else if (ev.shift[i]) { fq.setValueAtTime(pv.f[i], t); fq.exponentialRampToValueAtTime(ev.f[i], t + 0.14); }   // a held note forced to move: slide, don't re-sing
+      else if (!ev.held[i]) {                         // re-articulate only notes that move; shared notes are held
+        g.setTargetAtTime(0, t - 0.04, 0.012);
+        fq.setValueAtTime(ev.f[i], t);
+        g.setTargetAtTime(v.lev, t, 0.02); g.setTargetAtTime(v.lev * 0.7, t + 0.08, 0.5);
+      }
+      if (k === MAXK) { g.setTargetAtTime(0, t + 2.2, 0.25); v.o.stop(t + 4); }
+    });
+    pump.k++;
+  }
+  if (pump.k > MAXK && ctx.currentTime > pump.endT) { clearInterval(pump.timer); pump.timer = null; pump.mode = null; pump.viewK = MAXK + 0.6; pump.vo = null; droneOff(0.4); pumpButtons(); }
+}
+function pumpStop(tc = 0.08) {
+  if (pump.timer) clearInterval(pump.timer); pump.timer = null;
+  if (pump.vo && A.ctx) pump.vo.forEach(v => fadeVoice(v, A.ctx.currentTime, tc));
+  pump.vo = null;
+  if (pump.mode) pump.viewK = clamp((nowA() - pump.t0) / pump.dur, 0, MAXK + 0.6);
+  pump.mode = null; droneOff(tc); pumpButtons();
+}
+A.stoppers.add(() => pumpStop());
+function droneOn(t) {
+  if (pump.drone || !A.ctx) return;
+  const v = addVoice(C4), g = v.g.gain; t = t || A.ctx.currentTime;
+  g.setValueAtTime(0, t); g.setTargetAtTime(0.05, t, 0.2); v.o.start(t); pump.drone = v;
+}
+function droneOff(tc = 0.2) { if (pump.drone && A.ctx) fadeVoice(pump.drone, A.ctx.currentTime, tc); pump.drone = null; }
+$('drone').addEventListener('change', e => { if (!pump.mode) return; e.target.checked ? droneOn() : droneOff(); });
+function pumpButtons() { document.querySelectorAll('[data-act=pump]').forEach(b => b.classList.toggle('on', pump.mode === b.dataset.v)); }
+(function buildChain() {
+  let h = '';
+  CHAIN.forEach((ch, i) => {
+    if (i) h += `<div class="link" data-i="${i}"><span>keeps</span><b>${ch.keeps.join(' ')}</b></div>`;
+    h += `<div class="chip" data-i="${i}"><div class="rn">${ch.rn}</div><div class="cn">${ch.cn}</div><div class="rq"></div></div>`;
+  });
+  $('chain').innerHTML = h;
+})();
+const chipEls = [...document.querySelectorAll('#chain .chip')], linkEls = [...document.querySelectorAll('#chain .link')];
+function rootLabel(q, tonic) { const x = tonic ? q.foldNear() : q.fold(); const s = x.toString(); return s.length > 13 ? (tonic ? fmtS(x.c) : fmt(x.c)) + ' ¢' : s; }
+function ratioPow(L) { const q = PUMP.pow(L); const s = q.toString(); return s.length <= 17 ? s : `(${PUMP})^${L}`; }
+const FULL = {x: MAXK + 0.8, yt: 24, yb: LOOPS * PUMP_C - 18};
+const PVIEW = [{x: 4.6, yt: 10, yb: -40}, FULL, {x: 8.6, yt: 28, yb: -26}, FULL, FULL];
+$('eqbox').innerHTML = `<span class="r">(3/2)⁴ = ${FIFTH.pow(4)}</span> &nbsp;vs&nbsp; <span class="r">2² · 5/4 = ${OCT.pow(2).mul(THIRD).n * 16n}/16</span><br>
+  ratio <span class="r ju">${SYNT}</span> = <b class="ju">${fmt(SYNT.c, 2)} ¢</b>, the syntonic comma`;
+SC.pump = {
+  layer: 'L-pump', b: 0, v: {...PVIEW[0]},
+  set(b) { this.b = b; $('eqbox').classList.toggle('on', b === 4); if (!pump.mode) { pump.viewMode = null; pump.viewK = -1; } },
+  primary() { const m = BUILD_MODE[this.b]; pump.mode === m ? pumpStop() : pumpStart(m); },
+  frame() {
+    const playing = !!pump.mode, mode = pump.mode || pump.viewMode || BUILD_MODE[this.b];
+    const P = playing ? clamp((nowA() - pump.t0) / pump.dur, -0.2, MAXK + 0.6) : (pump.viewMode ? pump.viewK : -1);
+    const kNow = Math.max(0, Math.floor(P)), evNow = P >= 0 ? pumpEvent(mode, Math.min(kNow, MAXK)) : null;
+    $('L-pump').style.setProperty('--mc', COL[PMODE[mode].col]);
+    // chips: this loop's roots
+    const L = evNow ? (evNow.ci === 0 && evNow.k > 0 ? evNow.L - 1 : evNow.L) : 0, drift = PUMP.pow(L);
+    const lit = evNow ? (evNow.ci === 0 && evNow.k > 0 ? 4 : evNow.ci) : -1;
+    chipEls.forEach((el, i) => {
+      el.classList.toggle('lit', i === lit);
+      const tonic = i === 0 || i === 4;
+      const txt = mode === 'et' ? (tonic ? '1/1' : `2^${PC[PROG[i].root]}/12`) : mode === 'fixed' ? rootLabel(CHAIN_FIX[i].root, tonic) : rootLabel(CHAIN[i].root.mul(drift), tonic);
+      const rq = el.querySelector('.rq'); if (rq.textContent !== txt) rq.textContent = txt;
+    });
+    linkEls.forEach(el => {
+      const i = +el.dataset.i, jump = mode === 'fixed' && JUMPS.some(j => j.c === i);
+      const txt = jump ? `${JUMP.name} ${fmtS(JUMP.q.c)}¢` : CHAIN[i].keeps.join(' ');
+      el.classList.toggle('jump', jump); const b = el.querySelector('b'); if (b.textContent !== txt) b.textContent = txt;
+      el.querySelector('span').textContent = jump ? 'moves' : 'keeps';
+    });
+    // readout
+    const tl = evNow ? evNow.L : 0, tc = mode === 'just' ? tl * PUMP_C : 0;
+    const pc = $('pr-c'); pc.textContent = fmtS(tc) + ' ¢'; pc.classList.toggle('flat', tc < -0.05);
+    $('pr-r').textContent = mode === 'just' ? ratioPow(tl) : '1/1';
+    $('pr-l').textContent = P >= 0 ? `${Math.min(tl + 1, LOOPS)} of ${LOOPS}` : '–';
+    $('pr-g').textContent = PMODE[mode].goes;
+    this.draw(P, mode, playing);
+  },
+  draw(P, mode, playing) {
+    const {c, W, H} = fitCanvas($('pump-cv'));
+    let tv = PVIEW[this.b];
+    if (mode === 'just' && this.b === 2) tv = FULL;
+    if (P > tv.x - 0.4) tv = FULL;
+    const v = this.v; for (const k of ['x', 'yt', 'yb']) v[k] = lerp(v[k], tv[k], 0.12);
+    const zoom = v.x < 10;
+    const ml = 46, mr = 10, mt = this.b === 4 ? 64 : 12, mb = 24;
+    const X = k => ml + (W - ml - mr) * k / v.x, Y = d => mt + (H - mt - mb) * (v.yt - d) / (v.yt - v.yb);
+    c.font = '10px ' + MONO; c.lineWidth = 1;
+    // comma gridlines
+    for (let j = Math.ceil(v.yt / PUMP_C); j <= Math.floor(v.yb / PUMP_C); j++) {
+      const y = Y(j * PUMP_C);
+      c.strokeStyle = COL.rule; c.setLineDash(j ? [2, 4] : []); c.beginPath(); c.moveTo(ml, y); c.lineTo(W - mr, y); c.stroke(); c.setLineDash([]);
+      c.fillStyle = COL['ink-3']; c.textAlign = 'right'; c.fillText(j ? fmtS(j * PUMP_C) : '0 ¢', ml - 6, y + 3.5);
+    }
+    // x labels
+    c.textAlign = 'center';
+    if (v.x < 6) PROG.forEach((ch, i) => { c.fillStyle = COL['ink-2']; c.fillText(ch.rn, X(i + 0.5), H - 8); });
+    else for (let l = 0; l < LOOPS && 4 * l < v.x; l++) {
+      const x = X(4 * l); c.strokeStyle = COL.rule; c.beginPath(); c.moveTo(x, mt); c.lineTo(x, H - mb); c.stroke();
+      c.fillStyle = COL['ink-3']; c.fillText(l === 0 ? 'loop 1' : String(l + 1), X(4 * l + 2), H - 8);
+    }
+    c.save(); c.beginPath(); c.rect(ml, 0, W - ml - mr, H - mb + 2); c.clip();
+    const kMax = Math.min(MAXK, Math.ceil(v.x));
+    const drawTrace = (m, upto, alpha, colr, width) => {
+      if (upto < 0) return;
+      c.globalAlpha = alpha;
+      if (m !== 'et') for (let k = 0; k <= Math.min(kMax, Math.floor(upto)); k++) {   // upper voices; held notes bridge the barline
+        const ev = pumpEvent(m, k), xe = Math.min(k + 0.92, upto, MAXK + 0.6);
+        for (let vi = 1; vi < 4; vi++) {
+          const bridge = ev.held[vi] || ev.shift[vi], xs = bridge ? k - 0.08 : k + 0.08; if (xe <= xs) continue;
+          if (ev.shift[vi]) {                         // the comma jump: an arrow from the old pitch to the new
+            const d0 = pumpEvent(m, k - 1).dev[vi], y0 = Y(d0), y1 = Y(ev.dev[vi]), x = X(k);
+            c.strokeStyle = COL.warn; c.lineWidth = 2.6; c.beginPath(); c.moveTo(X(xs), y0); c.lineTo(x, y0); c.lineTo(x + 3, y1); c.lineTo(X(xe), y1); c.stroke();
+            c.beginPath(); c.moveTo(x + 3, y1); c.lineTo(x - 1, y1 + 6); c.moveTo(x + 3, y1); c.lineTo(x + 7, y1 + 6); c.stroke();
+            if (zoom && alpha > 0.5) { c.fillStyle = COL.warn; c.textAlign = 'left'; c.font = '600 10.5px ' + MONO; c.fillText(`${JUMP.name} ${fmtS(ev.dev[vi] - d0)} ¢`, x + 8, (y0 + y1) / 2 + 4); c.font = '10px ' + MONO; }
+            continue;
+          }
+          c.strokeStyle = ev.held[vi] ? COL.good : COL['ink-3']; c.lineWidth = ev.held[vi] ? 2.4 : 1.4;
+          c.beginPath(); c.moveTo(X(xs), Y(ev.dev[vi])); c.lineTo(X(xe), Y(ev.dev[vi])); c.stroke();
+        }
+      }
+      c.strokeStyle = colr; c.lineWidth = width; c.lineJoin = 'round'; c.beginPath();   // the root line (bass)
+      for (let k = 0; k <= Math.min(kMax, Math.floor(upto)); k++) {
+        const y = Y(pumpEvent(m, k).dev[0]), xe = X(Math.min(k + 1, upto, k === MAXK ? MAXK + 0.6 : k + 1));
+        k === 0 ? c.moveTo(X(0), y) : c.lineTo(X(k), y); c.lineTo(xe, y);
+      }
+      c.stroke(); c.globalAlpha = 1;
+    };
+    const active = P >= 0 ? mode : null, bm = BUILD_MODE[this.b];
+    const shown = [...new Set([...SHOWN[this.b], mode])];
+    for (const m of shown) if (m !== active) drawTrace(m, MAXK + 0.6, m === bm && !active ? 0.85 : 0.28, COL[PMODE[m].col], 2);
+    if (active) { drawTrace(active, MAXK + 0.6, 0.16, COL[PMODE[active].col], 2); drawTrace(active, P, 1, COL[PMODE[active].col], 3); }
+    // ratio labels in the zoomed view
+    const lm = active || bm;
+    if (v.x < 6 && lm !== 'et') {
+      c.font = '600 10.5px ' + MONO; c.textAlign = 'center';
+      PROG.forEach((ch, i) => { const ev = pumpEvent(lm, i); c.fillStyle = i === 4 && lm === 'just' ? COL.just : COL['ink-2']; c.fillText(`${ch.cn} ${rootLabel(ev.root, i === 0 || i === 4)}`, X(i + 0.5), Y(ev.dev[0]) + 16); });
+    }
+    c.restore();
+    // playhead
+    if (P >= 0) {
+      const k = Math.min(MAXK, Math.floor(P)), ev = pumpEvent(mode, k), x = X(Math.min(P, MAXK + 0.6)), y = Y(ev.dev[0]);
+      const colr = COL[PMODE[mode].col];
+      c.strokeStyle = colr; c.globalAlpha = 0.35; c.lineWidth = 1; c.beginPath(); c.moveTo(x, mt); c.lineTo(x, H - mb); c.stroke(); c.globalAlpha = 1;
+      const pulse = playing ? 1 + 0.25 * Math.max(0, 1 - (P - k) * 4) : 1;
+      c.fillStyle = colr; c.beginPath(); c.arc(x, y, 5.5 * pulse, 0, 7); c.fill();
+      c.strokeStyle = COL.panel; c.lineWidth = 2; c.stroke();
+    }
+    // legend
+    const lg = shown.map(m => [COL[PMODE[m].col], PMODE[m].name]);
+    if (shown.some(m => m !== 'et')) lg.push([COL.good, 'shared note, held']);
+    if (shown.includes('fixed')) lg.push([COL.warn, 'shared note, forced to move']);
+    const lh = lg.map(([cl, tx]) => `<span><i style="background:${cl}"></i>${tx}</span>`).join('');
+    if (lh !== this.lh) { this.lh = lh; $('pump-legend').innerHTML = lh; }
+    c.font = '10px ' + MONO;
+    c.save(); c.translate(11, mt + (H - mt - mb) / 2); c.rotate(-Math.PI / 2); c.textAlign = 'center'; c.fillStyle = COL['ink-3']; c.fillText('cents vs. equal temperament', 0, 0); c.restore();
+  },
+};
+
+/* ---------- 4 · Temperaments ---------- */
+SC.temper = {
+  layer: 'L-temper', t: 'just', b: 0, root: 0, view: 'triad', lamps: [], rows: [],
+  set(b) { this.b = b; this.view = b === 4 ? 'keys' : 'triad'; this.root = 0; this.t = ['just', 'mean', 'et', 'mean', 'mean'][b]; this.update(); },
+  update() {
+    const T = TUNINGS[this.t], n = T.names, r = this.root, ti = triadInfo(this.t, r), wf = worstFifth(this.t, r);
+    document.querySelectorAll('#te-tabs .btn').forEach(b => b.classList.toggle('on', b.dataset.v === this.t));
+    document.querySelectorAll('[data-act=te-view]').forEach(b => b.classList.toggle('on', b.dataset.v === this.view));
+    $('L-temper').classList.toggle('keys', this.view === 'keys');
+    $('te-title').textContent = T.long;
+    $('te-sub').textContent = `${n[r]} major triad. Off = cents from the pure ratio; beats = gap between the nearest coinciding harmonics.`;
+    this.rows = [
+      {name: `${n[r]}–${n[(r + 4) % 12]} major third`, c: ti.M3, pure: THIRD.c, off: ti.M3off, beat: ti.bM3},
+      {name: `${n[(r + 4) % 12]}–${n[(r + 7) % 12]} minor third`, c: ti.m3, pure: MIN3.c, off: ti.m3off, beat: ti.bm3},
+      {name: `${n[r]}–${n[(r + 7) % 12]} fifth`, c: ti.P5, pure: P5C, off: ti.P5off, beat: ti.bP5},
+      {name: `${wf.name} ${wf.all ? 'fifth (all equal)' : wf.ties > 1 ? `worst fifth (1 of ${wf.ties})` : 'worst fifth'}`, c: wf.c, pure: P5C, off: wf.off, beat: wf.beat, wolf: true},
+    ];
+    let h = '<tr><th>Interval</th><th>Size ¢</th><th>Pure ¢</th><th>Off ¢</th><th>Beats/s</th></tr>';
+    this.rows.forEach((x, i) => {
+      h += `<tr class="${x.wolf && Math.abs(x.off) > 10 ? 'wolf' : ''}${x.wolf && this.b < 3 && this.view === 'triad' ? ' dim' : ''}"><td>${x.name}</td><td class="mono">${fmt(x.c)}</td><td class="mono">${fmt(x.pure)}</td><td class="mono">${fmtS(x.off)}</td><td class="mono">${fmt(x.beat)}<span class="lamp" data-i="${i}"></span></td></tr>`;
+    });
+    $('te-tab').innerHTML = h; this.lamps = [...document.querySelectorAll('#te-tab .lamp')];
+    $('te-fifth').textContent = `▶ ${n[r]}–${n[(r + 7) % 12]}`;
+    $('te-wolf').textContent = `▶ ${wf.name}`;
+    this.ring();
+  },
+  ring() {
+    const svg = $('te-ring'), T = TUNINGS[this.t], F = 'style="font-family:var(--f-mono)"', FD = 'style="font-family:var(--f-display)"';
+    const P = (r, a) => [r * Math.sin(a), -r * Math.cos(a)].map(x => x.toFixed(2)).join(' ');
+    let o = '';
+    for (let k = 0; k < 12; k++) {
+      const pc = mod(7 * k, 12), ti = triadInfo(this.t, pc), sel = pc === this.root, col = badColor(badness(ti));
+      const a0 = (k - 0.5) * Math.PI / 6 + 0.012, a1 = (k + 0.5) * Math.PI / 6 - 0.012, ro = 102, ri = 54, am = k * Math.PI / 6;
+      o += `<g class="wedge" data-pc="${pc}" tabindex="0" role="button" aria-label="${T.names[pc]} major: third ${fmtS(ti.M3off)} cents, fifth ${fmtS(ti.P5off)} cents">
+        <path d="M${P(ro, a0)} A${ro} ${ro} 0 0 1 ${P(ro, a1)} L${P(ri, a1)} A${ri} ${ri} 0 0 0 ${P(ri, a0)} Z" fill="${col}" fill-opacity="${sel ? 0.55 : 0.26}" stroke="${sel ? COL.ink : col}" stroke-width="${sel ? 2 : 1}"/>
+        <text x="${(87 * Math.sin(am)).toFixed(2)}" y="${(-87 * Math.cos(am) + 4).toFixed(2)}" font-size="11.5" font-weight="700" text-anchor="middle" fill="${COL.ink}" ${FD} pointer-events="none">${T.names[pc]}</text>
+        <text x="${(69 * Math.sin(am)).toFixed(2)}" y="${(-69 * Math.cos(am) - 1).toFixed(2)}" font-size="6.2" text-anchor="middle" fill="${COL['ink-2']}" ${F} pointer-events="none">${fmtS(ti.M3off, 0)}</text>
+        <text x="${(69 * Math.sin(am)).toFixed(2)}" y="${(-69 * Math.cos(am) + 6.5).toFixed(2)}" font-size="6.2" text-anchor="middle" fill="${COL['ink-2']}" ${F} pointer-events="none">${fmtS(ti.P5off, 0)}</text></g>`;
+    }
+    const ti = triadInfo(this.t, this.root);
+    o += `<text x="0" y="-12" font-size="13" font-weight="700" text-anchor="middle" fill="${COL.ink}" ${FD}>${T.names[this.root]} major</text>`;
+    o += `<text x="0" y="3" font-size="7.5" text-anchor="middle" fill="${COL['ink-2']}" ${F}>3rd ${fmtS(ti.M3off)} ¢</text>`;
+    o += `<text x="0" y="14" font-size="7.5" text-anchor="middle" fill="${COL['ink-2']}" ${F}>5th ${fmtS(ti.P5off)} ¢</text>`;
+    o += `<text x="0" y="27" font-size="5.6" text-anchor="middle" fill="${COL['ink-3']}" ${F}>wedges: 3rd / 5th off, ¢</text>`;
+    const gy = 114; for (let i = 0; i < 40; i++) o += `<rect x="${-60 + i * 3}" y="${gy}" width="3.2" height="5" fill="${badColor(i / 39)}" fill-opacity="0.8"/>`;
+    o += `<text x="-64" y="${gy + 4.5}" font-size="6" text-anchor="end" fill="${COL['ink-2']}" ${F}>pure</text><text x="64" y="${gy + 4.5}" font-size="6" fill="${COL['ink-2']}" ${F}>rough</text>`;
+    keepFocus(svg, 'data-pc', () => { svg.innerHTML = o; });
+  },
+  frame(now) {
+    if (COL.key !== this.ck) { this.ck = COL.key; this.ring(); }
+    this.lamps.forEach((el, i) => { const b = this.rows[i].beat; el.style.opacity = b < 0.01 ? 0.15 : (0.2 + 0.8 * Math.abs(Math.cos(Math.PI * b * now))).toFixed(2); });
+    if (this.view === 'keys') return;
+    const {c, W, H} = fitCanvas($('te-cv')), n = this.rows.length, rh = H / n, win = 2;
+    c.font = '10px ' + MONO;
+    this.rows.forEach((x, i) => {
+      const yc = rh * (i + 0.62), half = rh * 0.3, x0 = 6, x1 = W - 6, dim = x.wolf && this.b < 3 ? 0.4 : 1;
+      const colr = x.beat < 0.01 ? COL.good : x.beat > 8 ? COL.just : COL.warn;
+      c.globalAlpha = dim * 0.55; c.fillStyle = colr; c.beginPath(); c.moveTo(x0, yc);
+      const pts = [];
+      for (let px = x0; px <= x1; px += 1) { const tau = now - win + (px - x0) / (x1 - x0) * win; pts.push([px, half * Math.abs(Math.cos(Math.PI * x.beat * tau))]); }
+      pts.forEach(([px, a]) => c.lineTo(px, yc - a)); for (let j = pts.length - 1; j >= 0; j--) c.lineTo(pts[j][0], yc + pts[j][1]);
+      c.closePath(); c.fill(); c.globalAlpha = dim;
+      c.fillStyle = COL['ink-2']; c.textAlign = 'left'; c.fillText(x.name, x0, yc - half - 3);
+      c.textAlign = 'right'; c.fillText(x.beat < 0.01 ? 'steady, no beats' : `${fmt(x.beat)} beats/s`, x1, yc - half - 3);
+      c.globalAlpha = 1;
+    });
+    c.textAlign = 'left';
+  },
+  primary() { playTriad(false); },
+};
+TUNE_ORDER.forEach(k => {
+  const b = document.createElement('button'); b.className = 'btn'; b.dataset.v = k; b.textContent = TUNINGS[k].name;
+  b.addEventListener('click', () => { SC.temper.t = k; SC.temper.update(); playTriad(false); }); $('te-tabs').appendChild(b);
+});
+$('te-ring').addEventListener('click', e => {
+  const w = e.target.closest('[data-pc]'); if (!w) return;
+  SC.temper.root = +w.dataset.pc; SC.temper.update(); playTriad(false);
+});
+function playTriad(arp) {
+  ensureAudio(); stopSequences();
+  const ti = triadInfo(SC.temper.t, SC.temper.root), t = nowA() + 0.03;
+  if (arp) { ti.f.forEach((f, i) => note(f, t + i * 0.45, 0.42)); chord(ti.f, t + 1.45, 2.8, 0.9); }
+  else { note(ti.f[0] / 2, t, 3.2, 0.7); chord(ti.f, t, 3.2, 0.9); }
+}
+function playDyad(fl, fh) { ensureAudio(); stopSequences(); const t = nowA() + 0.03; note(fl, t, 3.2); note(fh, t, 3.2); }
+
+/* ---------- 5 · Lattice ---------- */
+const LAT = {xmin: -4.5, xmax: 3.5, bmin: -1, bmax: 2, u: 58, narrow: null};
+const latIn = (a, b) => b >= LAT.bmin && b <= LAT.bmax && a + b / 2 >= LAT.xmin - 1e-9 && a + b / 2 <= LAT.xmax + 1e-9;
+let LAT_NODES = [];
+function latLayout(narrow) {            // a rectangle in Tonnetz coordinates; narrower on phones
+  LAT.narrow = narrow; LAT.xmax = narrow ? 2.5 : 3.5; LAT_NODES = [];
+  for (let b = LAT.bmin; b <= LAT.bmax; b++) for (let a = -12; a <= 12; a++) if (latIn(a, b)) LAT_NODES.push([a, b]);
+}
+const latF = (a, b) => { const c = mod(latQ(a, b).c, 1200); return C4 * 2 ** ((c >= 700 ? c - 1200 : c) / 1200); }; // C4-centered register
+const latName = (a, b) => nameOf(a + 4 * b) + (b > 0 ? '↓'.repeat(b) : b < 0 ? '↑'.repeat(-b) : '');
+const latXY = (a, b) => [(a + b / 2) * LAT.u, -b * LAT.u * 0.866];
+const etNear = f => etF(Math.round(69 + 12 * Math.log2(f / 440)));
+const PUMP_PATH = [ // triads as [a, b] of their notes: root first
+  [[0, 0], [1, 0], [0, 1]], [[-1, 1], [0, 0], [0, 1]], [[-2, 1], [-1, 0], [-1, 1]], [[-3, 1], [-2, 1], [-3, 2]], [[-4, 1], [-3, 1], [-4, 2]],
+];
+const triName = tri => latName(...tri[0]) + (tri[2][1] === tri[0][1] + 1 && tri[2][0] === tri[0][0] ? ' major' : ' minor');
+SC.lattice = {
+  layer: 'L-lattice', sel: [], lit: null, chordPts: null, path: 0, b: 0,
+  set(b) { this.b = b; this.path = b; this.render(); },
+  render() {
+    if (LAT.narrow == null) latLayout(false);
+    const svg = $('lat-svg'), pad = 34, xs = [], ys = [];
+    for (const [a, b] of LAT_NODES) { const [x, y] = latXY(a, b); xs.push(x); ys.push(y); }
+    const x0 = Math.min(...xs) - pad, x1 = Math.max(...xs) + pad, y0 = Math.min(...ys) - pad, y1 = Math.max(...ys) + pad;
+    svg.setAttribute('viewBox', `${x0} ${y0} ${x1 - x0} ${y1 - y0}`);
+    const key = p => p.join(','), litSet = new Set((this.lit || []).map(key)), selSet = new Set(this.sel.map(key));
+    const pathNodes = new Set(this.path ? PUMP_PATH.flat().map(key) : []), ji = $('lat-ji').checked;
+    const F = 'style="font-family:var(--f-mono)"', FD = 'style="font-family:var(--f-display)"';
+    let o = '';
+    for (const [a, b] of LAT_NODES) for (const tri of [[[a, b], [a + 1, b], [a, b + 1]], [[a, b + 1], [a + 1, b], [a + 1, b + 1]]]) {
+      if (!tri.every(p => latIn(...p))) continue;
+      const isLit = this.lit && tri.every(p => litSet.has(key(p))), up = tri[2][0] === a && tri[2][1] === b + 1;
+      const onPath = this.path && PUMP_PATH.some(pp => pp.every(p => tri.some(q => key(q) === key(p))));
+      const fill = isLit ? COL.accent : onPath ? COL.just : up ? COL.ink : COL['ink-3'];
+      o += `<polygon class="ltri" data-ab='${JSON.stringify(tri)}' points="${tri.map(p => latXY(...p).join(',')).join(' ')}" fill="${fill}" fill-opacity="${isLit ? 0.4 : onPath ? 0.16 : 0.035}"><title>${triName(tri)}</title></polygon>`;
+    }
+    for (const [a, b] of LAT_NODES) {
+      const [x, y] = latXY(a, b);
+      for (const [da, db, col] of [[1, 0, COL.lo], [0, 1, COL.hi], [1, -1, COL.rule]]) {
+        if (!latIn(a + da, b + db)) continue; const [x2, y2] = latXY(a + da, b + db);
+        o += `<line x1="${x}" y1="${y}" x2="${x2}" y2="${y2}" stroke="${col}" stroke-opacity="${da && db ? 0.9 : 0.5}" stroke-width="1.4" pointer-events="none"/>`;
+      }
+    }
+    if (this.path) for (let i = 0; i < PUMP_PATH.length - 1; i++) {
+      const [xa, ya] = latXY(...PUMP_PATH[i][0]), [xb, yb] = latXY(...PUMP_PATH[i + 1][0]);
+      o += `<line x1="${xa}" y1="${ya}" x2="${xb}" y2="${yb}" stroke="${COL.just}" stroke-width="3" stroke-dasharray="5 4" pointer-events="none"/>`;
+    }
+    for (const [a, b] of LAT_NODES) {
+      const [x, y] = latXY(a, b), q = latQ(a, b).fold(), k = key([a, b]);
+      const sel = selSet.has(k), lit = litSet.has(k), isC = (a === 0 && b === 0) || (this.path && a === -4 && b === 1);
+      const inJI = ji && a >= -1 && a <= 2 && b >= -1 && b <= 1;
+      const fill = sel || lit ? COL.accent : COL.panel, ink = sel || lit ? '#fff' : COL.ink;
+      const stroke = isC || pathNodes.has(k) ? COL.just : COL['ink-3'];
+      o += `<g class="lnode" data-ab='${JSON.stringify([[a, b]])}' tabindex="0" role="button" aria-pressed="${sel}" aria-label="${latName(a, b).replace(/↓/g, ' comma down').replace(/↑/g, ' comma up')}, ${q}">`;
+      if (inJI) o += `<circle cx="${x}" cy="${y}" r="25" fill="none" stroke="${COL.good}" stroke-width="2" stroke-dasharray="3 2.5" pointer-events="none"/>`;
+      o += `<circle cx="${x}" cy="${y}" r="20" fill="${fill}" stroke="${stroke}" stroke-width="${isC ? 2.6 : 1.2}"/>
+        <text x="${x}" y="${y - 1}" font-size="12.5" font-weight="700" text-anchor="middle" fill="${ink}" ${FD} pointer-events="none">${latName(a, b)}</text>
+        <text x="${x}" y="${y + 11}" font-size="8.5" text-anchor="middle" fill="${sel || lit ? '#fff' : COL['ink-2']}" ${F} pointer-events="none">${q}</text></g>`;
+    }
+    const ax = LAT.xmax * LAT.u, ay = -LAT.bmin * LAT.u * 0.866, bx = (LAT.xmin + 0.5) * LAT.u, by = -LAT.bmax * LAT.u * 0.866;
+    o += `<text x="${ax}" y="${ay + 34}" font-size="9" text-anchor="end" fill="${COL.lo}" ${F}>fifths ×3/2 →</text>`;
+    o += `<text x="${bx - 24}" y="${by - 26}" font-size="9" fill="${COL.hi}" ${F}>↗ thirds ×5/4</text>`;
+    keepFocus(svg, 'data-ab', () => { svg.innerHTML = o; });
+    this.readout();
+  },
+  readout() {
+    const desc = ([a, b]) => { const q = latQ(a, b).fold(), f = latF(a, b); return `<b>${latName(a, b)}</b> ${q} (${fmt(q.c)} ¢, ET ${fmtS(centsOf(f / etNear(f)))})`; };
+    let r;
+    if (this.chordPts) r = `<b>${triName(this.chordPts)}</b>: ` + this.chordPts.map(desc).join(' · ');
+    else if (this.sel.length) r = this.sel.map(desc).join(' · ');
+    else r = this.path ? `C <b>1/1</b> → … → C↓ <b>${latQ(-4, 1).fold()}</b>: an octave of <b>${PUMP}</b>, ${fmt(PUMP_C)} ¢` : 'Click a node or a triangle.';
+    const names = {}; this.sel.forEach(([a, b]) => { (names[nameOf(a + 4 * b)] ||= []).push(latQ(a, b)); });
+    for (const [nm, qs] of Object.entries(names)) if (qs.length > 1) { const d = qs[1].div(qs[0]).foldNear(); r += `<br>two ${nm}s, ${d} apart (${fmtS(d.c)} ¢)`; }
+    $('lat-read').innerHTML = r;
+  },
+  frame() {
+    const nar = $('lat-svg').getBoundingClientRect().width < 520;
+    if (nar !== LAT.narrow || COL.key !== this.ck) { this.ck = COL.key; latLayout(nar); this.render(); }
+  },
+  current() { return this.sel.length ? this.sel : this.chordPts || []; },
+  primary() { latWalk(); },
+};
+$('lat-svg').addEventListener('click', e => {
+  const n = e.target.closest('[data-ab]'); if (!n) return;
+  const L = SC.lattice, pts = JSON.parse(n.dataset.ab); ensureAudio(); stopSequences();
+  if (pts.length === 1) {
+    const [a, b] = pts[0], i = L.sel.findIndex(s => s[0] === a && s[1] === b);
+    i >= 0 ? L.sel.splice(i, 1) : L.sel.push([a, b]); L.chordPts = null;
+    note(latF(a, b), nowA() + 0.02, 1.3);
+  } else {
+    L.lit = pts; L.chordPts = pts; L.sel = [];
+    chord(pts.map(p => latF(...p)), nowA() + 0.02, 2.2); later(() => { L.lit = null; L.render(); }, 2300);
+  }
+  L.render();
+});
+$('lat-ji').addEventListener('change', () => SC.lattice.render());
+function latWalk() {
+  ensureAudio(); stopSequences();
+  const L = SC.lattice; L.path = 1; L.sel = []; L.chordPts = null;
+  const t = nowA() + 0.05, dt = 1.1;
+  PUMP_PATH.forEach((tri, i) => {
+    chord(tri.map(p => latF(...p)), t + i * dt, dt * 0.95, 0.85); note(latF(...tri[0]) / 2, t + i * dt, dt * 0.95, 0.8);
+    later(() => { L.lit = tri; L.render(); }, (0.05 + i * dt) * 1000);
+  });
+  const te = t + PUMP_PATH.length * dt + 0.3;
+  note(latF(0, 0), te, 3.2); note(latF(-4, 1), te, 3.2);
+  later(() => { L.lit = [[0, 0], [-4, 1]]; L.sel = [[0, 0], [-4, 1]]; L.render(); }, (te - t + 0.05) * 1000);
+  later(() => { L.lit = null; L.render(); }, (te - t + 3.4) * 1000);
+}
+
+/* ---------- Button wiring ---------- */
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const act = b.dataset.act, L = SC.lattice;
+  ({
+    'pu-play': () => playInterval(false), 'pu-apart': () => playInterval(true),
+    'st-mode': () => SC.stack.setMode(b.dataset.v, 'reveal'), 'st-play': () => playStack(SC.stack.mode),
+    'st-cmp': () => { stopSequences(); SC.stack.t0 = -99; playCompare(SC.stack.mode); },
+    'pump': () => pump.mode === b.dataset.v ? pumpStop() : pumpStart(b.dataset.v), 'pump-stop': () => pumpStop(),
+    'pump-tempo': () => {
+      pump.dur = +b.dataset.v; document.querySelectorAll('[data-act=pump-tempo]').forEach(x => x.classList.toggle('on', x === b));
+      if (pump.mode) pumpStart(pump.mode);
+    },
+    'te-view': () => { SC.temper.view = b.dataset.v; SC.temper.update(); },
+    'te-triad': () => playTriad(false), 'te-arp': () => playTriad(true),
+    'te-fifth': () => { const ti = triadInfo(SC.temper.t, SC.temper.root); playDyad(ti.f[0], ti.f[2]); },
+    'te-wolf': () => { const w = worstFifth(SC.temper.t, SC.temper.root); playDyad(w.fl, w.fh); },
+    'lat-walk': latWalk,
+    'lat-play': () => { ensureAudio(); stopSequences(); chord(L.current().map(p => latF(...p)), nowA() + 0.02, 2.5); },
+    'lat-et': () => { ensureAudio(); stopSequences(); chord(L.current().map(p => etNear(latF(...p))), nowA() + 0.02, 2.5); },
+    'lat-clear': () => { L.sel = []; L.lit = null; L.chordPts = null; L.render(); },
+  })[act]?.();
+});
+
+/* =====================================================================
+   Appendix tables (all computed)
+   ===================================================================== */
+(function appendix() {
+  const IV = [
+    ['Minor second', R(16, 15), 1], ['Major second (large)', R(9, 8), 2], ['Major second (small)', R(10, 9), 2], ['Minor third', MIN3, 3],
+    ['Major third', THIRD, 4], ['Perfect fourth', R(4, 3), 5], ['Augmented fourth', R(45, 32), 6], ['Perfect fifth', FIFTH, 7],
+    ['Minor sixth', R(8, 5), 8], ['Major sixth', R(5, 3), 9], ['Minor seventh', R(9, 5), 10], ['Major seventh', R(15, 8), 11], ['Octave', OCT, 12],
+  ];
+  $('tab-ivs').innerHTML = '<tr><th>Interval</th><th>Pure ratio</th><th>Cents</th><th>12-TET</th><th>Pure − 12-TET</th></tr>' +
+    IV.map(([n, q, s]) => `<tr><td>${n}</td><td class="mono">${q}</td><td class="mono">${fmt(q.c, 2)}</td><td class="mono">${fmt(s * ET_SEMI, 0)}</td><td class="mono">${fmtS(q.c - s * ET_SEMI, 2)}</td></tr>`).join('');
+  const CM = [
+    ['Pythagorean comma', '12 fifths over 7 octaves', PYTH], ['Syntonic comma', '4 fifths over 2 octaves and a major third', SYNT],
+    ['Lesser diesis', 'an octave over 3 major thirds', DIESIS], ['Greater diesis', '4 minor thirds over an octave', GDIESIS],
+    ['Schisma', 'Pythagorean comma over syntonic comma', SCHISMA],
+  ];
+  $('tab-commas').innerHTML = '<tr><th>Comma</th><th style="text-align:left">Built as</th><th>Ratio</th><th>Cents</th></tr>' +
+    CM.map(([n, d, q]) => `<tr><td>${n}</td><td class="l">${d}</td><td class="mono">${q}</td><td class="mono">${fmt(q.c, 3)}</td></tr>`).join('');
+  let h = '<tr><th>Note</th>' + TUNE_ORDER.map(k => `<th>${TUNINGS[k].name}</th>`).join('') + '</tr>';
+  for (let pc = 0; pc < 12; pc++) h += `<tr><td>${[...new Set(TUNE_ORDER.map(k => TUNINGS[k].names[pc]))].join(' / ')}</td>` + TUNE_ORDER.map(k => `<td class="mono">${fmt(TUNINGS[k].cents[pc])}</td>`).join('') + '</tr>';
+  $('tab-tunings').innerHTML = h;
+  $('snd-notes').innerHTML = `Nothing is sampled. Each note is a Web Audio oscillator playing a custom waveform of ${HARMONICS} harmonics, the <i>n</i>th at amplitude 1/<i>n</i><sup>${ROLLOFF}</sup>, because beating lives in the overtones and pure sine waves would hide it. Frequencies are computed from the ratios above, relative to an equal-tempered C (C4 = ${fmt(C4, 2)} Hz, from A4 = 440 Hz). Notes fade in over 30 ms, settle to a steady level so beats stay audible, and fade out over about 0.3 s, so nothing clicks. In the comma pump the four voices are continuous oscillators: shared notes are literally held, and a note forced to move slides instead of restarting.`;
+})();
+
+/* =====================================================================
+   Navigation: every (step, build) is a stop, plus the appendix.
+   ←/→ glide between stops; the stage switches at once so sound/visual
+   and text move together. On phones builds follow the paragraphs.
+   ===================================================================== */
+const stepEls = [...document.querySelectorAll('.step')], afterEl = $('after');
+const paras = stepEls.map(el => [...el.querySelectorAll('[data-b]')]);
+const nOf = el => +el.dataset.n || 1;
+const stops = []; stepEls.forEach((el, i) => { for (let b = 0; b < nOf(el); b++) stops.push({i, b}); });
+stops.push({i: stepEls.length - 1, b: nOf(stepEls[stepEls.length - 1]) - 1, after: true});
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const phoneMQ = matchMedia('(max-width: 900px)'), phone = () => phoneMQ.matches;
+const stageH = () => $('stagecol').offsetHeight;
+const readLine = () => phone() ? stageH() + 44 : innerHeight * 0.5;
+function stopY(st) {
+  if (st.after) return afterEl.getBoundingClientRect().top + scrollY - 16;
+  const el = stepEls[st.i], r = el.getBoundingClientRect();
+  if (phone()) {
+    if (st.b === 0) return el.querySelector('.card').getBoundingClientRect().top + scrollY - stageH() - 4;
+    return paras[st.i][st.b].getBoundingClientRect().top + scrollY - stageH() - 20;
+  }
+  if (st.i === 0) return 0;
+  return r.top + scrollY + ((st.b + 0.5) / nOf(el)) * r.height - readLine();
+}
+let glide = null, activeIdx = 0, activeBuild = 0, backRun = false;
+function goStop(k) {
+  k = clamp(k, 0, stops.length - 1);
+  const target = clamp(stopY(stops[k]), 0, document.documentElement.scrollHeight - innerHeight), start = scrollY, dist = Math.abs(target - start);
+  if (dist < 2) { glide = null; return; }
+  const dur = reduce ? 0.01 : clamp(0.6 + dist / innerHeight * 0.55, 0.85, 1.5);
+  glide = {start, target, t0: performance.now() / 1000, dur, k};
+}
+const inAfter = () => afterEl.getBoundingClientRect().top < innerHeight * 0.5;
+const curStop = () => glide ? glide.k : inAfter() ? stops.length - 1 : Math.max(0, stops.findIndex(x => !x.after && x.i === activeIdx && x.b === activeBuild));
+const cancelGlide = () => { glide = null; backRun = false; };
+addEventListener('wheel', cancelGlide, {passive: true});
+addEventListener('touchstart', e => { if (!e.target.closest('button, input, svg, label')) cancelGlide(); }, {passive: true});
+const next = () => { backRun = false; goStop(curStop() + 1); };
+const prev = () => {
+  const c = curStop(), s = stops[c];
+  goStop(backRun && !s.after ? stops.findIndex(x => x.i === s.i) - 1 : c - 1); backRun = true;
+};
+const pressKey = id => { const k = $(id); k.classList.add('press'); setTimeout(() => k.classList.remove('press'), 140); };
+$('k-next').addEventListener('click', next); $('k-prev').addEventListener('click', prev);
+addEventListener('keydown', e => {
+  if (e.metaKey || e.ctrlKey || e.altKey || e.target.closest('input, textarea, select')) return;
+  if ((e.key === ' ' || e.key === 'Enter') && e.target.closest('button, [role=button]')) return;
+  const k = e.key.toLowerCase();
+  if (['arrowright', 'arrowdown', 'pagedown', ' '].includes(k)) { e.preventDefault(); next(); pressKey('k-next'); }
+  else if (['arrowleft', 'arrowup', 'pageup'].includes(k)) { e.preventDefault(); prev(); pressKey('k-prev'); }
+  else if (k === 'p') { e.preventDefault(); SC[curScene]?.primary?.(); }
+  else if (k === 's' || k === 'escape') { stopAll(); }
+});
+const segsEl = $('segs');
+stepEls.forEach((s, i) => {
+  const b = document.createElement('button'); b.className = 'seg'; const h = s.querySelector('h1, h2');
+  b.setAttribute('aria-label', `Go to ${h ? h.textContent : 'slide ' + (i + 1)}`); b.title = h ? h.textContent : '';
+  b.addEventListener('click', () => { backRun = false; goStop(stops.findIndex(x => x.i === i)); }); segsEl.appendChild(b);
+});
+const segEls = [...segsEl.children];
+const CHAPTERS = [['Ratios', 'pure'], ['Stacking', 'stack'], ['The pump', 'pump'], ['Temperaments', 'temper'], ['Playground', 'lattice']];
+const chapStart = CHAPTERS.map(([, sc]) => stepEls.findIndex(el => el.dataset.scene === sc));
+const chapBtns = CHAPTERS.map(([name], c) => {
+  const b = document.createElement('button'); b.className = 'chapter'; b.textContent = name;
+  b.addEventListener('click', () => { backRun = false; goStop(stops.findIndex(x => x.i === chapStart[c])); b.blur(); });
+  $('chapters').appendChild(b); return b;
+});
+document.addEventListener('visibilitychange', () => { if (pump.mode) pumpTick(); });
+
+function detect() {
+  const line = readLine();
+  for (let i = stepEls.length - 1; i >= 0; i--) {
+    const r = stepEls[i].getBoundingClientRect();
+    if (r.top <= line || i === 0) {
+      activeIdx = i;
+      if (phone()) { let b = 0; paras[i].forEach(p => { if (p.getBoundingClientRect().top <= line) b = Math.max(b, +p.dataset.b); }); activeBuild = b; }
+      else activeBuild = clamp(Math.floor((line - r.top) / r.height * nOf(stepEls[i])), 0, nOf(stepEls[i]) - 1);
+      return;
+    }
+  }
+}
+let curScene = null, curKey = '';
+function frame(ms) {
+  const now = ms / 1000;
+  /* @render-hook */ if (glide) {
+    const u = clamp((now - glide.t0) / glide.dur);
+    scrollTo(0, lerp(glide.start, glide.target, (1 - Math.cos(Math.PI * u)) / 2));
+    const st = stops[glide.k]; activeIdx = st.i; activeBuild = st.b;
+    if (u >= 1) glide = null;
+  } else detect();
+  const scene = stepEls[activeIdx].dataset.scene, key = activeIdx + '/' + activeBuild;
+  if (key !== curKey) {
+    curKey = key;
+    if (scene !== curScene) {
+      if (curScene) { $(SC[curScene].layer).classList.remove('on'); stopSequences(); }
+      $(SC[scene].layer).classList.add('on'); curScene = scene;
+    }
+    SC[scene].set?.(activeBuild);
+    segEls.forEach((b, i) => { b.classList.toggle('done', i < activeIdx); b.classList.toggle('cur', i === activeIdx); });
+    stepEls.forEach((el, i) => el.classList.toggle('cur', i === activeIdx));
+    paras[activeIdx].forEach(el => {
+      const b = +el.dataset.b; el.classList.toggle('past', b < activeBuild); el.classList.toggle('now', b === activeBuild); el.classList.toggle('fut', b > activeBuild);
+    });
+    const ch = chapStart.filter(x => x <= activeIdx).length - 1;
+    chapBtns.forEach((b, c) => b.setAttribute('aria-current', String(c === ch)));
+    const n = nOf(stepEls[activeIdx]);
+    $('slideno').innerHTML = `<span><b>${activeIdx + 1}</b> / ${stepEls.length}</span>` + (n > 1 ? `<span class="pips">${[...Array(n).keys()].map(j => `<i class="pip${j <= activeBuild ? ' on' : ''}"></i>`).join('')}</span>` : '');
+  }
+  try { SC[scene].frame(now); } catch (err) { console.error(err); }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

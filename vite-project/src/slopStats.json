@@ -1,0 +1,59 @@
+{
+    "updated": "2026-11-22",
+    "projects": {
+        "rhyme-xray": {
+            "commits": 15,
+            "agents": 10,
+            "sessions": 4,
+            "hours": 4.7
+        },
+        "algorhythms": {
+            "commits": 652,
+            "agents": 132,
+            "sessions": 20,
+            "hours": 89.6
+        },
+        "spotify-unwrapped": {
+            "commits": 656,
+            "agents": 193,
+            "sessions": 177,
+            "hours": 100.7
+        },
+        "paper-othello": {
+            "commits": null,
+            "agents": 24,
+            "sessions": 24,
+            "hours": 17.4
+        },
+        "comma-pump": {
+            "commits": 2,
+            "agents": 1,
+            "sessions": 1,
+            "hours": 2
+        },
+        "single-cycles": {
+            "commits": null,
+            "agents": 3,
+            "sessions": 3,
+            "hours": 7.1
+        },
+        "craft-prs": {
+            "commits": 6,
+            "agents": 7,
+            "sessions": 5,
+            "hours": 1.8
+        },
+        "slop-zone": {
+            "commits": null,
+            "agents": 3,
+            "sessions": 3,
+            "hours": 3.6
+        },
+        "trivia": {
+            "commits": null,
+            "agents": 5,
+            "sessions": 5,
+            "hours": 1.7
+        }
+    }
+}

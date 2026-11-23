@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paper Othello</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <h1>Paper Othello</h1>
+    <p>Place a mark touching an opponent's mark. Line it up with one of your own and you may fill the gap. Nothing is ever erased.</p>
+  </div>
+  <nav class="tabs" aria-label="Sections">
+    <button data-tab="play" class="on">Play</button>
+    <button data-tab="puzzles">Puzzles</button>
+    <button data-tab="lab">Lab</button>
+    <button data-tab="tune">Tune</button>
+    <button data-tab="ladder">Ladder</button>
+    <button data-tab="bots">How the bots think</button>
+    <button data-tab="research">Research</button>
+  </nav>
+</header>
+
+<div class="shell">
+  <aside class="card rules" id="rules" aria-label="Rules"></aside>
+
+  <main>
+    <!-- ===================== PLAY ===================== -->
+    <section id="tab-play" class="play">
+      <div class="board-col">
+        <div class="scorebar">
+          <div class="score"><svg class="chip" viewBox="0 0 20 20"><path class="mk x" d="M5 5L15 15M15 5L5 15"/></svg><b id="score-x">0</b></div>
+          <div class="status" id="status" aria-live="polite"></div>
+          <div class="score"><b id="score-o">0</b><svg class="chip" viewBox="0 0 20 20"><circle class="mk o" cx="10" cy="10" r="6"/></svg></div>
+        </div>
+        <div class="segbar" id="score-bar" aria-hidden="true"><i class="sx"></i><i class="se"></i><i class="so"></i></div>
+        <div class="board-wrap" id="board"></div>
+
+        <div class="bar" id="confirm" hidden>
+          <span id="confirm-text"></span>
+          <span class="grow"></span>
+          <button class="primary" id="confirm-ok">Place</button>
+          <button id="confirm-cancel">Cancel</button>
+        </div>
+
+        <div class="bar" id="controls">
+          <button class="primary" id="btn-new">New game</button>
+          <button id="btn-undo">Undo</button>
+          <button id="btn-pause">Pause bots</button>
+          <button id="btn-step">Step</button>
+          <button id="btn-end" data-tip="No line can be filled any more, so only lone gaps are left. Shares them out instantly (cells both sides could take go first) and ends the game.">End game now</button>
+          <span class="grow"></span>
+          <button id="btn-sandbox" aria-pressed="false">Sandbox</button>
+        </div>
+
+        <div class="bar sandbox" id="sandbox-bar" hidden>
+          <span class="lbl">Brush</span>
+          <span class="seg" id="brush">
+            <button data-v="1" class="on">X</button><button data-v="2">O</button><button data-v="3">Hole</button><button data-v="0">Erase</button>
+          </span>
+          <span class="lbl">Moves next</span>
+          <span class="seg" id="tomove"><button data-v="1" class="on">X</button><button data-v="2">O</button></span>
+          <span class="grow"></span>
+          <button id="sb-clear">Clear</button>
+          <button id="sb-save">Save as start position</button>
+          <button class="primary" id="sb-play">Play from here</button>
+        </div>
+      </div>
+
+      <div class="side-col">
+        <div class="card me-card">
+          <div class="head-row"><h2>Your Elo <span id="me-elo" class="me-elo"></span></h2><button class="primary" id="me-fair">Play a fair opponent</button></div>
+          <p class="me-line" id="me-line" aria-live="polite"></p>
+        </div>
+        <div class="card">
+          <h2>Players</h2>
+          <div class="player-row"><span class="who"><svg class="chip" viewBox="0 0 20 20"><path class="mk x" d="M5 5L15 15M15 5L5 15"/></svg> X</span><span id="pick-x" class="pick"></span></div>
+          <div class="player-row"><span class="who"><svg class="chip" viewBox="0 0 20 20"><circle class="mk o" cx="10" cy="10" r="6"/></svg> O</span><span id="pick-o" class="pick"></span></div>
+          <label class="row">Bot pace <input type="range" id="opt-speed" min="0" max="1500" step="50"><output id="opt-speed-out"></output></label>
+          <label class="check"><input type="checkbox" id="opt-hints"> Show how many cells each move would fill</label>
+          <label class="check" id="opt-manual-wrap"><input type="checkbox" id="opt-manual"> Let me choose which lines to fill</label>
+        </div>
+
+        <div class="card brain">
+          <h2>Bot brain</h2>
+          <p class="muted" id="brain-head"></p>
+          <table class="eval" id="eval">
+            <thead><tr><th>What it sees</th><th class="num">Now</th><th class="num">Weight</th><th class="num">Stones</th></tr></thead>
+            <tbody></tbody>
+            <tfoot><tr><td colspan="3" id="eval-label">Estimate</td><td class="num" id="eval-total"></td></tr></tfoot>
+          </table>
+          <div class="row-between">
+            <label class="check"><input type="checkbox" id="opt-scores"> Score every legal cell, looking
+              <select id="opt-score-depth"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select> ahead</label>
+          </div>
+          <p class="muted" id="search-info"></p>
+          <div class="row-between">
+            <button class="link" id="weights-reset">Reset weights</button>
+            <button class="link" data-goto="bots">How this works</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Moves</h2>
+          <ol class="log" id="log"></ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== PUZZLES ===================== -->
+    <!-- Text, positions and exact answers come from puzzles-data.js, generated from experiments/fork-puzzles.md -->
+    <section id="tab-puzzles" class="puzzles" hidden>
+      <div class="card pz-head">
+        <div class="head-row">
+          <h2>Fork puzzles on the 5×5 board</h2>
+          <span class="muted small" id="pz-count"></span>
+        </div>
+        <div class="pz-lead" id="pz-lead"></div>
+        <details class="pz-rules">
+          <summary>The 5×5 board and the rules in one minute</summary>
+          <div class="pz-rules-body">
+            <div class="pz-start" id="pz-start" aria-label="Starting position"></div>
+            <div class="prose" id="pz-intro"></div>
+          </div>
+        </details>
+      </div>
+
+      <div class="play pz-main">
+        <div class="board-col">
+          <div class="pz-navrow">
+            <button id="pz-prev" aria-label="Previous puzzle">‹</button>
+            <nav class="pz-nav" id="pz-nav" aria-label="Puzzles"></nav>
+            <button id="pz-next" aria-label="Next puzzle">›</button>
+          </div>
+          <div class="board-wrap" id="pz-board"></div>
+          <label class="check" id="pz-fills-wrap"><input type="checkbox" id="pz-fills">Show how many cells each move would fill</label>
+          <label class="check" id="pz-scores-wrap"><input type="checkbox" id="pz-scores">Show the perfect-play result of every move</label>
+          <label class="check"><input type="checkbox" id="pz-choose">Let me choose which lines to fill</label>
+        </div>
+        <div class="side-col">
+          <div class="card">
+            <h2 id="pz-title"></h2>
+            <p class="pz-who" id="pz-who"></p>
+            <div class="prose pz-prompt" id="pz-prompt"></div>
+            <p class="pz-feedback" id="pz-feedback" aria-live="polite"></p>
+            <div class="bar">
+              <button id="pz-retry" hidden>Try again</button>
+              <button class="primary" id="pz-playon" hidden>Play on from here</button>
+              <button id="pz-show">Show the answer</button>
+            </div>
+          </div>
+          <div class="card" id="pz-solution" hidden>
+            <h2>Why</h2>
+            <div class="prose" id="pz-solution-text"></div>
+          </div>
+          <div class="card" id="pz-explore" hidden>
+            <h2>Playing on against the perfect bot</h2>
+            <p class="muted small" id="pz-ex-sub"></p>
+            <p class="pz-feedback" id="pz-ex-status" aria-live="polite"></p>
+            <div class="prose pz-ex-last" id="pz-ex-last" aria-live="polite"></div>
+            <div class="bar">
+              <button id="pz-ex-undo">Undo my last move</button>
+              <button id="pz-ex-exit">Back to the perfect line</button>
+            </div>
+            <ol class="pz-moves pz-exlog" id="pz-ex-log"></ol>
+          </div>
+          <div class="card" id="pz-line" hidden>
+            <h2>The perfect line</h2>
+            <p class="muted small">Both sides playing their best from the puzzle position. Step through it on the board (or use the ← → keys).</p>
+            <div class="bar">
+              <button id="pz-step-back" aria-label="Back one move">◀</button>
+              <button id="pz-step-fwd" aria-label="Forward one move">▶</button>
+              <span id="pz-step-text" class="muted"></span>
+            </div>
+            <div class="bar">
+              <button class="primary" id="pz-line-play">Play from here</button>
+              <span class="muted small" id="pz-line-hint"></span>
+            </div>
+            <ol class="pz-moves" id="pz-moves"></ol>
+          </div>
+        </div>
+      </div>
+
+      <details class="card pz-lessons">
+        <summary><h2>What the puzzles teach</h2></summary>
+        <div class="prose" id="pz-lessons"></div>
+      </details>
+    </section>
+
+    <!-- ===================== LAB ===================== -->
+    <section id="tab-lab" hidden>
+      <div class="card">
+        <h2>Bot lab</h2>
+        <p class="muted">Plays many games with the rules on the left and reports what happened. <span id="lab-rules"></span></p>
+        <div class="lab-grid">
+          <label class="fld"><span>Bot A</span><span id="lab-a" class="pick"></span></label>
+          <label class="fld"><span>Bot B</span><span id="lab-b" class="pick"></span></label>
+          <label class="fld"><span>Games</span><input type="number" id="lab-games" min="2" max="20000" step="10"></label>
+          <label class="fld"><span>Random opening moves</span><input type="number" id="lab-opening" min="0" max="12"></label>
+          <label class="check"><input type="checkbox" id="lab-alt"> Swap who plays X every game</label>
+        </div>
+        <p class="muted small">Minimax never varies its play, so two minimax bots would repeat one game forever. A couple of random opening moves gives every game a different start.</p>
+
+        <div class="seg modes" id="lab-mode">
+          <button data-v="match" class="on">Match</button>
+          <button data-v="sweep">Rule sweep</button>
+          <button data-v="starts">Start positions</button>
+        </div>
+
+        <div class="mode" data-mode="match">
+          <p>Bot A against Bot B, with full statistics, board heatmaps and every game available to replay.</p>
+        </div>
+        <div class="mode" data-mode="sweep" hidden>
+          <p>Runs the same match once per value of one rule, so you can see what that rule does.</p>
+          <div class="lab-grid">
+            <label class="fld"><span>Rule to vary</span><select id="sweep-param"></select></label>
+          </div>
+          <div class="checks" id="sweep-values"></div>
+        </div>
+        <div class="mode" data-mode="starts" hidden>
+          <p>Tries many starting positions and ranks them. The game count above is per position.</p>
+          <div class="lab-grid">
+            <label class="fld"><span>Stones per side</span><input type="number" id="st-stones" min="1" max="8"></label>
+            <label class="fld"><span>Random positions</span><input type="number" id="st-count" min="0" max="200"></label>
+            <label class="check"><input type="checkbox" id="st-sym"> Mirror X and O through the centre</label>
+            <label class="check"><input type="checkbox" id="st-presets"> Include the built-in starts</label>
+          </div>
+        </div>
+
+        <div class="bar">
+          <button class="primary" id="lab-run">Run</button>
+          <button id="lab-stop" disabled>Stop</button>
+          <div class="progress" id="lab-progress"><i></i></div>
+          <span class="muted" id="lab-status"></span>
+        </div>
+      </div>
+      <div id="lab-results"></div>
+    </section>
+
+    <!-- ===================== TUNE ===================== -->
+    <section id="tab-tune" hidden>
+      <div class="card">
+        <div class="head-row"><h2>Self-improving bots</h2><span class="muted small" id="tn-rules"></span></div>
+        <p class="muted">Tunes a bot's weights for the rules on the left. Each step nudges every weight up or down at random, giving a nudged-up and a nudged-down bot; both play the same pairs of games (same openings, colours swapped) against a field of other bots, and the weights move toward whichever scored more. Every few steps it plays the opponent you pick below at the same look-ahead, to measure progress in Elo. Each bot keeps its own tuning run, so you can switch between them.</p>
+        <p class="muted small" id="tn-engine">Games run on the fast engine (WebAssembly) whenever it can play both bots: the same games the JavaScript bots would play, move for move, about five times faster. On the 7×7 mandatory-fill rules a minute of tuning gains about +55 to +80 Elo at look-ahead 2 (most of it in the first ten seconds), +70 at look-ahead 3 and +86 in 2½ minutes at look-ahead 4; one more move of look-ahead is worth +70 to +160 there. The weights alone level off within a minute or two: the training-score chart shows when. Looking further while fills are on offer (3 more moves) is worth nearly a whole move of look-ahead at a fraction of its cost, and tuning on top of it took the Accountant at look-ahead 2 to +94 over Default at look-ahead 3. Tuned bots are not equally better against every style, so a ladder check plays the same panel of bots every time.</p>
+        <div class="tn-seen" id="tn-seen"></div>
+        <div class="lab-grid">
+          <label class="fld"><span>Bot to tune</span><select id="tn-start"></select></label>
+          <label class="fld"><span>Measure against</span><select id="tn-vs"></select></label>
+          <label class="fld" data-tip="Self-play (the bot against a nudged copy of itself) can drift: it rewards beating near-copies of itself. On the 5×5 guide game 30 s of it ended below the untuned bot on the ladder, while training against the field gained +100. On 7×7 both gain about the same against bots neither trained on; self-play shows more against the bot it started from."><span>Train against</span><select id="tn-train"></select></label>
+        </div>
+        <p class="muted small" id="tn-idea"></p>
+        <div id="tn-td" hidden>
+          <p class="muted small">A pattern bot is not tuned by nudging weights: it has hundreds of thousands of table entries, one per small pattern (every 3×3 neighbourhood and every 6-cell row, column or diagonal, read as empty, the mover's, the opponent's or wall). Each step, every worker plays games against itself on the rules on the left, choosing moves one ply deep, and moves each pattern's value toward how the game actually went; then the page merges what the workers learned. The progress checks and saving work as for the other bots. The shipped table took 1.3 million games (4 minutes on 6 cores) and is about +180 over Default at look-ahead 3 on the 7×7 mandatory-fill rules; on rules it never saw (orthogonal lines, "fewest wins", other placements) start from it or from an empty table and let it learn.</p>
+          <div class="lab-grid">
+            <label class="fld" data-tip="The shipped table was trained on 5×5, 6×6, 7×7 and 8×8 boards with 8-way placement and lines in all directions. On rules like those, starting from it saves time; on very different rules an empty table may learn cleaner values. Fixed once a run has started (Start over to change it)."><span>Start the table from</span><select id="tn-tdfrom"><option value="mix">The shipped table</option><option value="blank">An empty table (learn from scratch)</option></select></label>
+            <label class="fld" data-tip="Self-play games each worker plays per step before the page adds up what they learned. More games per step: fewer, bigger steps."><span>Games per worker per step</span><input type="number" id="tn-tdgames" min="50" max="5000" step="50"></label>
+            <label class="fld" data-tip="How far each pattern's value moves toward what the game showed, as a share of the error (shared out over the patterns in the position). It shrinks on its own as the run goes on, down to a fifth. 0.03 to 0.05 worked well; much bigger and the values thrash."><span>Learning rate</span><input type="number" id="tn-tdalpha" min="0.002" max="0.2" step="0.005"></label>
+            <label class="fld" data-tip="Share of training moves played at random, so the bot also sees positions its own best play would avoid. Random moves are not learned from as if they were good play."><span>Random moves while training (%)</span><input type="number" id="tn-tdeps" min="0" max="50"></label>
+          </div>
+        </div>
+        <label class="check" id="tn-phased-wrap" data-tip="Each weight gets a value for the start of the game and one for the end, and slides between them as the board fills (by the share of cells taken, so it means the same on any board size). Twice as many weights to tune: in tests on the 7×7 mandatory-fill rules it did not gain anything measurable over one value all game, so it is off unless you want to experiment."><input type="checkbox" id="tn-phased"> Weights may change over the game (a start and an end value each)</label>
+        <div class="lab-grid">
+          <label class="fld"><span>Tuned bot's look-ahead</span><select id="tn-depth"><option value="1">1 move</option><option value="2">2 moves</option><option value="3">3 moves</option><option value="4">4 moves</option><option value="5">5 moves (slow)</option><option value="6">6 moves (very slow)</option></select></label>
+          <label class="fld" data-tip="Quiescence search: when the look-ahead runs out in the middle of a fill exchange, keep going through the big fills (either side may also stop there) instead of judging the position halfway. On the 7×7 mandatory-fill rules this one setting is worth as much as all the weight tuning. It makes each game slower, so a run takes fewer steps per second. The opponents it trains and is checked against never use it."><span>Look further while big fills are on offer</span><select id="tn-q"><option value="0">No: plain look-ahead</option><option value="1">1 more move</option><option value="2">2 more moves</option><option value="3">3 more moves (best in tests)</option><option value="4">4 more moves</option></select></label>
+          <label class="fld" data-tip="Which fills count as big enough to look further for."><span>A big fill is</span><select id="tn-qmin"><option value="1">Any fill (best in tests)</option><option value="2">2 cells or more</option><option value="3">3 cells or more</option><option value="4">4 cells or more</option></select></label>
+          <label class="fld" data-tip="Once this few cells are left, the bot stops guessing and plays the endgame perfectly (an exact search to the end of the game). On the 7×7 mandatory-fill rules, 16 made the Accountant about 50 Elo stronger and the pattern bot about 10. Only the bot's progress checks and its games use it: training games don't (they would run many times slower). The opponents never use it, and the ladder's own bots keep their levels."><span>Perfect endgame from</span><select id="tn-end"><option value="0">Off</option><option value="12">12 empty cells</option><option value="14">14 empty cells</option><option value="16">16 empty cells (recommended)</option><option value="18">18 empty cells (slower)</option></select></label>
+          <label class="fld"><span>Opponent's look-ahead</span><select id="tn-vsdepth"><option value="0">Same as the tuned bot</option><option value="1">1 move</option><option value="2">2 moves</option><option value="3">3 moves</option><option value="4">4 moves</option><option value="5">5 moves (slow)</option><option value="6">6 moves (very slow)</option></select></label>
+          <label class="fld"><span>Game pairs per step</span><input type="number" id="tn-pairs" min="2" max="64"></label>
+          <label class="fld" data-tip="How far the weights move toward the winning side after each step: the learning rate. It shrinks on its own as the run goes on. Too big and the weights wander at random (2 did, on 8×8); too small and they hardly move. 0.4 worked well."><span>Step size</span><input type="number" id="tn-gain" min="0.05" max="5" step="0.05"></label>
+          <label class="fld"><span>Random opening moves</span><input type="number" id="tn-opening" min="0" max="12"></label>
+          <label class="fld"><span>Elo check every</span><input type="number" id="tn-every" min="1" max="500"></label>
+          <label class="fld"><span>Pairs per Elo check</span><input type="number" id="tn-checkpairs" min="10" max="1000" step="10"></label>
+        </div>
+        <p class="muted small">Every check replays the same openings, so two checks differ only because the weights changed. The openings are still a sample: 200 pairs put the whole curve within about ±35 Elo of the truth, the same at every check, so read its shape and rate a bot properly when you save it. More pairs per step and a bigger step size are not better: in tests, step size 1 or bigger nudges halved the gain.</p>
+        <div class="bar">
+          <button class="primary" id="tn-run">Start tuning</button>
+          <button id="tn-restart">Start over</button>
+          <span class="muted" id="tn-status"></span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 id="tn-chart-h">Strength over time</h2>
+        <p class="muted small" id="tn-chart-sub"></p>
+        <div class="chart" id="tn-chart"></div>
+        <div id="tn-best" class="tn-best"></div>
+        <div id="tn-train-box" hidden>
+          <h3>Training score</h3>
+          <p class="muted small" id="tn-train-sub"></p>
+          <div class="chart" id="tn-train-chart"></div>
+        </div>
+        <details class="tn-table"><summary>Show as a table</summary><div id="tn-history"></div></details>
+      </div>
+
+      <div class="card">
+        <div class="head-row"><h2 id="tn-wh">Weights</h2><button class="link" id="tn-use">Use these weights for Minimax on the Play tab</button></div>
+        <p class="muted small" id="tn-wnote"></p>
+        <table class="data tn-weights" id="tn-weights"></table>
+        <div id="tn-patviz" class="pv" hidden></div>
+      </div>
+
+      <div class="card">
+        <h2>Try weights at other look-aheads or on other rules</h2>
+        <p class="muted small">Plays a bot against an opponent at each look-ahead you list, on the rules on the left. The bot can be the weights being tuned here or any saved bot, including bots tuned on another board size, at another look-ahead or for other rules: switch the rules first to try them there. Each look-ahead gets its own Elo (above 0: the bot wins more often).</p>
+        <div class="lab-grid">
+          <label class="fld"><span>Bot</span><select id="tx-bot"></select></label>
+          <label class="fld"><span>Against</span><select id="tx-vs"></select></label>
+          <label class="fld"><span>Look-aheads</span><input type="text" id="tx-depths" value="1-4" size="8" data-tip="For example 1-4, or 2, 3, 5"></label>
+          <label class="fld"><span>Pairs each</span><input type="number" id="tx-pairs" min="10" max="2000" step="10" value="200"></label>
+          <button class="primary" id="tx-run">Play</button>
+          <span class="muted" id="tx-status"></span>
+        </div>
+        <div id="tx-out"></div>
+      </div>
+
+      <div class="card">
+        <h2>Saved bots</h2>
+        <div class="bar tn-save">
+          <input type="text" id="tn-name" placeholder="Name for the current weights" maxlength="40">
+          <label>rate over <input type="number" id="tn-ratepairs" min="20" max="2000" step="20" value="150"> pairs</label>
+          <button class="primary" id="tn-save">Save as a bot</button>
+          <span class="muted" id="tn-save-status"></span>
+        </div>
+        <p class="muted small" id="tn-save-note">Saving rates the new bot. When these rules have a ladder, it plays the ladder bots nearest its strength (two rounds, the second re-centred on the first) and gets a ladder Elo, the same as rating it on the Ladder tab. Without a ladder it plays Minimax (Default) at the same look-ahead, so every Elo here means "points above the default bot at that look-ahead". To put it on one scale with every other bot, rate it on the <button class="link" data-goto="ladder">Ladder</button> tab. Saved bots appear in the player and Lab menus.</p>
+        <div id="tn-bots"></div>
+        <div id="tn-other"></div>
+        <div class="bar">
+          <button id="tn-export">Export all bots</button>
+          <label class="button-like">Import<input type="file" id="tn-import" accept="application/json,.json" hidden></label>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== LADDER ===================== -->
+    <section id="tab-ladder" hidden>
+      <div class="card">
+        <div class="head-row"><h2>Bot ladder</h2><div class="seg" id="ld-boards" role="tablist" aria-label="Ladder"></div></div>
+        <p class="muted">One standard for Elo. Every bot here played every other in pairs of games from the same random first move, colours swapped, and the ratings are the single set of numbers that best explains all of those results (a Bradley–Terry fit). <b>Random is pinned at 0</b>, so a rating never drifts: 400 points apart means the stronger bot is expected to score about 91%.</p>
+        <p class="muted small" id="ld-meta"></p>
+        <div class="bar ld-train" id="ld-train"></div>
+        <div id="ld-table"></div>
+      </div>
+
+      <div class="card">
+        <h2>You on this ladder</h2>
+        <p class="muted small">Games you play to the end against one bot on the Play tab, from the normal start, without take-backs, paused bots or move scores. Your rating is fitted with the bots' ratings held fixed, just as a new bot joins the ladder, and recent games count more (a game counts half once you have played 40 more), so it follows you as you improve.</p>
+        <div id="ld-me"></div>
+      </div>
+
+      <div class="card">
+        <h2>Your bots on this ladder</h2>
+        <p class="muted small">Bots you saved on the Tune tab for these exact rules. Rating one plays it against the frozen bots nearest its strength and fits its rating with theirs held fixed, so it lands on the same scale without moving anyone else. Until then the number shown is a guess: the ladder rating of Default at the same look-ahead plus the bot's Tune-tab Elo.</p>
+        <div id="ld-mine"></div>
+      </div>
+
+      <div class="card">
+        <h2>Head to head</h2>
+        <p class="muted small">Each cell is the row bot's score against the column bot (wins plus half the draws). Blue: the row bot won most; orange: it lost most.</p>
+        <div id="ld-h2h" class="ld-h2h"></div>
+      </div>
+
+      <div class="card">
+        <h2>A ladder for other rules</h2>
+        <p class="muted small">Tuning on some rules doesn't make a ladder for them: only ysbvl comes with one. For the rules in the panel on the left you can build your own: the quicker bots (and your saved bots for those rules) play a round robin here in the browser. It is kept in this browser only.</p>
+        <div class="bar">
+          <label>pairs per pairing <input type="number" id="ld-pairs" min="2" max="200" value="10"></label>
+          <button class="primary" id="ld-build">Build a ladder for the current rules</button>
+          <span class="muted" id="ld-status"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== ICONS (shared by the Bots and Research tabs) ===================== -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <defs>
+        <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/><path d="M4.8 4.8l2.4 2.4M7.2 4.8l-2.4 2.4"/><circle cx="18" cy="18" r="1.4"/></symbol>
+        <symbol id="i-tree" viewBox="0 0 24 24"><circle cx="12" cy="4.5" r="2"/><circle cx="5" cy="13" r="2"/><circle cx="19" cy="13" r="2"/><circle cx="3.5" cy="20.5" r="1.3"/><circle cx="8" cy="20.5" r="1.3"/><circle cx="19" cy="20.5" r="1.3"/><path d="M10.7 6L6.3 11.4M13.3 6l4.4 5.4M4.5 15l-.7 4.2M5.8 15l1.6 4.3M19 15v4.2"/></symbol>
+        <symbol id="i-check" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M7.5 12.5l3 3 6-7"/></symbol>
+        <symbol id="i-swap" viewBox="0 0 24 24"><path d="M4 8h14l-3.5-3.5M20 16H6l3.5 3.5"/></symbol>
+        <symbol id="i-mirror" viewBox="0 0 24 24"><path d="M12 2v20" stroke-dasharray="2.5 2"/><path d="M4 7l5 5-5 5zM20 7l-5 5 5 5z"/></symbol>
+        <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 1.5v4M12 18.5v4M1.5 12h4M18.5 12h4"/></symbol>
+        <symbol id="i-cross" viewBox="0 0 24 24"><path d="M4 4l16 16M20 4L4 20" /><circle cx="12" cy="12" r="2.6"/></symbol>
+        <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><rect x="9.5" y="9.5" width="5" height="5"/><path d="M9 2.5V6M15 2.5V6M9 18v3.5M15 18v3.5M2.5 9H6M2.5 15H6M18 9h3.5M18 15h3.5"/></symbol>
+        <symbol id="i-hole" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><rect x="9" y="9" width="6" height="6" fill="currentColor" stroke="none" opacity=".55"/></symbol>
+        <symbol id="i-parity" viewBox="0 0 24 24"><circle cx="6" cy="8" r="2.2"/><circle cx="12" cy="8" r="2.2"/><circle cx="18" cy="8" r="2.2"/><circle cx="9" cy="16.5" r="2.2"/><circle cx="15" cy="16.5" r="2.2"/></symbol>
+        <symbol id="i-bars" viewBox="0 0 24 24"><path d="M3 21h18"/><rect x="5" y="11" width="3.5" height="10"/><rect x="10.3" y="5" width="3.5" height="16"/><rect x="15.6" y="14" width="3.5" height="7"/></symbol>
+        <symbol id="i-equal" viewBox="0 0 24 24"><path d="M5 9h14M5 15h14"/></symbol>
+        <symbol id="i-wave" viewBox="0 0 24 24"><path d="M2 14c2.5 0 2.5-6 5-6s2.5 9 5 9 2.5-12 5-12 2.5 7 5 7"/></symbol>
+        <symbol id="i-corner" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M6.5 6.5h3M6.5 6.5v3M17.5 17.5h-3M17.5 17.5v-3"/><circle cx="17" cy="7" r="1.6"/><circle cx="7" cy="17" r="1.6"/></symbol>
+        <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></symbol>
+        <symbol id="i-infinite" viewBox="0 0 24 24"><path d="M12 12c-2-3-4-4.5-6-4.5a4.5 4.5 0 000 9c2 0 4-1.5 6-4.5s4-4.5 6-4.5a4.5 4.5 0 010 9c-2 0-4-1.5-6-4.5z"/></symbol>
+        <symbol id="i-scale" viewBox="0 0 24 24"><path d="M12 3v18M7 21h10M4 7h16"/><path d="M4 7l-2.5 6h5zM20 7l-2.5 6h5z"/></symbol>
+        <symbol id="i-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M14.8 8.6c-.6-.9-1.6-1.3-2.8-1.3-1.6 0-2.8.8-2.8 2.1 0 2.9 5.8 1.6 5.8 4.6 0 1.4-1.3 2.3-3 2.3-1.3 0-2.4-.5-3-1.4M12 5.5v1.8M12 16.6v1.9"/></symbol>
+        <symbol id="i-pie" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l7.5 5"/></symbol>
+        <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M5 3v18M12 3v18M19 3v18"/><circle cx="5" cy="15" r="2.2" fill="var(--surface)"/><circle cx="12" cy="8" r="2.2" fill="var(--surface)"/><circle cx="19" cy="13" r="2.2" fill="var(--surface)"/></symbol>
+        <symbol id="i-ladder" viewBox="0 0 24 24"><path d="M7 2v20M17 2v20M7 6h10M7 11h10M7 16h10"/></symbol>
+        <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 018 0v3"/></symbol>
+        <symbol id="i-lead" viewBox="0 0 24 24"><path d="M3 17l5-5 4 3 8-8"/><path d="M15 7h5v5"/></symbol>
+        <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 22s7-6.6 7-12a7 7 0 00-14 0c0 5.4 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+        <symbol id="i-pocket" viewBox="0 0 24 24"><path d="M3 3h18v18H3z" stroke-dasharray="3 2"/><rect x="7" y="7" width="10" height="10"/><path d="M7 12h10M12 7v10"/></symbol>
+        <symbol id="i-fork" viewBox="0 0 24 24"><path d="M12 22v-8M12 14L5 5M12 14l7-9"/><path d="M5 5h3.5M5 5v3.5M19 5h-3.5M19 5v3.5"/></symbol>
+        <symbol id="i-grow" viewBox="0 0 24 24"><rect x="9" y="9" width="6" height="6"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5M10 4l2-2 2 2M10 20l2 2 2-2M4 10l-2 2 2 2M20 10l2 2-2 2"/></symbol>
+        <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-5.5 9.5A2 2 0 006.2 21h11.6a2 2 0 001.7-2.5L14 9V3"/><path d="M7 15h10"/></symbol>
+        <symbol id="i-bank" viewBox="0 0 24 24"><path d="M3 9l9-5 9 5M4 21h16M5 9v9M9.5 9v9M14.5 9v9M19 9v9M3 18h18"/></symbol>
+        <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2.5l8 3v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10v-6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></symbol>
+        <symbol id="i-door" viewBox="0 0 24 24"><path d="M4 21h16M6 21V4h9v17M15 6l4-1v16"/><circle cx="12.5" cy="13" r=".9" fill="currentColor"/></symbol>
+        <symbol id="i-dash" viewBox="0 0 24 24"><circle cx="4.5" cy="19.5" r="2.3"/><circle cx="19.5" cy="4.5" r="2.3"/><path d="M6.5 17.5l11-11" stroke-dasharray="2.5 2.5"/></symbol>
+        <symbol id="i-hourglass" viewBox="0 0 24 24"><path d="M6 2.5h12M6 21.5h12M7 2.5c0 5 10 5.5 10 9.5S7 16.5 7 21.5M17 2.5c0 5-10 5.5-10 9.5s10 4.5 10 9.5"/></symbol>
+        <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2.8l2.8 6 6.4.6-4.8 4.3 1.4 6.4L12 16.8l-5.8 3.3 1.4-6.4-4.8-4.3 6.4-.6z"/></symbol>
+        <symbol id="i-question" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.3 9.3a2.8 2.8 0 015.4 1c0 1.9-2.7 2.4-2.7 4.2"/><circle cx="12" cy="17.6" r=".9" fill="currentColor"/></symbol>
+        <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 6.5C10 5 7 4.5 3 5v14c4-.5 7 0 9 1.5 2-1.5 5-2 9-1.5V5c-4-.5-7 0-9 1.5zM12 6.5v14"/></symbol>
+        <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6 2.5h8.5L19 7v14.5H6z"/><path d="M14 2.5V7h5M9 12h7M9 15.5h7M9 19h4"/></symbol>
+        <symbol id="i-dice" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><circle cx="8.3" cy="8.3" r="1.3" fill="currentColor"/><circle cx="15.7" cy="15.7" r="1.3" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/></symbol>
+        <symbol id="i-grab" viewBox="0 0 24 24"><path d="M4 12h11M11 7l5 5-5 5"/><path d="M19 4v16"/></symbol>
+        <symbol id="i-block" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></symbol>
+        <symbol id="i-scissors" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.2 8.2L20 19M8.2 15.8L20 5"/></symbol>
+        <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 12.5l9 5 9-5M3 17l9 5 9-5"/></symbol>
+        <symbol id="i-pattern" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/><circle cx="6" cy="6" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18" cy="12" r="1.4"/></symbol>
+        <symbol id="i-sum" viewBox="0 0 24 24"><path d="M18 4H6l7 8-7 8h12"/></symbol>
+        <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 22V3M5 4h12l-2.5 4L17 12H5"/></symbol>
+        <symbol id="i-test" viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h7"/><path d="M15 17l2 2 4-4.5"/></symbol>
+        <symbol id="i-save" viewBox="0 0 24 24"><path d="M5 3h11l3 3v15H5z"/><path d="M8 3v5h7V3M8 21v-6h8v6"/></symbol>
+        <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 00-1-1H5a1 1 0 00-1 1v10a1 1 0 001 1h3"/></symbol>
+      </defs>
+    </svg>
+
+    <!-- ===================== BOTS / RESEARCH: icon tiles that open articles (articles-data.js, made by paper/web.js) ===================== -->
+    <section id="tab-bots" class="arts-tab" hidden><div class="arts" data-set="bots"></div></section>
+    <section id="tab-research" class="arts-tab" hidden><div class="arts" data-set="research"></div></section>
+  </main>
+</div>
+
+<div id="tip" class="tip" hidden></div>
+<div id="toast" class="toast" hidden></div>
+
+<script src="engine.js"></script>
+<script src="bots.js"></script>
+<script src="lab.js"></script>
+<script src="fast-wasm.js"></script>
+<script src="patterns-data.js"></script>
+<script src="fast.js"></script>
+<script src="tune.js"></script>
+<script src="ladder.js"></script>
+<script src="ladder-data.js"></script>
+<script src="puzzles-data.js"></script>
+<script src="articles-data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

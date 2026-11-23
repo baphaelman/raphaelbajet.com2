@@ -3,8 +3,8 @@
 - [x] actual modal after clicking on File in FilePage
 - [x] fix bug with isHovering staying False after closing Modal
 - [x] import crossNumbers
-- [ ] flesh out (actually write) One-Cycles, include images in Articles
-- [ ] componentize scroll buttons
+- [x] flesh out (actually write) One-Cycles, include images in Articles
+- [ ] componentize scroll buttons (and everything jesus. Did I never split Home.jsx??)
 - [ ] add dropshadow to PdfModal
 
 # Longer-Term

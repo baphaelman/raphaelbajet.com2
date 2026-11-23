@@ -1,0 +1,1895 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Single Cycles</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+/* Layout: scrollytelling. Text steps on the left, a sticky stage on the right (on top on phones). Arrow keys step between screens like slides. The stage holds a 3D cube that hands off to a ring diagram, a chart, a cancellation table, a live histogram and a live simulation. */
+:root {
+  --bg: #f4f5f8;
+  --panel: #ffffff;
+  --stage: #e8ebf1;
+  --stage-hi: #f8f9fb;
+  --ink: #14161b;
+  --ink-2: #4a4f5a;
+  --ink-3: #7b8190;
+  --rule: #d9dde5;
+  --accent: #2a78d6;
+  --accent-ink: #1c5cab;
+  --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100; --c5: #e87ba4; --c6: #008300;
+  --yes: #0f7a3c; --no: #c0362c;
+  --f-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --f-math: "STIX Two Math", "Cambria Math", "Latin Modern Math", math, serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101217; --panel: #191c23; --stage: #151920; --stage-hi: #222935;
+    --ink: #eceef2; --ink-2: #b7bcc7; --ink-3: #8a909c; --rule: #2b303a;
+    --accent: #5598e7; --accent-ink: #86b6ef;
+    --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181; --c6: #0ca30c;
+    --yes: #4cc27a; --no: #ff7b72;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101217; --panel: #191c23; --stage: #151920; --stage-hi: #222935;
+  --ink: #eceef2; --ink-2: #b7bcc7; --ink-3: #8a909c; --rule: #2b303a;
+  --accent: #5598e7; --accent-ink: #86b6ef;
+  --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181; --c6: #0ca30c;
+  --yes: #4cc27a; --no: #ff7b72;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+/* No page scroll bar: the stage's progress bar and chapters do that job (scrolling still works) */
+html { scrollbar-width: none; }
+html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; height: 0; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--f-body); font-size: 1.1rem; line-height: 1.62;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 64px;
+}
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; line-height: 1.1; letter-spacing: -0.01em; margin: 0 0 0.6rem; }
+h1 { font-size: clamp(2.8rem, 7vw, 4.6rem); font-weight: 800; letter-spacing: -0.035em; }
+h2 { font-size: 1.65rem; font-weight: 700; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0 0 0.9rem; }
+p:last-child { margin-bottom: 0; }
+a { color: var(--accent-ink); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.pos { font-family: var(--f-mono); font-size: 0.8em; font-weight: 600; padding: 0 0.32em; border-radius: 4px; background: var(--rule); white-space: nowrap; }
+.eyebrow { font-family: var(--f-mono); font-size: 0.76rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 10px; }
+math { font-family: var(--f-math); font-size: 1.08em; }
+math.sq { margin-right: -0.22em; } /* Chrome pads the right of an inline radical */
+math[display="block"] { margin: 1rem 0; overflow-x: auto; overflow-y: hidden; padding-block: 4px; }
+.note { font-size: 0.93rem; color: var(--ink-2); }
+.hint { font-family: var(--f-mono); font-size: 0.78rem; color: var(--ink-3); letter-spacing: 0.02em; }
+kbd { font-family: var(--f-mono); font-size: 0.78rem; font-weight: 600; color: var(--ink); background: var(--panel); border: 1px solid var(--rule); border-bottom-width: 3px; border-radius: 6px; padding: 1px 7px; }
+
+/* Scrolly frame */
+.scrolly { position: relative; display: grid; grid-template-columns: minmax(0, 30rem) minmax(0, 1fr); column-gap: clamp(24px, 4vw, 64px); max-width: 1320px; margin: 0 auto; }
+.steps { grid-column: 1; grid-row: 1; padding-bottom: 30vh; min-width: 0; }
+.stage-col { grid-column: 2; grid-row: 1; position: relative; min-width: 0; }
+.stage { position: sticky; top: 0; height: 100vh; padding-block: 20px; }
+.stage-inner { position: relative; height: 100%; border-radius: 22px; overflow: hidden; border: 1px solid var(--rule); background: radial-gradient(120% 90% at 50% 42%, var(--stage-hi), var(--stage)); touch-action: pan-y; cursor: grab; }
+.stage-inner:active { cursor: grabbing; }
+.step { min-height: 92vh; display: flex; align-items: center; }
+.step.tall { min-height: calc(var(--n, 2) * 85vh); align-items: flex-start; }
+.step.tall .card { position: sticky; top: 16vh; }
+.step:first-child { min-height: 100vh; }
+.card { max-width: 30rem; width: 100%; min-width: 0; padding-block: 24px; }
+/* Only the current slide's text shows; the others fade out as you leave them. */
+.step .card { opacity: 0; visibility: hidden; transition: opacity .45s ease, visibility 0s linear .45s; }
+.step.cur .card { opacity: 1; visibility: visible; transition: opacity .55s ease .1s, visibility 0s; }
+.qbox { margin-top: 1.4rem; padding-top: 1rem; border-top: 1px solid var(--rule); }
+.scrub { display: inline-flex; align-items: center; gap: 8px; margin-top: 4px; }
+.scrub::before { content: ""; width: 18px; height: 1px; background: var(--ink-3); }
+
+/* Slide navigation */
+.nav { position: absolute; top: 12px; left: 14px; right: 14px; display: flex; align-items: center; gap: 10px; z-index: 5; }
+.segs { flex: 1; display: flex; gap: 3px; min-width: 0; }
+.seg { flex: 1; height: 16px; padding: 0; border: 0; background: none; cursor: pointer; position: relative; min-width: 0; }
+.seg::before { content: ""; position: absolute; left: 0; right: 0; top: 6px; height: 4px; border-radius: 2px; background: var(--rule); transition: background .3s, transform .3s; }
+.seg.done::before { background: color-mix(in srgb, var(--accent) 45%, var(--rule)); }
+.seg.cur::before { background: var(--accent); transform: scaleY(1.6); }
+.key { font-family: var(--f-mono); font-size: 0.9rem; font-weight: 600; min-width: 34px; height: 30px; padding: 0 8px; border-radius: 8px; border: 1px solid var(--rule); border-bottom-width: 3px; background: var(--panel); color: var(--ink); cursor: pointer; transition: transform .08s, border-bottom-width .08s; }
+.key:hover { border-color: var(--accent); }
+.key.press, .key:active { transform: translateY(2px); border-bottom-width: 1px; }
+.subnav { position: absolute; top: 48px; left: 16px; right: 14px; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 6px 12px; flex-wrap: wrap; }
+.chapters { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+.chapter { font-family: var(--f-display); font-size: 0.74rem; font-weight: 600; white-space: nowrap; padding: 3px 9px; border-radius: 99px; border: 1px solid var(--rule); background: color-mix(in srgb, var(--panel) 80%, transparent); color: var(--ink-2); cursor: pointer; transition: background .25s, color .25s, border-color .25s; }
+.chapter:hover { border-color: var(--accent); }
+.chapter[aria-current="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.slideno { z-index: 5; display: flex; align-items: center; gap: 10px; font-family: var(--f-mono); font-size: 0.78rem; color: var(--ink-2); pointer-events: none; font-variant-numeric: tabular-nums; }
+.slideno b { color: var(--ink); font-weight: 600; }
+.pips { display: inline-flex; gap: 5px; }
+.pip { width: 7px; height: 7px; border-radius: 50%; border: 1.5px solid var(--ink-3); transition: background .25s, border-color .25s; }
+.pip.on { background: var(--accent); border-color: var(--accent); }
+
+/* Stage layers */
+.layer { position: absolute; inset: 0; opacity: 0; transform: scale(0.97); transition: opacity .55s ease, transform .55s ease; pointer-events: none; }
+.layer.on { opacity: 1; transform: none; pointer-events: auto; }
+#cube { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+#ov { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+.pipbar { position: absolute; left: 0; right: 0; bottom: 12px; display: flex; justify-content: center; z-index: 5; pointer-events: none; }
+.pipbar:empty { display: none; }
+.cap { position: absolute; left: 16px; right: 16px; bottom: 30px; display: flex; justify-content: center; pointer-events: none; }
+.cap span { font-family: var(--f-mono); font-size: 0.8rem; line-height: 1.35; color: var(--ink); background: color-mix(in srgb, var(--panel) 88%, transparent); border: 1px solid var(--rule); border-radius: 99px; padding: 6px 14px; max-width: 100%; text-align: center; transition: opacity .25s; }
+.cap span:empty { display: none; }
+/* Front-page tally of how many cycles each scramble had */
+/* Front-page running tally: one bar split by how many cycles each scramble had */
+.tally { position: absolute; left: 50%; transform: translateX(-50%); width: min(460px, calc(100% - 32px)); bottom: 72px; display: grid; gap: 4px; pointer-events: none; transition: opacity .4s; font-family: var(--f-mono); font-size: 0.72rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.tally[hidden] { display: grid; opacity: 0; }
+.tb-head, .tb-foot { display: flex; justify-content: space-between; gap: 8px; }
+.tb-head b, .tb-foot b { color: var(--ink); }
+.tb-bar { display: flex; height: 26px; border-radius: 7px; overflow: hidden; border: 1px solid var(--rule); background: color-mix(in srgb, var(--panel) 70%, transparent); }
+.tb-seg { flex: 0 0 0%; min-width: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; white-space: nowrap; color: #fff; font-weight: 600; transition: flex-basis .6s ease, box-shadow .3s; }
+.tb-seg + .tb-seg { border-left: 1px solid var(--stage); }
+.tb-seg.now { box-shadow: inset 0 0 0 2px var(--ink); }
+.tb-seg span { padding: 0 6px; overflow: hidden; text-overflow: clip; }
+.tb-key { display: flex; gap: 4px 10px; flex-wrap: wrap; justify-content: center; }
+.tb-key i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+.panel-layer { display: flex; flex-direction: column; justify-content: center; padding: 56px clamp(16px, 4vw, 40px) 40px; gap: 10px; }
+.lay-title { font-family: var(--f-display); font-weight: 700; font-size: 1.1rem; }
+.lay-sub { font-size: 0.92rem; color: var(--ink-2); line-height: 1.45; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 0.85rem; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 11px; height: 11px; border-radius: 3px; display: inline-block; flex: none; }
+.panel-layer svg { width: 100%; height: auto; max-height: 58%; display: block; overflow: visible; }
+.bar { transform-box: fill-box; transform-origin: 50% 100%; transition: transform .8s cubic-bezier(.2,.8,.2,1); }
+.vlabel { transition: opacity .5s ease .4s; }
+#L-chart:not(.on) .bar { transform: scaleY(0); transition-duration: .2s; transition-delay: 0s !important; }
+#L-chart:not(.mode2) .s2 { transform: scaleY(0); }
+#L-chart:not(.mode2) .v2, #L-chart:not(.on) .vlabel { opacity: 0; }
+.total { display: flex; gap: 20px; flex-wrap: wrap; align-items: baseline; }
+.total div { display: grid; }
+.total b { font-family: var(--f-display); font-size: 2rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.total span { font-size: 0.82rem; color: var(--ink-2); }
+#L-chart:not(.mode2) .t2 { opacity: 0.25; }
+.t2 { transition: opacity .5s; }
+.lab-group { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3); margin-top: 8px; }
+.lab-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: baseline; }
+.lab-row .name { font-size: 0.95rem; }
+.lab-row .nums { font-family: var(--f-mono); font-size: 0.82rem; font-variant-numeric: tabular-nums; color: var(--ink-2); text-align: right; }
+.lab-row .nums b { color: var(--ink); font-size: 0.95rem; }
+.track { grid-column: 1 / -1; position: relative; height: 10px; border-radius: 5px; background: var(--rule); }
+.fill { position: absolute; inset: 0 auto 0 0; border-radius: 5px; background: var(--accent); width: 0; }
+.tick { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink); border-radius: 1px; }
+.runbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.lab-count { font-family: var(--f-mono); font-size: 0.82rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.mini { font-family: var(--f-display); font-weight: 600; font-size: 0.85rem; border-radius: 8px; padding: 5px 12px; cursor: pointer; border: 1px solid var(--accent); background: none; color: var(--accent-ink); }
+
+/* Cancellation table */
+.ctable { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+.ctable th, .ctable td { padding: 7px 8px; text-align: center; border-bottom: 1px solid var(--rule); white-space: nowrap; vertical-align: middle; }
+.ctable th { font-family: var(--f-display); font-weight: 600; font-size: 0.85rem; color: var(--ink-2); line-height: 1.2; vertical-align: bottom; }
+.ctable th small { display: block; font-family: var(--f-mono); font-weight: 400; font-size: 0.68rem; color: var(--ink-3); margin-top: 3px; }
+.ctable td:first-child, .ctable th:first-child { text-align: left; font-family: var(--f-display); font-weight: 700; }
+.ctable td.res { font-weight: 700; color: var(--accent-ink); }
+.ev { display: block; font-family: var(--f-mono); font-size: 0.64rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 2px; }
+.ev.ret { color: var(--accent-ink); }
+.fr { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; font-family: var(--f-math); font-size: 1.12rem; line-height: 1.15; }
+.fr > span { position: relative; padding: 0 4px; }
+.fr > span:first-child { border-bottom: 1.5px solid currentColor; }
+.x::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 2px; border-radius: 1px; background: var(--xc); transform: rotate(-38deg) scaleX(0); transition: transform .35s ease; }
+.x { color: var(--xc); }
+.xa { --xc: var(--c2); } .xb { --xc: var(--c3); }
+/* Rows appear one build at a time (data-b on #L-cancel); the active arrow's column is highlighted; strikes come last. */
+#L-cancel tbody tr { opacity: 0; transform: translateY(6px); transition: opacity .45s ease, transform .45s ease; }
+#L-cancel.on[data-b="0"] tr.r1, #L-cancel.on[data-b="1"] :is(tr.r1, tr.r2), #L-cancel.on[data-b="2"] :is(tr.r1, tr.r2, tr.r3), #L-cancel.on[data-b="3"] tbody tr { opacity: 1; transform: none; }
+#L-cancel[data-b="0"] :is(th, td):nth-child(2), #L-cancel[data-b="1"] :is(th, td):nth-child(3), #L-cancel[data-b="2"] :is(th, td):nth-child(4) { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+#L-cancel.on[data-b="3"] .x::after { transform: rotate(-38deg) scaleX(1); }
+#L-cancel.on[data-b="3"] tr.r2 .x::after { transition-delay: .2s; }
+#L-cancel.on[data-b="3"] tr.r3 .x::after { transition-delay: .5s; }
+#L-cancel { justify-content: flex-start; padding-top: 84px; gap: 8px; overflow-y: auto; }
+#L-cancel > * { flex: none; }
+.fanrow { display: flex; align-items: center; gap: 14px; }
+#L-cancel .fanrow svg { width: min(230px, 40%); max-height: none; flex: none; }
+.fan-note { font-size: 0.92rem; color: var(--ink-2); line-height: 1.45; }
+.fan-note b { color: var(--ink); }
+.histstrip { border-top: 1px solid var(--rule); padding-top: 8px; display: grid; gap: 4px; }
+.hs-head { display: flex; gap: 6px 12px; align-items: baseline; flex-wrap: wrap; font-size: 0.85rem; color: var(--ink-2); }
+#L-cancel .histstrip svg { max-height: 112px; }
+.tablebox { overflow-x: auto; }
+
+/* After the scrolly */
+.after { max-width: 66ch; margin: 0 auto; padding-top: 24px; }
+.tablewrap { overflow-x: auto; margin: 1rem 0 1.5rem; }
+table.plain { border-collapse: collapse; width: 100%; font-size: 0.93rem; font-variant-numeric: tabular-nums; }
+table.plain th, table.plain td { padding: 7px 10px; text-align: right; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+table.plain th { font-family: var(--f-display); font-weight: 600; color: var(--ink-2); font-size: 0.85rem; vertical-align: bottom; }
+table.plain td:first-child, table.plain th:first-child { text-align: left; }
+td.q { white-space: normal; min-width: 14ch; }
+tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3); padding-top: 16px; }
+.exact { font-family: var(--f-mono); font-size: 0.78rem; color: var(--ink-3); }
+.answers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 24px; margin-top: 34px; }
+.answer { display: grid; gap: 2px; align-content: start; }
+.answer .who { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3); }
+.answer b { font-family: var(--f-display); font-size: 1.9rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.05; }
+.answer span { font-size: 0.88rem; color: var(--ink-2); line-height: 1.35; }
+.dek { font-size: 1.25rem; line-height: 1.45; color: var(--ink-2); }
+
+@media (max-width: 900px) {
+  .scrolly { grid-template-columns: minmax(0, 1fr); }
+  .steps, .stage-col { grid-column: 1; grid-row: 1; }
+  .stage-col { z-index: 2; pointer-events: none; }
+  .stage { height: 50vh; padding-block: 8px; pointer-events: auto; background: var(--bg); }
+  .steps { padding-top: 52vh; position: relative; z-index: 1; }
+  .step, .step:first-child { min-height: 78vh; }
+  .step.tall { min-height: calc(var(--n, 2) * 78vh); }
+  .step.tall .card { top: calc(50vh + 12px); }
+  .card { background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; padding: 16px 18px; }
+  h1 { font-size: 2.6rem; }
+  .panel-layer { padding: 48px 14px 16px; gap: 6px; }
+  .subnav { left: 10px; right: 10px; }
+  .chapter { font-size: 0.68rem; padding: 2px 7px; }
+  .tally { bottom: 64px; font-size: 0.62rem; gap: 2px; }
+  .tb-bar { height: 20px; }
+  .fr { font-size: 0.98rem; }
+  .ctable th, .ctable td { padding: 4px 3px; }
+  #L-cancel { padding-top: 76px; gap: 4px; }
+  #L-cancel .fanrow svg { width: 34%; }
+  .fan-note { font-size: 0.8rem; }
+}
+/* Text editing (owner only) */
+.editbar { position: fixed; right: 16px; bottom: 16px; z-index: 40; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.editbar[hidden], .edpanel[hidden], .ed-tools[hidden] { display: none; }
+.editbar .mini { background: var(--panel); }
+.editbar .ed-save { background: var(--accent); color: #fff; }
+.ed-tools { display: inline-flex; gap: 6px; }
+.ed-msg { font-family: var(--f-mono); font-size: 0.75rem; color: var(--ink-2); }
+body.editing [data-tk] { outline: 1px dashed color-mix(in srgb, var(--accent) 55%, transparent); outline-offset: 2px; border-radius: 3px; }
+body.editing [data-tk]:focus { outline: 2px solid var(--accent); }
+body.editing .step .card { opacity: 1; visibility: visible; }
+body.editing .layer:not(.on) { pointer-events: none; }
+.edpanel { position: fixed; right: 16px; bottom: 64px; z-index: 40; width: min(440px, calc(100vw - 32px)); max-height: 60vh; display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--rule); border-radius: 12px; box-shadow: 0 10px 30px rgb(0 0 0 / 0.25); }
+.ed-head { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; font-family: var(--f-display); font-weight: 700; border-bottom: 1px solid var(--rule); }
+.ed-list { overflow-y: auto; padding: 8px 12px 12px; display: grid; gap: 6px; }
+.ed-list input { width: 100%; font: 0.85rem var(--f-mono); color: var(--ink); background: var(--bg); border: 1px solid var(--rule); border-radius: 6px; padding: 5px 7px; }
+.ed-list input.changed { border-color: var(--accent); }
+@media (prefers-reduced-motion: reduce) { .layer, .bar, .vlabel, #L-cancel tbody tr, .x::after { transition: none !important; } }
+</style>
+
+<div class="scrolly">
+  <div class="stage-col">
+    <div class="stage">
+      <div class="stage-inner" id="stage-inner">
+        <div class="layer on" id="L-cube">
+          <canvas id="cube" aria-label="A 3D Rubik's Cube showing edge pieces"></canvas>
+          <svg id="ov" aria-hidden="true">
+            <defs id="ov-defs"></defs>
+            <g id="ov-dyn"></g>
+          </svg>
+        </div>
+        <div class="layer panel-layer" id="L-chart">
+          <div class="lay-title">Chance that the edges form one cycle of length k</div>
+          <div class="legend"><span><i class="sw" style="background: var(--c1)"></i>Ignoring flips</span><span class="t2"><i class="sw" style="background: var(--c2)"></i>Counting flips</span></div>
+          <svg id="chart-svg" viewBox="0 0 640 330" role="img" aria-label="Bar chart of single-cycle probability by cycle length 6 to 12. Long cycles dominate."></svg>
+          <div class="total"><div><b>24.94%</b><span>total, ignoring flips</span></div><div class="t2"><b>14.40%</b><span>total, counting flips</span></div></div>
+        </div>
+        <div class="layer panel-layer" id="L-cancel" data-b="0">
+          <div class="lay-title">Following the arrows out of UR</div>
+          <div class="fanrow"><svg id="fan-svg" viewBox="0 0 300 300" role="img" aria-label="The ring of slots, with the arrows out of UR so far and every home the next one could point to."></svg><div class="fan-note" id="fan-note"></div></div>
+          <div class="tablebox">
+            <table class="ctable">
+              <thead><tr>
+                <th>Cycle<br>length</th>
+                <th>Arrow 1<small>12 homes left</small></th>
+                <th>Arrow 2<small>11 homes left</small></th>
+                <th>Arrow 3<small>10 homes left</small></th>
+                <th>Chance</th>
+              </tr></thead>
+              <tbody>
+                <tr class="r1"><td>1</td>
+                  <td><span class="ev ret">back to UR</span><span class="fr"><span>1</span><span>12</span></span></td>
+                  <td></td><td></td>
+                  <td class="res"><span class="fr"><span>1</span><span>12</span></span></td></tr>
+                <tr class="r2"><td>2</td>
+                  <td><span class="ev">moves on</span><span class="fr"><span class="x xa">11</span><span>12</span></span></td>
+                  <td><span class="ev ret">back to UR</span><span class="fr"><span>1</span><span class="x xa">11</span></span></td>
+                  <td></td>
+                  <td class="res"><span class="fr"><span>1</span><span>12</span></span></td></tr>
+                <tr class="r3"><td>3</td>
+                  <td><span class="ev">moves on</span><span class="fr"><span class="x xa">11</span><span>12</span></span></td>
+                  <td><span class="ev">moves on</span><span class="fr"><span class="x xb">10</span><span class="x xa">11</span></span></td>
+                  <td><span class="ev ret">back to UR</span><span class="fr"><span>1</span><span class="x xb">10</span></span></td>
+                  <td class="res"><span class="fr"><span>1</span><span>12</span></span></td></tr>
+                <tr class="r4"><td>4…12</td>
+                  <td colspan="3" style="font-size: 0.9rem; color: var(--ink-2); white-space: normal">Same pattern, one more arrow each time</td>
+                  <td class="res"><span class="fr"><span>1</span><span>12</span></span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="histstrip">
+            <div class="hs-head"><span>Check it on real scrambles: length of the buffer's cycle</span><span class="lab-count" id="hist-count"></span><button class="mini" id="hist-more" hidden="">Run another million</button></div>
+            <svg id="hist-svg" viewBox="0 0 640 112" role="img" aria-label="Live histogram of the buffer's cycle length in random scrambles: flat at one twelfth."></svg>
+          </div>
+        </div>
+        <div class="layer panel-layer" id="L-lab">
+          <div class="lay-title">Live simulation</div>
+          <div class="runbar"><span class="lab-count" id="lab-count">0 scrambles</span><button class="mini" id="lab-more" hidden="">Run another million</button></div>
+          <div class="lab-group">The answer · traced from UR, solved cube excluded</div>
+          <div class="lab-row"><span class="name">No cycle break</span><span class="nums"><b id="sim2">–</b> · exact 22.65%</span><div class="track"><div class="fill" id="fill2"></div><div class="tick" style="left: 75.51%"></div></div></div>
+          <div class="lab-row"><span class="name">No cycle break, no flip algorithm</span><span class="nums"><b id="sim3">–</b> · exact 13.74%</span><div class="track"><div class="fill" id="fill3"></div><div class="tick" style="left: 45.80%"></div></div></div>
+          <div class="lab-group">First attempt · one cycle anywhere, solved cube included</div>
+          <div class="lab-row"><span class="name">Ignoring flips</span><span class="nums"><b id="sim0">–</b> · exact 24.94%</span><div class="track"><div class="fill" id="fill0"></div><div class="tick" style="left: 83.13%"></div></div></div>
+          <div class="lab-row"><span class="name">Counting flips</span><span class="nums"><b id="sim1">–</b> · exact 14.40%</span><div class="track"><div class="fill" id="fill1"></div><div class="tick" style="left: 47.99%"></div></div></div>
+          <div class="hint">Bars run from 0 to 30%. The dark tick marks the exact answer.</div>
+        </div>
+        <div class="nav" id="nav">
+          <button class="key" id="k-prev" aria-label="Previous screen">←</button>
+          <div class="segs" id="segs"></div>
+          <button class="key" id="k-next" aria-label="Next screen">→</button>
+        </div>
+        <div class="subnav"><div class="slideno" id="slideno"></div><nav class="chapters" id="chapters" aria-label="Chapters"></nav></div>
+        <div class="tally" id="tally" hidden=""></div>
+        <div class="cap"><span id="cap"></span></div>
+        <div class="pipbar" id="pipbar"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="steps">
+    <section class="step" data-scene="hero"><div class="card">
+      <div class="eyebrow">Combinatorics · blindfolded cubing</div>
+      <h1>Single Cycles</h1>
+      <p class="dek">Scramble a Rubik's Cube. How often can a blindfolded solver fix every edge in one unbroken chain of swaps?</p>
+      <div class="answers">
+        <div class="answer"><span class="who">No cycle break</span><b>22.65%</b></div>
+        <div class="answer"><span class="who">No break, no flips</span><b>13.74%</b></div>
+      </div>
+      <p class="note" style="margin-top: 18px">Look closer and both are made of <em>e</em>: they're <math><mi>e</mi><mo lspace="0" rspace="0">/</mo><mn>12</mn></math> and <math><msqrt><mpadded height="0.7em" depth="0"><mi>e</mi></mpadded></msqrt><mo lspace="0" rspace="0">/</mo><mn>12</mn></math>. Euler's number, hiding in a Rubik's Cube!</p>
+      <p class="hint" style="margin-top: 20px">Press <kbd>→</kbd> to step through like slides, or scroll. Drag the cube to turn it.</p>
+    </div></section>
+
+    <section class="step" data-scene="pieces"><div class="card">
+      <h2>Twelve edges</h2>
+      <p>A cube has 26 visible pieces: 6 centers, 8 corners and 12 edges. The centers never move relative to each other, so they fix each face's color.</p>
+      <p>This article is only about the edges. The corners are grayed out from here on.</p>
+    </div></section>
+
+    <section class="step" data-scene="homes"><div class="card">
+      <h2>Every edge has a home</h2>
+      <p>On a solved cube, each edge sits in one particular slot: its <em>home</em>. Slots are named by the two faces they touch. <span class="pos">UF</span> is between Up and Front. <span class="pos">DB</span> is between Down and Back.</p>
+      <p>Twelve slots, twelve names. Three of them, <span class="pos">BL</span>, <span class="pos">DL</span> and <span class="pos">DB</span>, are on the back. Drag the cube to see them.</p>
+    </div></section>
+
+    <section class="step" data-scene="scramble"><div class="card">
+      <h2>A scramble</h2>
+      <p>A scramble moves edges away from home. In this one, seven edges have moved and five are still home.</p>
+      <p>Each piece still knows where it belongs from its colors. The yellow-green edge belongs in <span class="pos">DF</span> wherever it is.</p>
+    </div></section>
+
+    <section class="step" data-scene="buffer"><div class="card">
+      <h2>The buffer</h2>
+      <p>The beginner method for blindfolded solving is <a href="https://www.speedcubereview.com/blind-solving-algorithms.html" target="_blank" rel="noopener">Old Pochmann</a>. One slot, <span class="pos">UR</span>, is the <em>buffer</em>.</p>
+      <p>You look at the piece in the buffer, work out where it belongs, and swap it there using one memorized algorithm. Here the buffer holds the yellow-green edge, so the first swap is with <span class="pos">DF</span>.</p>
+    </div></section>
+
+    <section class="step tall" data-scene="tperm"><div class="card">
+      <h2>One swap, up close</h2>
+      <p>The swap is an algorithm called the <em>T-perm</em>: fourteen face turns that swap whatever is in <span class="pos">UR</span> with whatever is in <span class="pos">UL</span>. It also swaps two corners, shown in color on this slide so you can watch them.</p>
+      <p>Our first swap is with <span class="pos">DF</span>, so a solver first makes two setup turns, <span class="pos">D' L2</span>, that bring the edge in <span class="pos">DF</span> up to <span class="pos">UL</span> without touching the buffer. Then the T-perm, then the setup turns undone. Every swap drags the same two corners along, but Old Pochmann fixes the corners in a separate pass afterwards (with one extra algorithm if the number of edge swaps was odd).</p>
+      <p>So for our purposes, the buffer can be swapped with any edge at will, and the corners can be ignored.</p>
+      <p class="hint scrub">press → to play the T-perm, then again to undo the setup</p>
+    </div></section>
+
+    <section class="step tall" data-scene="swaps"><div class="card">
+      <h2>Swap, swap, swap</h2>
+      <p>Each swap sends one piece home and brings a new piece into the buffer. The swap with <span class="pos">DF</span> brought in the piece that belongs in <span class="pos">FL</span>, so you repeat with whatever arrives: <span class="pos">FL</span>, then <span class="pos">UB</span>.</p>
+      <p>The arrows point from each piece to its home. They form a loop, and every swap removes one arrow.</p>
+      <p class="hint scrub">press → once for each swap</p>
+    </div></section>
+
+    <section class="step" data-scene="closed"><div class="card">
+      <h2>The loop closes</h2>
+      <p>After three swaps, the buffer's own white-red piece arrives back in <span class="pos">UR</span>. Four edges were solved in three swaps. A loop like this is called a <em>cycle</em>.</p>
+      <p>But <span class="pos">UF</span>, <span class="pos">DR</span> and <span class="pos">BR</span> are still wrong. They form a cycle of their own, and the buffer isn't in it. Swapping the buffer with itself does nothing, so the method is stuck.</p>
+    </div></section>
+
+    <section class="step tall" data-scene="break"><div class="card">
+      <h2>A cycle break</h2>
+      <p>To get unstuck, you deliberately swap the solved buffer piece into the other cycle, then follow that cycle until the buffer piece comes back. Solvers call this a <em>cycle break</em>.</p>
+      <p>These three edges took four swaps. Had they been part of the buffer's cycle, they would have taken three. Each break costs an extra swap and an extra thing to memorize.</p>
+      <p class="hint scrub">press → to make the break, then again to finish it</p>
+    </div></section>
+
+    <section class="step" data-scene="rewind"><div class="card">
+      <h2>Every scramble is a set of cycles</h2>
+      <p>Finish the solve, then rewind it swap by swap back to the scramble, and draw an arrow from every misplaced piece to its home. Follow the arrows from any piece and you always come back to where you started. So the arrows always split into closed loops.</p>
+      <p>This scramble has two: four edges through the buffer, and three without it.</p>
+    </div></section>
+
+    <section class="step tall" data-scene="ring"><div class="card">
+      <h2>Flatten it</h2>
+      <p>For counting, the cube's shape doesn't matter, only which slot points to which. So peel the twelve slots off the cube and lay them in a ring, keeping the arrows.</p>
+      <div class="qbox">
+        <div class="eyebrow">The question</div>
+        <p>Call a scramble a <strong>single cycle</strong> when one loop covers every edge that's out of place. Then the solve needs no cycle break.</p>
+        <p>Ours has two loops, so it doesn't count. Press → to see one that does: a single loop through eight edges, with the other four home. On a random scramble, how often does this happen?</p>
+      </div>
+    </div></section>
+
+    <section class="step tall" data-scene="flips"><div class="card">
+      <h2>First, a wrinkle: flips</h2>
+      <p>An edge can be home but <em>flipped</em>, sitting in its slot with its colors swapped. Is that edge solved? Not quite.</p>
+      <p>A cube can never have exactly one flipped edge. Every move flips an even number of edges, <a href="https://puzzling.stackexchange.com/questions/521/why-cant-i-have-only-one-edge-piece-flipped-on-a-3x3-rubiks-cube" target="_blank" rel="noopener">so flips come in pairs</a>.</p>
+      <p>So there are two answers to find: how often the solve needs no cycle break, and how often it needs no break <em>and</em> no flip algorithm.</p>
+      <p class="hint scrub">press → to flip a second edge</p>
+    </div></section>
+
+    <section class="step tall" data-scene="uniform"><div class="card">
+      <h2>The buffer's cycle</h2>
+      <p>A solver always traces from <span class="pos">UR</span>. So the question is: does the buffer's cycle cover every misplaced edge?</p>
+      <p>The way in is to <strong>sort scrambles by the length of the buffer's cycle</strong> and handle each length on its own. Nothing about the cube forces that split; it's a choice. But it's the choice that makes counting easy: a fixed length means a fixed number of arrows to follow out of <span class="pos">UR</span>, and every other edge simply has to be home.</p>
+      <p>A neat fact helps: <strong>the buffer's cycle is equally likely to have any length from 1 to 12.</strong> Follow the arrows out of <span class="pos">UR</span>. The first can point to any of the 12 homes, and only one of them, UR's own, closes the loop at once. Each later arrow has one home fewer to choose from, and the chances cancel down to <math><mfrac><mn>1</mn><mn>12</mn></mfrac></math> for every length.</p>
+      <p>The strip at the bottom is sampling random scrambles live. Every bar settles at <math><mfrac><mn>1</mn><mn>12</mn></mfrac></math>.</p>
+      <p class="hint scrub">press → to follow each arrow</p>
+    </div></section>
+
+    <section class="step" data-scene="cuber"><div class="card">
+      <h2>The answers</h2>
+      <p>If the buffer's cycle has length <math><mi>k</mi></math>, the other <math><mi>j</mi><mo>=</mo><mn>12</mn><mo>−</mo><mi>k</mi></math> edges must all be home, with chance <math><mn>1</mn><mo>/</mo><mi>j</mi><mo>!</mo></math>. The ring steps through a few lengths. Dropping <math><mi>k</mi><mo>=</mo><mn>1</mn></math>, the solved cube:</p>
+      <math display="block"><mfrac><mn>1</mn><mn>12</mn></mfrac><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>0</mn></mrow><mn>10</mn></munderover><mfrac><mn>1</mn><mrow><mi>j</mi><mo>!</mo></mrow></mfrac><mo>≈</mo><mfrac><mi>e</mi><mn>12</mn></mfrac><mo>≈</mo><mn>22.65</mn><mo>%</mo></math>
+      <p>That sum is the series for <math><mi>e</mi></math>. It's the chance of <strong>no cycle break</strong>, about 2 scrambles in 9.</p>
+      <p>A flipped edge sitting at home doesn't cause a break, but it does need a separate flip algorithm. Requiring that there are none adds <math><msup><mn>2</mn><mi>j</mi></msup></math> to each term, which gives the series for <math class="sq"><msqrt><mpadded height="0.7em" depth="0"><mi>e</mi></mpadded></msqrt></math>:</p>
+      <math display="block"><mfrac><mn>1</mn><mn>12</mn></mfrac><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>0</mn></mrow><mn>10</mn></munderover><mfrac><mn>1</mn><mrow><mi>j</mi><mo>!</mo><mspace width="0.17em"/><msup><mn>2</mn><mi>j</mi></msup></mrow></mfrac><mo>≈</mo><mfrac><msqrt><mpadded height="0.7em" depth="0"><mi>e</mi></mpadded></msqrt><mn>12</mn></mfrac><mo>≈</mo><mn>13.74</mn><mo>%</mo></math>
+      <p>That's the chance the edges are just one clean cycle from the buffer, with no break and no flip algorithm.</p>
+    </div></section>
+
+    <section class="step" data-scene="attempt"><div class="card">
+      <div class="eyebrow">My first attempt</div>
+      <h2>Where I first went wrong</h2>
+      <p>When I first wrote this up, I answered a slightly different question: how often do the edges form a single cycle <em>anywhere</em>, with the solved cube counted too?</p>
+      <p>That isn't what a solver needs. A single cycle that skips <span class="pos">UR</span>, like this one, still needs a cycle break, and nobody is handed a solved cube to solve. Claude pointed this out while building this page; the answers above are the corrected ones.</p>
+      <p>The original counting is still a nice piece of combinatorics, so here it is.</p>
+    </div></section>
+
+    <section class="step" data-scene="count"><div class="card">
+      <h2>Counting cycles anywhere</h2>
+      <p>The edges can be in any of <math><mn>12</mn><mo>!</mo></math> arrangements, all equally likely. (A real cube can't swap just two edges, but the corners take up the difference, so the edges alone reach all of them.)</p>
+      <p>The trick is the same as before: <strong>sort single cycles by their length</strong> <math><mi>k</mi></math> and count each length separately. It's a choice, not something the cube imposes, and it's what makes the count manageable. With <math><mi>k</mi></math> fixed, a single cycle is just two independent choices.</p>
+      <p>A single cycle of length <math><mi>k</mi></math> takes two choices. <strong>Which edges:</strong> <math><mrow><mo>(</mo><mfrac linethickness="0"><mn>12</mn><mi>k</mi></mfrac><mo>)</mo></mrow></math> ways, with the rest at home. <strong>What order:</strong> start at one edge and follow the arrows. The other <math><mi>k</mi><mo>−</mo><mn>1</mn></math> edges appear in some order, giving <math><mo>(</mo><mi>k</mi><mo>−</mo><mn>1</mn><mo>)</mo><mo>!</mo></math> cycles.</p>
+      <p>Three edges make exactly <math><mo>(</mo><mn>3</mn><mo>−</mo><mn>1</mn><mo>)</mo><mo>!</mo><mo>=</mo><mn>2</mn></math> cycles: the same triangle, traveled one way or the other.</p>
+    </div></section>
+
+    <section class="step" data-scene="term"><div class="card">
+      <h2>First answer</h2>
+      <p>Divide by <math><mn>12</mn><mo>!</mo></math> and most of the factorials cancel:</p>
+      <math display="block"><mfrac><mrow><mrow><mo>(</mo><mfrac linethickness="0"><mn>12</mn><mi>k</mi></mfrac><mo>)</mo></mrow><mo>(</mo><mi>k</mi><mo>−</mo><mn>1</mn><mo>)</mo><mo>!</mo></mrow><mrow><mn>12</mn><mo>!</mo></mrow></mfrac><mo>=</mo><mfrac><mn>1</mn><mrow><mi>k</mi><mspace width="0.17em"/><mo>(</mo><mn>12</mn><mo>−</mo><mi>k</mi><mo>)</mo><mo>!</mo></mrow></mfrac></math>
+      <p>Every edge left out of the cycle has to happen to be home, which <math><mo>(</mo><mn>12</mn><mo>−</mo><mi>k</mi><mo>)</mo><mo>!</mo></math> makes unlikely fast: <math><mfrac><mn>1</mn><mn>12</mn></mfrac></math> for 12 edges, <math><mfrac><mn>1</mn><mn>11</mn></mfrac></math> for 11 (the edge left out can be any of the 12), under 2% by 9. Add every length, plus a lone <math><mn>1</mn><mo>/</mo><mn>12</mn><mo>!</mo></math> for the solved cube:</p>
+      <math display="block"><mfrac><mn>1</mn><mrow><mn>12</mn><mo>!</mo></mrow></mfrac><mo>+</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>2</mn></mrow><mn>12</mn></munderover><mfrac><mn>1</mn><mrow><mi>k</mi><mspace width="0.17em"/><mo>(</mo><mn>12</mn><mo>−</mo><mi>k</mi><mo>)</mo><mo>!</mo></mrow></mfrac><mo>=</mo><mfrac><mn>103447</mn><mn>414720</mn></mfrac><mo>≈</mo><mn>24.94</mn><mo>%</mo></math>
+    </div></section>
+
+    <section class="step" data-scene="flipcount"><div class="card">
+      <h2>Full: adding flips back</h2>
+      <p>With flips, there are <math><mn>12</mn><mo>!</mo><mo>×</mo><msup><mn>2</mn><mn>11</mn></msup></math> edge states: the first 11 edges can each be flipped or not, and the 12th is forced to keep the count even.</p>
+      <p>Edges outside the cycle must be home <em>and</em> unflipped. Edges inside can be flipped in any even-sized pattern: choose freely for <math><mi>k</mi><mo>−</mo><mn>1</mn></math> of them and the last is forced. That's <math><msup><mn>2</mn><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msup></math> patterns. The cube is cycling through all 8 for this 4-edge cycle.</p>
+    </div></section>
+
+    <section class="step" data-scene="full"><div class="card">
+      <h2>First answer: counting flips</h2>
+      <p>Dividing by <math><msup><mn>2</mn><mn>11</mn></msup></math> as well, each term picks up one more factor:</p>
+      <math display="block"><mfrac><mn>1</mn><mrow><mi>k</mi><mspace width="0.17em"/><mo>(</mo><mn>12</mn><mo>−</mo><mi>k</mi><mo>)</mo><mo>!</mo><mspace width="0.17em"/><msup><mn>2</mn><mrow><mn>12</mn><mo>−</mo><mi>k</mi></mrow></msup></mrow></mfrac></math>
+      <p>Each edge left out of the cycle now has to be home and unflipped, a further 1-in-2 chance. The 12-edge cycle stays at <math><mfrac><mn>1</mn><mn>12</mn></mfrac></math>, but the 11-edge cycle halves and shorter ones shrink faster.</p>
+      <math display="block"><mfrac><mn>1</mn><mrow><mn>12</mn><mo>!</mo><mspace width="0.17em"/><msup><mn>2</mn><mn>11</mn></msup></mrow></mfrac><mo>+</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>2</mn></mrow><mn>12</mn></munderover><mfrac><mn>1</mn><mrow><mi>k</mi><mspace width="0.17em"/><mo>(</mo><mn>12</mn><mo>−</mo><mi>k</mi><mo>)</mo><mo>!</mo><mspace width="0.17em"/><msup><mn>2</mn><mrow><mn>12</mn><mo>−</mo><mi>k</mi></mrow></msup></mrow></mfrac><mo>≈</mo><mn>14.40</mn><mo>%</mo></math>
+      <p>Those were my original answers: a cycle anywhere, with the solved cube counted. They're within a couple of points of the real ones, 22.65% and 13.74%, but they answer a question no solver asks.</p>
+    </div></section>
+
+    <section class="step" data-scene="lab"><div class="card">
+      <h2>Check all four</h2>
+      <p>The stage is generating random edge states, each a uniformly random permutation with a random even set of flips, and sorting them under all four definitions: the two real answers and the two from my first attempt. The bars settle onto the exact answers well before the run stops at a million.</p>
+      <p class="note">The original counting and verification code is on <a href="https://github.com/baphaelman/one-cycles" target="_blank" rel="noopener">GitHub</a>.</p>
+    </div></section>
+  </div>
+</div>
+
+
+<section class="after" id="after">
+  <h2>All four numbers</h2>
+  <div class="tablewrap">
+    <table class="plain">
+      <thead><tr><th>Question</th><th>Exact</th><th>Approx.</th></tr></thead>
+      <tbody>
+        <tr class="grp"><td colspan="3">The answer · traced from UR, solved cube excluded</td></tr>
+        <tr><td class="q">No cycle break ≈ e/12</td><td><span class="exact">9864101 / 43545600</span></td><td>22.65%</td></tr>
+        <tr><td class="q">No cycle break, no flip algorithm ≈ √e/12</td><td><span class="exact">2042156287 / 14863564800</span></td><td>13.74%</td></tr>
+        <tr class="grp"><td colspan="3">My first attempt · one cycle anywhere, solved cube included</td></tr>
+        <tr><td class="q">Ignoring flips</td><td><span class="exact">103447 / 414720</span></td><td>24.94%</td></tr>
+        <tr><td class="q">Counting flips</td><td><span class="exact">4279796117 / 29727129600</span></td><td>14.40%</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h3>Counts by cycle length</h3>
+  <div class="tablewrap">
+    <table class="plain">
+      <thead><tr><th>k</th><th>Cycles, ignoring flips</th><th>Share</th><th>Cycles, counting flips</th><th>Share</th></tr></thead>
+      <tbody id="ktable"></tbody>
+    </table>
+  </div>
+  <p class="note">Notation: <math><mrow><mo>(</mo><mfrac linethickness="0"><mi>n</mi><mi>k</mi></mfrac><mo>)</mo></mrow></math> is “n choose k”, the number of ways to pick k items from n. Slots are named with the standard face letters U, D, F, B, L, R. Colors follow the common scheme with white on top and green in front.</p>
+</section>
+
+<div class="editbar" id="editbar" hidden="">
+  <button class="mini" id="ed-toggle">Edit text</button>
+  <span class="ed-tools" hidden=""><button class="mini" id="ed-stage">Stage text</button><button class="mini" id="ed-cancel">Cancel</button><button class="mini ed-save" id="ed-save">Save</button></span>
+  <span class="ed-msg" id="ed-msg" role="status"></span>
+</div>
+<div class="edpanel" id="edpanel" hidden="">
+  <div class="ed-head">Stage captions and labels <button class="mini" id="ed-close">Done</button></div>
+  <div class="ed-list" id="ed-list"></div>
+</div>
+<!-- Text edits saved from the page: {key: replacement}. Keys hash the original text, so edits survive code changes elsewhere. -->
+<script type="application/json" id="sc-text">{"t2ja6te":"Running tally","hlddv6e":"The Cube","h1vw6z26":"A Rubik's cube has 26 pieces: 6 centers, 8 corners, and 12 edges. The centers never move relative to each other, so they fix each face's color.","h188pv85":"Names","h1k1ur2r":"On a solved cube, each edge belongs in one particular slot: its \u003cem>home\u003c/em>. Slots are named by the two faces they touch, so&nbsp;\u003cspan class=\"pos\">UF\u003c/span>&nbsp;, the white-green edge, belongs between the Up (white) and Front (green) faces. \u003cspan class=\"pos\">DB\u003c/span> is between Down and Back, etc.","h7lottj":"The process of a blindfolded solve involves gradually getting displaced edges back to their homes.","h118hbdf":"The way in is to \u003cstrong>sort scrambles by the length of the buffer's cycle\u003c/strong> and handle each length on its own. This makes counting easy: a fixed length means a fixed number of arrows to follow out of \u003cspan class=\"pos\">UR\u003c/span>, and every other edge simply has to be home.","h1mdylns":"\u003cb id=\"sim2\">22.64%\u003c/b> · exact 22.65%","h1d3nnot":"\u003cb id=\"sim3\">13.76%\u003c/b> · exact 13.74%","h1oqochs":"\u003cb id=\"sim0\">24.92%\u003c/b> · exact 24.94%","h66dih7":"\u003cb id=\"sim1\">14.40%\u003c/b> · exact 14.40%","h9kn1mn":"This article is about the edges.","hfu1q55":"A scramble displaces edges from their homes :(. In this one, seven edges have moved and five are still home.","hp6dh1v":"The swap is an algorithm called the \u003cem>T-perm\u003c/em>: fourteen face turns that swap whatever is in \u003cspan class=\"pos\">UR\u003c/span> with whatever is in \u003cspan class=\"pos\">UL\u003c/span>. It also swaps two corners, shown in color on this slide so you can watch them. Everything else stays fixed, which is how solvers accumulate solved pieces.","h1jchzea":"Look closer and both are made of \u003cem>e\u003c/em>: they're \u003cmath>\u003cmi>e\u003c/mi>\u003cmo lspace=\"0\" rspace=\"0\">/\u003c/mo>\u003cmn>12\u003c/mn>\u003c/math> and \u003cmath>\u003cmsqrt>\u003cmpadded height=\"0.7em\" depth=\"0\">\u003cmi>e\u003c/mi>\u003c/mpadded>\u003c/msqrt>\u003cmo lspace=\"0\" rspace=\"0\">/\u003c/mo>\u003cmn>12\u003c/mn>\u003c/math>&nbsp;!"}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(() => {
+  // ---------------- editable text ----------------
+  // The page as written (the slice from <title> on), kept for republishing with new text. Captured before any script touches the DOM.
+  const SRC = document.body.innerHTML.slice(Math.max(0, document.body.innerHTML.indexOf('<title>')));
+  let TX = {};
+  try { TX = JSON.parse(document.getElementById('sc-text').textContent || '{}'); } catch (e) {}
+  const hash = str => { let h = 0x811c9dc5; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 0x01000193); } return (h >>> 0).toString(36); };
+  // Every element that holds text directly (outside svg/math and JS-filled slots) gets a key from its original HTML.
+  const NO_EDIT = 'script, style, svg, math, #ktable, #cap, #slideno, #segs, #chapters, .editbar, .edpanel, .lab-count, .nums b, .key';
+  const textEls = [];
+  (function tagText(root) {
+    for (const el of root.children) {
+      if (el.matches(NO_EDIT)) continue;
+      if ([...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim())) { textEls.push(el); continue; }
+      tagText(el);
+    }
+  })(document.body);
+  textEls.forEach(el => { const k = 'h' + hash(el.innerHTML.trim()); el.dataset.tk = k; el.dataset.orig = el.innerHTML; if (TX[k] != null) el.innerHTML = TX[k]; });
+  // Stage strings (captions, tags) go through T(); STAGE_TX collects them for the editor.
+  const STAGE_TX = new Set();
+  const T = str => { if (!str) return str; STAGE_TX.add(str); const v = TX['t' + hash(str)]; return v != null ? v : str; };
+
+  // ---------------- basics ----------------
+  const POS = ['UR','UF','UL','UB','FR','FL','BL','BR','DR','DF','DL','DB']; // ring order; 0 = buffer
+  const IDX = Object.fromEntries(POS.map((n, i) => [n, i]));
+  const FV = {U:[0,1,0], D:[0,-1,0], F:[0,0,1], B:[0,0,-1], R:[1,0,0], L:[-1,0,0]};
+  const FCOL = {U:'#f3f4ef', D:'#ffd21f', F:'#18a64b', B:'#1f5fd6', R:'#d42a3c', L:'#ff7a12'};
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const ss = x => { x = clamp(x); return x * x * (3 - 2 * x); };
+  const ease = u => u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
+  const wrapPi = a => { a = (a + Math.PI) % (2 * Math.PI); if (a < 0) a += 2 * Math.PI; return a - Math.PI; };
+
+  // ---------------- edge states ----------------
+  // s.p[i] = home of the piece sitting in slot i; s.fl[i] = 1 if that piece is flipped.
+  const SOLVED = {p: POS.map((_, i) => i), fl: POS.map(() => 0)};
+  const key = s => s.p.join(',') + '/' + s.fl.join('');
+  function fromArrows(pairs, flips = []) {
+    const s = {p: SOLVED.p.slice(), fl: SOLVED.fl.slice()};
+    pairs.forEach(([a, b]) => { s.p[IDX[a]] = IDX[b]; });
+    flips.forEach(a => { s.fl[IDX[a]] = 1; });
+    return s;
+  }
+  function swapS(s, a, b) {
+    const p = s.p.slice(), fl = s.fl.slice();
+    [p[a], p[b]] = [p[b], p[a]]; [fl[a], fl[b]] = [fl[b], fl[a]];
+    return {p, fl};
+  }
+  function seqFrom(s0, targets) { const out = [s0]; let s = s0; for (const t of targets) { s = swapS(s, 0, IDX[t]); out.push(s); } return out; }
+  function cyclesOf(s) {
+    const seen = new Array(12).fill(false), out = [];
+    for (let i = 0; i < 12; i++) { if (seen[i]) continue; const c = []; let j = i; while (!seen[j]) { seen[j] = true; c.push(j); j = s.p[j]; } out.push(c); }
+    return out;
+  }
+  function arrowsOf(s, onlyBuffer) {
+    const cs = cyclesOf(s).filter(c => c.length > 1), out = [];
+    cs.filter(c => c.includes(0)).forEach(c => c.forEach(i => out.push([i, s.p[i], 1])));
+    if (!onlyBuffer) cs.filter(c => !c.includes(0)).sort((a, b) => b.length - a.length)
+      .forEach((c, ci) => c.forEach(i => out.push([i, s.p[i], Math.min(6, ci + 2)])));
+    return out;
+  }
+
+
+  const DEMO = fromArrows([['UR','DF'],['DF','FL'],['FL','UB'],['UB','UR'],['UF','DR'],['DR','BR'],['BR','UF']]);
+  const SOLVE_DEMO = ['DF','FL','UB','UF','DR','BR','UF'];
+  const SWAPS = seqFrom(DEMO, SOLVE_DEMO.slice(0, 3));
+  const BREAK = seqFrom(SWAPS[3], SOLVE_DEMO.slice(3));
+  const ONE8 = fromArrows([['UR','FR'],['FR','UB'],['UB','FL'],['FL','UL'],['UL','DL'],['DL','DR'],['DR','DB'],['DB','UR']]); // random, re-rolled until it looked tidy: two crossings, no pile-up
+  // ---------------- face turns ----------------
+  const HERO_DELAY = 2.5;
+  // A move turns one face: 'R' clockwise (looking at that face), "R'" anticlockwise, 'R2' half. Slots and stickers are integer
+  // vectors, so a turn maps slot i to slot j exactly; a piece is flipped when its first sticker ends up off its new slot's first face.
+  const SV = POS.map(n => FV[n[0]].map((v, k) => v + FV[n[1]][k])); // slot centers, e.g. UR = [1, 1, 0]
+  const FACE_AX = {R: [0, 1], L: [0, -1], U: [1, 1], D: [1, -1], F: [2, 1], B: [2, -1]};
+  function parseMove(mv) { const [ax, sg] = FACE_AX[mv[0]], q = mv[1] === "'" ? -1 : mv[1] === '2' ? 2 : 1; return {mv, ax, sg, q, ang: -sg * q * Math.PI / 2}; }
+  const invMove = mv => mv[1] === '2' ? mv : mv[1] === "'" ? mv[0] : mv + "'";
+  function rotV(v, ax, ang) { const c = Math.round(Math.cos(ang)), sn = Math.round(Math.sin(ang)), [i, j] = [[1, 2], [2, 0], [0, 1]][ax], o = v.slice(); o[i] = v[i] * c - v[j] * sn; o[j] = v[i] * sn + v[j] * c; return o; }
+  const vEq = (a, b) => a[0] === b[0] && a[1] === b[1] && a[2] === b[2];
+  function turnState(s, M) {
+    if (typeof M === 'string') M = parseMove(M);
+    const out = {p: s.p.slice(), fl: s.fl.slice()};
+    for (let i = 0; i < 12; i++) {
+      if (SV[i][M.ax] !== M.sg) continue;
+      const v = rotV(SV[i], M.ax, M.ang), j = SV.findIndex(w => vEq(w, v)), d = rotV(FV[POS[i][s.fl[i]]], M.ax, M.ang);
+      out.p[j] = s.p[i]; out.fl[j] = vEq(d, FV[POS[j][0]]) ? 0 : 1;
+    }
+    return out;
+  }
+  function randomMoves(n, r = Math.random) { // no face twice in a row
+    const out = []; let last = '';
+    while (out.length < n) { const f = 'RLUDFB'[Math.floor(r() * 6)]; if (f === last) continue; last = f; out.push(f + ['', "'", '2'][Math.floor(r() * 3)]); }
+    return out;
+  }
+  // Turn paths: states[0..n], moves[i] takes states[i] to states[i+1]. TURNS[key(A) + '>' + key(B)] = {path, from, to}
+  // (indices into path.states). A path can be played either way, and from any point along it (see pathSteps).
+  const TURNS = {};
+  // mul: per-move slowdown against the front page's base time (default PRES for 'present', 1 for 'scramble').
+  function makePath(s0, moves, kind, caps, mul) { const states = [s0]; for (const mv of moves) states.push(turnState(states[states.length - 1], mv)); return {states, moves, kind, caps, mul: mul || moves.map(() => kind === 'present' ? PRES : 1)}; }
+  // Turn timing (chosen by the user): 0.05 s a turn, slower at both ends (×1.5) and fastest mid-way (×0.5), smooth easing.
+  // Slides: PRES × the front page's base time per turn, evenly timed (no fast middle). The T-perm itself plays at PRES_TP (chosen by the user).
+  const PRES = 8, PRES_TP = 3;
+  const RV = {spd: 0.05, rhy: 'ramp', edge: 1.5, mid: 0.5, shape: 1, peak: 0.5, ez: 'smooth'};
+  // 'Fast in the middle': weight 'edge' at both ends, 'mid' at the fastest point ('peak', 0..1 through the sequence);
+  // 'shape' sharpens (high) or widens (low) the fast stretch.
+  function rampW(x) {
+    const p = RV.peak, xw = x < p ? 0.5 * x / p : 0.5 + 0.5 * (x - p) / (1 - p);
+    return lerp(RV.edge, RV.mid, Math.pow(Math.sin(Math.PI * clamp(xw)), RV.shape));
+  }
+  // kind: 'scramble' (the front page) or 'present' (every face-turn sequence in the slides: twice the time per turn).
+  function turnTiming(tp) {
+    const n = tp.moves.length; // two speeds: the front page, and every cube in the slides (the T-perm moves carry their own)
+    const durs = tp.moves.map((mv, k) => {
+      const base = RV.spd * (tp.mul ? tp.mul[k] : tp.kind === 'present' ? PRES : 1);
+      const x = n > 1 ? k / (n - 1) : 0.5, w = tp.kind === 'present' ? 1 : RV.rhy === 'ramp' ? rampW(x) : RV.rhy === 'accel' ? lerp(1.7, 0.55, x) : 1;
+      return base * w * (mv[1] === '2' ? 1.4 : 1);
+    });
+    const sine = u => (1 - Math.cos(Math.PI * u)) / 2, inQ = u => u * u, outQ = u => 1 - (1 - u) * (1 - u);
+    const ez = tp.moves.map((_, k) => RV.ez === 'crisp' ? ease : RV.ez === 'smooth' ? sine : n === 1 ? sine : k === 0 ? inQ : k === n - 1 ? outQ : u => u);
+    return {durs, ez, total: durs.reduce((a, b) => a + b, 0)};
+  }
+  const TPERM = "R U R' U' R' F R2 U' R' U' R U R' F'".split(' ');
+
+  // Seeded randomness, so the front page and the answers slide show the same scrambles every visit.
+  const rng = (seed => () => { seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; })(20261119);
+  const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  // Front page: each scramble is HERO_N random face turns on top of the last one, starting from solved.
+  // Front page: each scramble is HERO_N random face turns on top of the last, starting from solved. A fresh random chain is
+  // made every time the front page is entered, so the persistent tally never counts the same scramble twice.
+  const HERO_N = 18, HERO_SEQ = [], HERO_MOVES = [], HERO_INFO = [];
+  function newHeroChain() {
+    HERO_SEQ.length = HERO_MOVES.length = HERO_INFO.length = 0;
+    for (let prevS = SOLVED; HERO_SEQ.length < 80;) {
+      const moves = randomMoves(HERO_N), path = makePath(prevS, moves, 'scramble'), st = path.states[HERO_N], cs = cyclesOf(st).filter(c => c.length > 1);
+      const n = cs.length, ur = cs.some(c => c.includes(0)), lens = cs.map(c => c.length).sort((a, b) => b - a), brk = ur ? n - 1 : n;
+      const text = !n ? 'every edge happens to be home' : n === 1 ? (ur ? `one cycle through UR (${lens[0]} edges) · no break needed` : `one cycle, but not through UR (${lens[0]} edges) · one break`)
+        : `${n} cycles (${lens.join(' + ')} edges) · ${brk} break${brk > 1 ? 's' : ''}`;
+      TURNS[key(prevS) + '>' + key(st)] = {path, from: 0, to: HERO_N};
+      HERO_SEQ.push(st); HERO_MOVES.push(moves); HERO_INFO.push({n, ur, text}); prevS = st;
+    }
+  }
+  newHeroChain();
+  // Running tally of every scramble seen on the front page, kept in this browser: [1, 2, 3, 4+ cycles, no break needed] and the count.
+  const TALLY = {c: [0, 0, 0, 0, 0], n: 0};
+  try { const t = JSON.parse(localStorage.getItem('sc-tally') || 'null'); if (t && t.c && t.c.length === 5) Object.assign(TALLY, t); } catch (e) {}
+  function tallyAdd(info) {
+    if (info.n) TALLY.c[Math.min(4, info.n) - 1]++; if (info.n === 1 && info.ur) TALLY.c[4]++; TALLY.n++;
+    try { localStorage.setItem('sc-tally', JSON.stringify(TALLY)); } catch (e) {}
+  }
+  // The opening slides' cube is one line of real face turns: solved → the scramble ("A scramble", "The buffer") → setup D' L2 brings
+  // DF's edge to UL → the T-perm → setup undone, which is exactly the first Old Pochmann swap UR ↔ DF (SWAPS[1], where "Swap, swap,
+  // swap" picks up). Any two of those five states are joined by a stretch of this one path, so ←/→ mid-way just turns back.
+  const DEMO_MOVES = "R F2 D L' R' U' L D'".split(' '); // an edge-only meet-in-the-middle search; the corners land anywhere
+  const OP_SETUP = ["D'", 'L2'];
+  const OP_MOVES = DEMO_MOVES.concat(OP_SETUP, TPERM, OP_SETUP.slice().reverse().map(invMove));
+  const OP_AT = [0, DEMO_MOVES.length, DEMO_MOVES.length + 2, DEMO_MOVES.length + 2 + TPERM.length, OP_MOVES.length]; // solved, scramble, set up, T-permed, swapped
+  const opCap = (k, back) => {
+    const show = (ms, i) => ms.map((m, j) => j === i ? `[${m}]` : m).join(' '), d = DEMO_MOVES.length, t = d + 2 + TPERM.length;
+    if (k < d) return `${back ? 'Unscrambling' : 'Scrambling'} · turn ${k + 1} of ${d}`;
+    if (k < d + 2) return (back ? 'Undoing the setup · ' : 'Setup: DF up to UL · ') + show(OP_SETUP, k - d);
+    if (k < t) return (back ? 'Undoing the T-perm · ' : 'T-perm · ') + show(TPERM, k - d - 2);
+    return (back ? 'Redoing the setup · ' : 'Undoing the setup · ') + show(OP_SETUP.slice().reverse().map(invMove), k - t);
+  };
+  const OP_PATH = makePath(SOLVED, OP_MOVES, 'present', opCap, OP_MOVES.map((_, k) => k >= OP_AT[2] && k < OP_AT[3] ? PRES_TP : PRES));
+  const [, , OP_SET, OP_TP] = OP_AT.map(i => OP_PATH.states[i]);
+  const opCorners = i => OP_MOVES.slice(0, OP_AT[i]); // where the corners physically are at each of the five states
+  // The two corner pieces the T-perm swaps: the ones sitting in UFR and UBR once the setup is done (indices into the corner cubies,
+  // created x, y, z ∈ {−1, 1} in that loop order). The T-perm slide colors only these.
+  const TP_CORNERS = (() => {
+    const pos = []; for (const x of [-1, 1]) for (const y of [-1, 1]) for (const z of [-1, 1]) pos.push([x, y, z]);
+    for (const mv of opCorners(2)) { const M = parseMove(mv); pos.forEach((v, i) => { if (v[M.ax] === M.sg) pos[i] = rotV(v, M.ax, M.ang); }); }
+    return [[1, 1, 1], [1, 1, -1]].map(t => pos.findIndex(v => vEq(v, t)));
+  })();
+  // The piece the buffer swaps with first: it starts in DF and belongs in FL. Highlighted (track) from "The buffer" until it's home.
+  const PARTNER = POS[DEMO.p[IDX.DF]];
+  if (key(OP_PATH.states[OP_AT[1]]) !== key(DEMO)) console.warn('DEMO_MOVES do not reach DEMO');
+  if (key(OP_PATH.states[OP_AT[4]]) !== key(SWAPS[1])) console.warn('setup + T-perm + undo is not the swap UR ↔ DF');
+  OP_AT.forEach((a, ia) => {
+    if (OP_PATH.states.filter(x => key(x) === key(OP_PATH.states[a])).length !== 1) console.warn('OP_PATH revisits state', ia);
+    OP_AT.forEach((b, ib) => { if (a !== b) TURNS[key(OP_PATH.states[a]) + '>' + key(OP_PATH.states[b])] = {path: OP_PATH, from: a, to: b, lead: ia === 1 && ib === 2 ? 0.9 : 0}; });
+  });
+  // The moves (and captions) that take path P from state index a to b, in either direction.
+  function pathSegment(P, a, b) {
+    const moves = [], caps = [], mul = [];
+    if (b >= a) for (let i = a; i < b; i++) { moves.push(P.moves[i]); caps.push(P.caps ? P.caps(i, false) : null); mul.push(P.mul[i]); }
+    else for (let i = a - 1; i >= b; i--) { moves.push(invMove(P.moves[i])); caps.push(P.caps ? P.caps(i, true) : null); mul.push(P.mul[i]); }
+    return {moves, caps, mul};
+  }
+  // Seconds a TURNS entry takes to play.
+  function entryTotal(e) { if (!e) return 0; const d = turnTiming(e.path).durs; let t = 0; for (let i = Math.min(e.from, e.to); i < Math.max(e.from, e.to); i++) t += d[i]; return t; }
+  // "The answers": the buffer's cycle at a few lengths k, with the other 12 − k edges home.
+  const CUB_K = [11, 9, 7, 4];
+  const CUB = CUB_K.map(k => { const c = [0].concat(shuffle(POS.map((_, i) => i).slice(1)).slice(0, k - 1)); return fromArrows(c.map((a, i) => [POS[a], POS[c[(i + 1) % k]]])); });
+  // "My first attempt": a single cycle that skips the buffer.
+  const SKIP5 = fromArrows([['UF','BL'],['BL','DR'],['DR','FL'],['FL','DB'],['DB','UF']]);
+  const F1 = fromArrows([], ['UF']);
+  const F2 = fromArrows([], ['UF','UB']);
+  const TRI = fromArrows([['UF','FL'],['FL','DF'],['DF','UF']]);
+  const TRI_EDGES = [['UF','FL'],['FL','DF'],['DF','UF']].map(([a, b]) => [IDX[a], IDX[b]]);
+  const CYC4 = fromArrows([['UR','DF'],['DF','FL'],['FL','UB'],['UB','UR']]);
+  const MEM4 = ['UR','DF','FL','UB'].map(n => IDX[n]);
+  function flipPattern(idx) {
+    const s = {p: CYC4.p.slice(), fl: CYC4.fl.slice()}; let par = 0;
+    for (let b = 0; b < 3; b++) { const v = (idx >> b) & 1; s.fl[MEM4[b]] = v; par ^= v; }
+    s.fl[MEM4[3]] = par; return s;
+  }
+  // Swap sequences between states, played as Old Pochmann swaps. A path is a list of segments:
+  // {st: states, dur: seconds per swap, cap: stage caption while it plays} or {hold: seconds, at: state, cap}.
+  // The reverse direction is listed separately and plays faster, without captions.
+  const PATHS = {};
+  const first = segs => segs[0].st ? segs[0].st[0] : segs[0].at;
+  const last = segs => { const z = segs[segs.length - 1]; return z.st ? z.st[z.st.length - 1] : z.at; };
+  function addPath(fwd, back) {
+    PATHS[key(first(fwd)) + '>' + key(last(fwd))] = fwd;
+    PATHS[key(first(back)) + '>' + key(last(back))] = back;
+  }
+  const rev = st => st.slice().reverse();
+  for (let i = 0; i < 3; i++) addPath([{st: [SWAPS[i], SWAPS[i + 1]], dur: 0.85, cap: `Swapping UR ↔ ${SOLVE_DEMO[i]}`}], [{st: [SWAPS[i + 1], SWAPS[i]], dur: 0.5}]);
+  addPath([{st: BREAK.slice(0, 2), dur: 0.85, cap: 'Cycle break: swapping UR ↔ UF'}], [{st: rev(BREAK.slice(0, 2)), dur: 0.5}]);
+  // "A cycle break" b2 finishes the break; the next press rewinds the solve, a little faster in the middle.
+  addPath([{st: BREAK.slice(1), dur: 0.6, cap: 'Finishing the break: UR ↔ DR, BR, UF'}], [{st: rev(BREAK.slice(1)), dur: 0.3}]);
+  const REWIND = seqFrom(SOLVED, SOLVE_DEMO.slice().reverse());
+  addPath(REWIND.slice(1).map((st, i) => ({st: [REWIND[i], st], dur: 0.5 - 0.14 * Math.sin(Math.PI * i / (REWIND.length - 2)), cap: 'Rewinding the solve, swap by swap'})),
+          [{st: rev(REWIND), dur: 0.15}]);
+
+  // ---------------- 3D cube ----------------
+  const stageEl = document.getElementById('stage-inner');
+  const canvas = document.getElementById('cube');
+  let has3D = false, renderer, scene, camera, tilt, spin, POSE, DIRS, tmpV, AXV;
+  const cubies = [], cornerMats = []; // corners and centers: {g, p, q} = resting pose, which turns update
+  let turnNow = null; // the layer turning this frame: {ax, sg, a}
+  const edges = [];
+  try {
+    if (!window.THREE) throw new Error('three.js missing');
+    renderer = new THREE.WebGLRenderer({canvas, antialias: true, alpha: true});
+    renderer.setClearColor(0x000000, 0);
+    has3D = true;
+  } catch (e) { has3D = false; canvas.style.display = 'none'; }
+
+  if (has3D) {
+    const V3 = a => new THREE.Vector3(a[0], a[1], a[2]);
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x40454f, 0.8));
+    const keyL = new THREE.DirectionalLight(0xffffff, 0.7); keyL.position.set(3, 7, 8); scene.add(keyL);
+    const rim = new THREE.DirectionalLight(0xffffff, 0.25); rim.position.set(-6, -2, 4); scene.add(rim);
+    tilt = new THREE.Group(); spin = new THREE.Group(); tilt.add(spin); scene.add(tilt);
+    tmpV = new THREE.Vector3();
+
+    const sh = new THREE.Shape(), h = 0.42, r = 0.12;
+    sh.moveTo(-h + r, -h); sh.lineTo(h - r, -h); sh.quadraticCurveTo(h, -h, h, -h + r); sh.lineTo(h, h - r);
+    sh.quadraticCurveTo(h, h, h - r, h); sh.lineTo(-h + r, h); sh.quadraticCurveTo(-h, h, -h, h - r); sh.lineTo(-h, -h + r);
+    sh.quadraticCurveTo(-h, -h, -h + r, -h);
+    const SG = new THREE.ShapeGeometry(sh);
+    const BG = new THREE.BoxGeometry(0.96, 0.96, 0.96);
+    const bodyMat = new THREE.MeshStandardMaterial({color: 0x16181d, roughness: 0.6});
+    const Z = new THREE.Vector3(0, 0, 1);
+    const addSticker = (g, f, mat) => {
+      const m = new THREE.Mesh(SG, mat), n = V3(FV[f]);
+      m.position.copy(n).multiplyScalar(0.484); m.quaternion.setFromUnitVectors(Z, n); g.add(m);
+    };
+    spin.add(new THREE.Mesh(new THREE.BoxGeometry(1.9, 1.9, 1.9), bodyMat)); // core: small enough that a turning layer never shows it
+    // Grayed-out stickers (corners, and edges dimmed by focus) share one neutral gray: no trace of the original color.
+    const DIM_GRAY = '#3c3f47';
+    // Corners: gray, except on the T-perm slide (cornerCol), where they show their real colors.
+    for (const x of [-1, 1]) for (const y of [-1, 1]) for (const z of [-1, 1]) {
+      const g = new THREE.Group(); g.position.set(x, y, z); g.add(new THREE.Mesh(BG, bodyMat));
+      for (const f of [x > 0 ? 'R' : 'L', y > 0 ? 'U' : 'D', z > 0 ? 'F' : 'B']) {
+        const m = new THREE.MeshStandardMaterial({color: DIM_GRAY, roughness: 0.7}); addSticker(g, f, m);
+        cornerMats.push({m, ci: cubies.length, base: new THREE.Color(FCOL[f]), gray: new THREE.Color(DIM_GRAY)});
+      }
+      spin.add(g); cubies.push({g, p: g.position.clone(), q: new THREE.Quaternion(), home: g.position.clone()});
+    }
+    for (const f in FV) {
+      const g = new THREE.Group(); g.position.copy(V3(FV[f])); g.add(new THREE.Mesh(BG, bodyMat));
+      addSticker(g, f, new THREE.MeshStandardMaterial({color: FCOL[f], roughness: 0.35})); spin.add(g);
+      cubies.push({g, p: g.position.clone(), q: new THREE.Quaternion(), home: g.position.clone()});
+    }
+    AXV = [V3([1, 0, 0]), V3([0, 1, 0]), V3([0, 0, 1])];
+    const poseFor = (i, hh, f) => {
+      const p1 = V3(FV[POS[i][0]]), p2 = V3(FV[POS[i][1]]);
+      const h1 = V3(FV[POS[hh][0]]), h2 = V3(FV[POS[hh][1]]);
+      const t1 = f ? p2 : p1, t2 = f ? p1 : p2;
+      const H = new THREE.Matrix4().makeBasis(h1, h2, h1.clone().cross(h2));
+      const T = new THREE.Matrix4().makeBasis(t1, t2, t1.clone().cross(t2));
+      T.multiply(H.transpose());
+      return {position: p1.clone().add(p2), q: new THREE.Quaternion().setFromRotationMatrix(T)};
+    };
+    POSE = POS.map((_, i) => POS.map((_, hh) => [0, 1].map(f => poseFor(i, hh, f))));
+    DIRS = POS.map(n => V3(FV[n[0]]).add(V3(FV[n[1]])).normalize());
+    for (let hh = 0; hh < 12; hh++) {
+      const g = new THREE.Group(); g.add(new THREE.Mesh(BG, bodyMat));
+      const mats = [POS[hh][0], POS[hh][1]].map(f => {
+        const m = new THREE.MeshStandardMaterial({color: FCOL[f], roughness: 0.35});
+        addSticker(g, f, m); return {m, base: new THREE.Color(FCOL[f]), dimC: new THREE.Color(DIM_GRAY)};
+      });
+      g.position.copy(POSE[hh][hh][0].position); g.quaternion.copy(POSE[hh][hh][0].q);
+      spin.add(g); edges.push({g, mats, glow: 0, dim: 0});
+    }
+  }
+
+
+  // ---------------- piece motion ----------------
+  function posesOf(s) { const out = []; for (let i = 0; i < 12; i++) out[s.p[i]] = POSE[i][s.p[i]][s.fl[i]]; return out; }
+  const perpTo = d => (Math.abs(d.y) < 0.9 ? new THREE.Vector3(0, 1, 0) : new THREE.Vector3(1, 0, 0)).cross(d);
+  // One swap: both pieces lift out, pass on opposite sides, and drop in.
+  function interp(a, b, u) {
+    const A = posesOf(a), B = posesOf(b), out = [];
+    for (let h = 0; h < 12; h++) {
+      const pa = A[h], pb = B[h];
+      if (pa === pb) { out[h] = pa; continue; }
+      const same = pa.position.distanceTo(pb.position) < 1e-6;
+      const pos = pa.position.clone().lerp(pb.position, u);
+      if (pos.length() < 0.2) pos.y += 0.3;
+      const bump = Math.sin(Math.PI * u);
+      pos.setLength(Math.SQRT2 + (same ? 0.55 : 1.0) * bump);
+      if (!same) { const perp = new THREE.Vector3().crossVectors(pa.position, pb.position); if (perp.lengthSq() > 1e-6) pos.addScaledVector(perp.normalize(), 0.6 * bump); }
+      out[h] = {position: pos, q: pa.q.clone().slerp(pb.q, u)};
+    }
+    return out;
+  }
+  // Scramble-style move: lift off, glide over the surface at height, land.
+  function arcPose(pa, pb, u) {
+    const d0 = pa.position.clone().normalize(), d1 = pb.position.clone().normalize(), ang = d0.angleTo(d1);
+    const qa = pa.q.angleTo(pb.q);
+    if (ang < 0.02 && qa < 0.02) return pb;
+    const pu = ease(clamp((u - 0.2) / 0.6));
+    let dir = d0.clone();
+    if (ang > 1e-4) { let ax = new THREE.Vector3().crossVectors(d0, d1); if (ax.lengthSq() < 1e-8) ax = perpTo(d0); dir.applyAxisAngle(ax.normalize(), ang * pu); }
+    const lift = (ang > 0.05 ? 1.15 : 0.6) * ease(clamp(u / 0.24)) * ease(clamp((1 - u) / 0.24));
+    return {position: dir.multiplyScalar(lerp(pa.position.length(), pb.position.length(), pu) + lift), q: pa.q.clone().slerp(pb.q, pu)};
+  }
+  const snapshot = () => edges.map(e => ({position: e.g.position.clone(), q: e.g.quaternion.clone()}));
+  function near(s) { const P = posesOf(s); return edges.every((e, h) => e.g.position.distanceTo(P[h].position) < 0.1 && e.g.quaternion.angleTo(P[h].q) < 0.15); }
+  let anim = null;
+  function appendPath(an, segs) {
+    for (const g of segs) {
+      if (g.hold) { const P = posesOf(g.at); an.steps.push({dur: g.hold, cap: g.cap, f: () => P}); continue; }
+      for (let i = 1; i < g.st.length; i++) { const a = g.st[i - 1], b = g.st[i]; an.steps.push({dur: g.dur, cap: g.cap, f: u => interp(a, b, ease(u))}); }
+    }
+  }
+  const UI_CLEAR = 0.3; // seconds the overlay gets to fade before a turn sequence between slides
+  // pend: states still to visit, in order, once the running animation lands, when the target can't be reached by turning that
+  // animation around (e.g. swap demos after face turns, or face turns after a swap demo). Any newer press replaces it.
+  let pend = null;
+  // Shortest chain of swap demos (PATHS) and turn paths (TURNS) from state a to b, as the states to visit: [next, …, b].
+  function route(a, b) {
+    const adj = {}, add = (k, st) => { const [x, y] = k.split('>'); (adj[x] = adj[x] || []).push([y, st]); };
+    for (const k in PATHS) add(k, last(PATHS[k]));
+    for (const k in TURNS) add(k, TURNS[k].path.states[TURNS[k].to]);
+    const ka = key(a), kb = key(b), prev = {[ka]: null}, q = [ka];
+    while (q.length && !(kb in prev)) { const x = q.shift(); for (const [y, st] of adj[x] || []) if (!(y in prev)) { prev[y] = [x, st]; q.push(y); } }
+    if (ka === kb || !(kb in prev)) return null;
+    const out = []; for (let y = kb; prev[y]; y = prev[y][0]) out.unshift(prev[y][1]);
+    return out;
+  }
+  function startTransition(from, to, useSwaps, now) {
+    pend = null;
+    if (reduce) { anim = null; return; }
+    if (anim && anim.to && key(anim.to) === key(to)) return; // already on its way there (a newer press only dropped the queue)
+    // Mid-way through a turn path and asked for a state on it: carry on, or turn back, from exactly where the cube is.
+    if (anim && anim.path) {
+      const j = anim.path.states.findIndex(x => key(x) === key(to));
+      if (j >= 0) { animPoses(now); const P = anim.path, f = animPos(now); anim = {t0: now, to, path: P, steps: pathSteps(P, f, j)}; if (!anim.steps.length) anim = null; return; }
+      // Target is off this path but another path starts where this one is heading: finish these turns, then chain on.
+      const jEnd = anim.path.states.findIndex(x => key(x) === key(anim.to)), tp2 = TURNS[key(anim.to) + '>' + key(to)];
+      if (jEnd >= 0 && tp2) {
+        // Finish the turn in progress, then one merged path (the rest of this one + the next), so it can be reversed again.
+        animPoses(now); const P = anim.path, f = animPos(now), i0 = Math.floor(f + 1e-9), k1 = f - i0 < 1e-6 ? i0 : jEnd > f ? i0 + 1 : i0;
+        const steps0 = pathSteps(P, f, k1).map(st => Object.assign(st, {pos: () => 0}));
+        const s1 = pathSegment(P, k1, jEnd), s2 = pathSegment(tp2.path, tp2.from, tp2.to), caps = s1.caps.concat(s2.caps);
+        const M = makePath(P.states[k1], s1.moves.concat(s2.moves), tp2.path.kind, k => caps[k], s1.mul.concat(s2.mul));
+        anim = {t0: now, to, path: M, steps: steps0.concat(pathSteps(M, 0, M.moves.length))}; return;
+      }
+    }
+    if (useSwaps) {
+      if (anim && !anim.path && anim.to && PATHS[key(anim.to) + '>' + key(to)]) { appendPath(anim, PATHS[key(anim.to) + '>' + key(to)]); anim.to = to; return; }
+      const p = from && PATHS[key(from) + '>' + key(to)];
+      if (!anim && p && near(from)) { anim = {t0: now, steps: [], to}; appendPath(anim, p); return; }
+    }
+    const tp = TURNS[key(from) + '>' + key(to)];
+    if (tp && !anim && near(from)) {
+      // A short hold first, so the slide's labels, tags and glows fade out before the turns start (front page excepted).
+      // lead: a longer hold where something else changes first (the T-perm slide's corners color in before its setup turns).
+      const P0 = posesOf(from), hold = tp.path.kind === 'present' ? [{dur: Math.max(UI_CLEAR, tp.lead || 0), pos: () => tp.from, f: () => P0}] : [];
+      anim = {t0: now, to, path: tp.path, steps: hold.concat(pathSteps(tp.path, tp.from, tp.to))}; return;
+    }
+    // Something is playing that can't be turned around onto the target, but the target is reachable from where it lands: queue it
+    // rather than fly pieces over the cube (flying edges would leave the corners behind).
+    if (anim && anim.to) { const r = route(anim.to, to); if (r) { pend = r; return; } }
+    const A = snapshot(), B = posesOf(to), moving = [];
+    A.forEach((p, h) => { if (p.position.distanceTo(B[h].position) > 0.02 || p.q.angleTo(B[h].q) > 0.02) moving.push(h); });
+    if (!moving.length) { anim = null; return; }
+    const stag = Math.min(0.04, 0.3 / moving.length), dur = 0.95, total = dur + stag * (moving.length - 1);
+    anim = {t0: now, to, steps: [{dur: total, fly: true, f: u => { const t = u * total; return A.map((p, h) => { const k = moving.indexOf(h); return k < 0 ? B[h] : arcPose(p, B[h], clamp((t - k * stag) / dur)); }); }}]};
+  }
+  const animLeft = now => anim ? anim.steps.reduce((s, x) => s + x.dur, 0) - (now - anim.t0) : 0;
+  let animCap = null; // caption of the animation step now playing, if it has one
+  function animPoses(now) {
+    let t = now - anim.t0;
+    for (const st of anim.steps) {
+      if (st.onStart && !st.started) { st.started = true; st.onStart(); }
+      if (t < st.dur) { animCap = st.cap || null; return st.f(t / st.dur); }
+      if (st.onEnd && !st.ended) { st.ended = true; st.onEnd(); } // a face turn commits its corners and centers once
+      t -= st.dur;
+    }
+    animCap = null; return null;
+  }
+  // Where along its path a turn animation is now (move index + fraction).
+  function animPos(now) { let t = now - anim.t0; for (const st of anim.steps) { if (t < st.dur) return st.pos(t / st.dur); t -= st.dur; } return anim.steps[anim.steps.length - 1].pos(1); }
+  // Steps that take the cube from position f (move index + fraction) to state index j on path P. The edges in a turning layer
+  // rotate about the face's axis; corners and centers follow via turnNow. A forward turn commits its layer when it lands; a full
+  // backward turn first un-commits it, then turns it back.
+  function pathSteps(P, f, j) {
+    const tm = turnTiming(P), sine = u => (1 - Math.cos(Math.PI * u)) / 2, steps = [];
+    const step = (i, a0, a1, full) => {
+      const M = parseMove(P.moves[i]), A = P.states[i], Ps = posesOf(A), inL = h => SV[A.p.indexOf(h)][M.ax] === M.sg, ez = full ? tm.ez[i] : sine, fwd = a1 > a0;
+      return {dur: Math.max(0.02, tm.durs[i] * Math.abs(a1 - a0)), cap: P.caps ? P.caps(i, !fwd) : null,
+        onStart: !fwd && a0 === 1 ? () => commitTurn(M, -1) : null, onEnd: fwd ? () => commitTurn(M) : () => { turnNow = null; },
+        pos: v => i + lerp(a0, a1, ez(v)),
+        f: v => {
+          const a = M.ang * lerp(a0, a1, ez(v)); turnNow = {ax: M.ax, sg: M.sg, a};
+          const R = new THREE.Quaternion().setFromAxisAngle(AXV[M.ax], a);
+          return Ps.map((p, h) => inL(h) ? {position: p.position.clone().applyQuaternion(R), q: R.clone().multiply(p.q)} : p);
+        }};
+    };
+    const i0 = Math.floor(f + 1e-9), u = f - i0;
+    if (j > f) { let i = i0; if (u > 1e-6) { steps.push(step(i0, u, 1, false)); i++; } for (; i < j; i++) steps.push(step(i, 0, 1, true)); }
+    else if (j < f) { if (u > 1e-6) steps.push(step(i0, u, 0, false)); for (let i = i0 - 1; i >= j; i--) steps.push(step(i, 1, 0, true)); }
+    return steps;
+  }
+  function commitTurn(M, dir = 1) {
+    const R = new THREE.Quaternion().setFromAxisAngle(AXV[M.ax], M.ang * dir);
+    for (const cb of cubies) if (Math.round(cb.p.getComponent(M.ax)) === M.sg) { cb.p.applyQuaternion(R).round(); cb.q.premultiply(R).normalize(); }
+    turnNow = null;
+  }
+  function placeCubies() {
+    for (const cb of cubies) {
+      if (turnNow && Math.round(cb.p.getComponent(turnNow.ax)) === turnNow.sg) {
+        const R = new THREE.Quaternion().setFromAxisAngle(AXV[turnNow.ax], turnNow.a);
+        cb.g.position.copy(cb.p).applyQuaternion(R); cb.g.quaternion.copy(R).multiply(cb.q);
+      } else { cb.g.position.copy(cb.p); cb.g.quaternion.copy(cb.q); }
+    }
+  }
+  // Put corners/centers at once where a list of face turns from solved leaves them ('home' or nothing = solved). Used when the cube
+  // snaps, so a slide reached by a fade has its corners where the face turns would have put them.
+  function setCubies(moves) {
+    for (const cb of cubies) { cb.p.copy(cb.home); cb.q.identity(); }
+    if (Array.isArray(moves)) for (const mv of moves) commitTurn(parseMove(mv));
+  }
+  function setPoses(P) { edges.forEach((e, h) => { e.g.position.copy(P[h].position); e.g.quaternion.copy(P[h].q); }); }
+  // Follow a moving target (time-driven demos) smoothly, arcing over the cube rather than through it.
+  function followTo(P, dt) {
+    const a = reduce ? 1 : 1 - Math.exp(-dt * 16);
+    edges.forEach((e, h) => {
+      const tg = P[h], cur = e.g.position;
+      const d0 = cur.clone().normalize(), d1 = tg.position.clone().normalize(), ang = d0.angleTo(d1);
+      let dir = d1.clone();
+      if (ang > 1e-4 && a < 1) { let ax = new THREE.Vector3().crossVectors(d0, d1); if (ax.lengthSq() < 1e-8) ax = perpTo(d0); dir = d0.clone().applyAxisAngle(ax.normalize(), ang * a); }
+      const r = Math.max(lerp(cur.length(), tg.position.length(), a), Math.SQRT2 + 0.8 * Math.min(1, ang * (1 - a) / 0.9));
+      cur.copy(dir.multiplyScalar(r));
+      e.g.quaternion.slerp(tg.q, a);
+    });
+  }
+
+  // ---------------- slides ----------------
+  // Each slide has n builds; → plays the next build, then moves on to the next slide.
+  const V0 = {rx: 0.5, ry: -0.62}, V_HOME = {rx: 0.45, ry: -0.62};
+  // buf: mark the buffer slot UR (on every cube and ring slide from "The buffer" on).
+  const DEF = {track: null, fly: false, glowCol: null, dimHome: null, heroDone: null, slotMark: null, cornerCol: 0, cornerSet: null, layer: 'cube', morph: 0, view: V0, spin: false, state: SOLVED, poses: null, labels: [], glow: [], focus: null, arrows: false, tags: [], caption: '', glowEdges: false, chartMode: 1, neutral: false, tri: null, via: null, showHidden: false, buf: false};
+  const SW_LAB = ['UR', 'DF', 'FL', 'UB'], BR_LAB = ['UR', 'UF', 'DR', 'BR'];
+  const FLIP_AT = 1.3;
+  const CUB_P = 5.2;
+  const heroP = () => turnTiming({moves: Array(HERO_N).fill('R'), kind: 'scramble'}).total * 1.15 + 6; // one scramble + trace + a pause
+  const fact = n => n < 2 ? 1 : n * fact(n - 1);
+  const S = {
+    // Front page: starts solved (also when you come back to it), then scrambles with face turns every heroP() seconds.
+    hero: {n: 1, f: (b, el) => {
+      const base = {spin: true, split: true, buf: true, arrows: true};
+      if (el < HERO_DELAY) return Object.assign(base, {state: SOLVED, tally: {c: TALLY.c.slice(), n: TALLY.n, now: 0}, caption: 'A solved cube, and the same cube as a ring'});
+      const P = heroP(), idx = Math.floor((el - HERO_DELAY) / P), t = el - HERO_DELAY - idx * P, q = idx % HERO_SEQ.length;
+      const settled = reduce || t > entryTotal(TURNS[key(q ? HERO_SEQ[q - 1] : SOLVED) + '>' + key(HERO_SEQ[q])]) + 2.8;
+      return Object.assign(base, {state: HERO_SEQ[q], dimHome: settled ? HERO_SEQ[q] : null, heroDone: settled ? idx : null, tally: {c: TALLY.c.slice(), n: TALLY.n, now: settled ? HERO_INFO[q].n : 0},
+        caption: settled ? `Scramble ${idx + 1}: ${HERO_INFO[q].text}` : `Scrambling: ${HERO_MOVES[q].length} face turns`});
+    }},
+    pieces: {n: 1, f: () => ({view: V_HOME, slotMark: 'near3', caption: '12 edges · 6 centers · 8 corners',
+      tags: [{p3: [0, 0, 1.5], text: 'center'}, {p3: [1.5, 0, 1], text: 'edge'}, {p3: [1, 1.5, 1], text: 'corner', tone: '--ink-3'}]})},
+    homes: {n: 1, f: () => ({view: V_HOME, labels: 'all', caption: 'Twelve slots, named by the faces they touch'})},
+    scramble: {n: 1, f: () => ({state: DEMO, cornerSet: opCorners(1), labels: 'all', caption: 'Scrambled · seven edges have left home'})},
+    // Tilts slowly up and down (16 s) so the yellow bottom shows too.
+    buffer: {n: 1, f: (b, el) => ({state: DEMO, cornerSet: opCorners(1), track: [PARTNER], buf: true, view: {rx: reduce ? V0.rx : 0.02 + 0.48 * Math.cos(2 * Math.PI * el / 16), ry: V0.ry}, labels: ['UR', 'DF'], focus: ['UR', 'DF'], arrows: [['UR', 'DF']],
+      tags: [{pos: 'UR', text: 'buffer'}], caption: 'The buffer holds yellow-green, which belongs in DF'})},
+    // The first swap of the solve, UR ↔ DF, as real face turns (OP_PATH), with the two corners it swaps (TP_CORNERS) in color. Entering, they color in,
+    // then the setup D' L2 brings DF's edge to UL; b1 plays the T-perm (faster, PRES_TP); b2 undoes the setup.
+    tperm: {n: 3, f: b => ({state: [OP_SET, OP_TP, SWAPS[1]][b], cornerCol: TP_CORNERS, cornerSet: opCorners(b + 2), track: [PARTNER], buf: true,
+      labels: b < 2 ? ['UR', 'UL', 'DF'] : ['UR', 'DF'], focus: b < 2 ? ['UR', 'UL'] : ['UR', 'DF'],
+      tags: [[{pos: 'UL', text: 'from DF'}], [{pos: 'UL', text: 'swapped'}, {p3: [1.5, 1.5, 1.5], text: 'corner'}, {p3: [1.5, 1.5, -1.5], text: 'corner'}], [{pos: 'DF', text: 'home', tone: '--yes'}]][b],
+      caption: ["Setup D' L2 · DF's edge is now in UL, ready to swap", 'T-perm · UR ↔ UL swapped, and two corners with them', 'Setup undone · yellow-green is home in DF'][b]})},
+    // Picks up after the T-perm slide's swap UR ↔ DF.
+    swaps: {n: 2, f: b => ({state: SWAPS[b + 1], via: 'swaps', cornerSet: opCorners(4), track: [PARTNER], buf: true, labels: SW_LAB, arrows: 'buffer', glow: [SOLVE_DEMO[b + 1]],
+      tags: [{pos: 'UR', text: 'buffer'}],
+      caption: ['DF solved · next: swap UR ↔ FL', 'FL solved · next: swap UR ↔ UB'][b]})},
+    closed: {n: 1, f: () => ({state: SWAPS[3], via: 'swaps', cornerSet: opCorners(4), buf: true, labels: BR_LAB, glow: ['UF', 'DR', 'BR'], arrows: true,
+      tags: [{pos: 'UR', text: 'home', tone: '--yes'}], caption: 'UB solved · loop closed · UF, DR and BR still wrong'})},
+    break: {n: 3, f: b => ({state: [BREAK[0], BREAK[1], BREAK[4]][b], via: 'swaps', cornerSet: opCorners(4), buf: true, labels: BR_LAB, arrows: true, glow: b ? [] : ['UF', 'DR', 'BR'],
+      caption: ['Next: break into the other cycle', 'White-red parked in UF · the buffer is now in that cycle', 'Every edge solved · 3 edges took 4 swaps'][b]})},
+    rewind: {n: 1, f: () => ({state: DEMO, via: 'swaps', cornerSet: opCorners(4), buf: true, labels: 'all', arrows: true, caption: 'Rewound · two cycles: 4 edges with the buffer, 3 without'})},
+    ring: {n: 2, f: b => ({state: b ? ONE8 : DEMO, buf: true, morph: 1, labels: 'all', arrows: true, glow: b ? [] : ['UF', 'DR', 'BR'],
+      caption: b ? 'One cycle through 8 edges · no cycle break' : 'Same slots, same arrows, laid out in a ring · two cycles'})},
+    // b0: a solved cube fades in, then UF flips (FLIP_AT) and the "impossible" tag appears once it lands.
+    flips: {n: 2, f: (b, el) => {
+      const k = b ? 2 : el < FLIP_AT ? 0 : 1;
+      return {state: [SOLVED, F1, F2][k], fly: true, buf: true, view: {rx: 0.62, ry: -0.55}, labels: ['UF', 'UB'],
+        glow: [[], ['UF'], ['UF', 'UB']][k], glowCol: '--c2',
+        tags: [[], el > FLIP_AT + 0.9 || b ? [{pos: 'UF', text: 'impossible alone', tone: '--no'}] : [], [{pos: 'UB', text: 'a legal pair', tone: '--yes'}]][k],
+        caption: ['Each edge has two ways to sit in its slot', 'One flipped edge: no sequence of moves gives this', 'Two flipped edges: a real cube can do this'][k]};
+    }},
+    count: {n: 1, f: (b, el) => {
+      const P = 2.6, ph = el / P, i = Math.floor(ph) % 2, f = ph % 1;
+      const rev = Math.floor(ph) === 0 ? 0 : (i === 1 ? ss(f / 0.28) : 1 - ss(f / 0.28));
+      return {state: TRI, buf: true, morph: 1, labels: 'all', neutral: true, focus: ['UF', 'FL', 'DF'], tri: rev,
+        caption: i ? 'Cycle 2 of 2 · UF → DF → FL → UF · same lines, reversed' : 'Cycle 1 of 2 · UF → FL → DF → UF'};
+    }},
+    term: {n: 1, f: () => ({layer: 'chart', chartMode: 1})},
+    flipcount: {n: 1, f: (b, el) => {
+      const P = 1.5, idx = Math.floor(el / P), u = reduce ? 1 : ss(((el / P) % 1) / 0.45);
+      const A = flipPattern(Math.max(0, idx - 1) % 8), B = flipPattern(idx % 8);
+      return {state: B, buf: true, poses: has3D ? interp(A, B, u) : null, labels: SW_LAB, arrows: true,
+        caption: `Flip pattern ${idx % 8 + 1} of 8 · ${B.fl.reduce((x, y) => x + y, 0)} flipped`};
+    }},
+    full: {n: 1, f: () => ({layer: 'chart', chartMode: 2})},
+    uniform: {n: 4, f: b => ({layer: 'cancel', fan: b})},
+    cuber: {n: 1, f: (b, el) => {
+      const i = Math.floor(el / CUB_P) % CUB.length, k = CUB_K[i], j = 12 - k;
+      return {state: CUB[i], buf: true, morph: 1, labels: 'all', arrows: true,
+        caption: j === 1 ? `Buffer's cycle: ${k} edges · the last edge can only be home` : `Buffer's cycle: ${k} edges · the other ${j} must all be home: 1 in ${j}! = 1 in ${fact(j).toLocaleString()}`};
+    }},
+    attempt: {n: 1, f: () => ({state: SKIP5, buf: true, morph: 1, labels: 'all', arrows: true, caption: "One cycle, but UR isn't in it · my first attempt counted it; a solver needs a break"})},
+    lab: {n: 1, f: () => ({layer: 'lab'})},
+  };
+
+  // ---------------- overlay ----------------
+  const ov = document.getElementById('ov'), dyn = document.getElementById('ov-dyn');
+  document.getElementById('ov-defs').innerHTML = '<filter id="bglow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3.2"/></filter>';
+
+  // Buffer marker: the UR slot's two outer faces (on the cube) or a ring round the UR node (flattened).
+  // el(attrs) returns the shape with those attributes, so each style can stack several strokes.
+  // A yellow line with a soft yellow glow under it.
+  const bufMark = el => el('style="fill: none; stroke: #ffc21a" stroke-width="8" filter="url(#bglow)"') + el('style="fill: none; stroke: #ffd84d" stroke-width="2.2" stroke-linejoin="round"');
+  const MARK_YELLOW = {glow: '#ffc21a', line: '#ffd84d'}, MARK_PINK = {glow: 'var(--c5)', line: 'var(--c5)'};
+  // Outline quads ({c: 4 corners, n: outward normal}, cube coordinates): a glowing line where the face looks at you, a thin dashed
+  // line where it's turned away (seen through the cube). Back faces first, so front ones draw over them.
+  function drawQuads(quads, col, alpha) {
+    let back = '', front = '';
+    for (const f of quads) {
+      const ctr = f.c[0].clone().add(f.c[2]).multiplyScalar(0.5);
+      const wp = spin.localToWorld(ctr.clone()), toCam = camera.position.clone().sub(wp).normalize();
+      const fv = ss((f.n.clone().transformDirection(spin.matrixWorld).dot(toCam) - 0.05) / 0.25);
+      const d = 'M' + f.c.map(c => proj(c, 1).map(v => v.toFixed(1)).join(' ')).join('L') + 'Z';
+      if (fv < 0.98) back += `<path d="${d}" style="fill: none; stroke: ${col.line}" stroke-width="1.6" stroke-dasharray="4 4" stroke-linejoin="round" opacity="${(alpha * 0.85 * (1 - fv)).toFixed(3)}"/>`;
+      if (fv > 0.02) front += `<g opacity="${(alpha * fv).toFixed(3)}"><path d="${d}" style="fill: none; stroke: ${col.glow}" stroke-width="8" filter="url(#bglow)"/><path d="${d}" style="fill: none; stroke: ${col.line}" stroke-width="2.2" stroke-linejoin="round"/></g>`;
+    }
+    return back + front;
+  }
+  const slotQuads = i => slotFaces(i).map(f => ({c: f.c.map(v => new THREE.Vector3(...v)), n: new THREE.Vector3(...f.n)}));
+  // A piece's own outline: its home slot's faces, carried along with the piece's current pose (so it follows every turn).
+  function pieceQuads(h) {
+    const g = edges[h].g, home = POSE[h][h][0].position;
+    return slotQuads(h).map(f => ({c: f.c.map(v => v.sub(home).applyQuaternion(g.quaternion).add(g.position)), n: f.n.applyQuaternion(g.quaternion)}));
+  }
+  // The two outer faces of an edge slot, as quads (cube coordinates) with their outward normals.
+  function slotFaces(i) {
+    const c = SV[i], out = [];
+    for (let a = 0; a < 3; a++) {
+      if (!c[a]) continue;
+      const b = [0, 1, 2].find(x => x !== a && c[x]), z = 3 - a - b, lo = c[b] > 0 ? 0.5 : -1.5, hi = lo + 1;
+      const pt = (vb, vz) => { const v = [0, 0, 0]; v[a] = 1.5 * c[a]; v[b] = vb; v[z] = vz; return v; };
+      const n = [0, 0, 0]; n[a] = c[a];
+      out.push({n, c: [pt(lo, -0.5), pt(lo, 0.5), pt(hi, 0.5), pt(hi, -0.5)]});
+    }
+    return out;
+  }
+  let bufA = 0;
+  // Yellow marks on slots: the slot's outer faces on the cube, a ring round the node when flat.
+  function drawSlotMarks(G, slots, alpha) {
+    const {pts, m, NR} = G;
+    if (alpha < 0.02) return '';
+    let out = '';
+    if (has3D && m < 0.98) for (const i of slots) out += drawQuads(slotQuads(i), MARK_YELLOW, alpha * (1 - m));
+    if (m > 0.02) for (const i of slots) {
+      const [x, y] = pts[i];
+      out += `<g opacity="${(alpha * m).toFixed(3)}">${bufMark(a => `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${NR + 4}" ${a}/>`)}</g>`;
+    }
+    return out;
+  }
+  const drawBuffer = (G, alpha) => drawSlotMarks(G, [0], alpha);
+  const markA = new Array(12).fill(0); // per-slot fade of the yellow slot marks
+  let W = 1, H = 1;
+  // Front page: the cube shrinks to one side and its ring sits beside it (below it on tall stages).
+  let splitK = 0, camD = 10;
+  function splitGeo() {
+    if (W / H >= 1) return {cx: W * 0.27, cy: H * 0.48, cs: 0.44, rx: W * 0.73, ry: H * 0.48, RR: Math.min(W * 0.17, H * 0.16)};
+    return {cx: W / 2, cy: H * 0.3, cs: 0.56, rx: W / 2, ry: H * 0.635, RR: Math.min(W * 0.3, H * 0.15)};
+  }
+  function applySplit() {
+    if (!has3D) return;
+    const g = splitGeo(), k = ease(clamp(splitK));
+    camera.position.set(0, 0, camD / lerp(1, g.cs, k));
+    if (k > 0.001) camera.setViewOffset(W, H, (W / 2 - g.cx) * k, (H / 2 - g.cy) * k, W, H); else camera.clearViewOffset();
+    camera.updateProjectionMatrix();
+  }
+  function resize() {
+    const r = stageEl.getBoundingClientRect(); W = Math.max(1, r.width); H = Math.max(1, r.height);
+    ov.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    if (has3D) {
+      renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1)); renderer.setSize(W, H, false);
+      camera.aspect = W / H;
+      camD = 3.9 / Math.tan(14 * Math.PI / 180) / Math.min(1, W / H);
+      camera.position.set(0, 0, camD); camera.lookAt(0, 0, 0); applySplit();
+    }
+  }
+  new ResizeObserver(resize).observe(stageEl); resize();
+  function proj(dir, scale) {
+    tmpV.copy(dir).multiplyScalar(scale); spin.localToWorld(tmpV); tmpV.project(camera);
+    return [(tmpV.x + 1) / 2 * W, (1 - tmpV.y) / 2 * H];
+  }
+  function facing(i) {
+    const wp = spin.localToWorld(DIRS[i].clone().multiplyScalar(1.85));
+    const toCam = camera.position.clone().sub(wp).normalize();
+    return Math.max(...[0, 1].map(k => new THREE.Vector3(...FV[POS[i][k]]).transformDirection(spin.matrixWorld).dot(toCam)));
+  }
+
+  const halo = 'paint-order: stroke; stroke: var(--stage); stroke-width: 4px; stroke-linejoin: round';
+  // Slot names in their faces' colors (UL: U white, L orange), used on the front page's ring only (the user's pick). White and yellow letters get a dark outline so they read on the
+  // light stage; the others keep the usual stage-colored halo.
+  const slotHalo = 'paint-order: stroke; stroke-width: 3.6px; stroke-linejoin: round';
+  const slotName = n => [...n].map(f => `<tspan style="fill: ${FCOL[f]}; ${f === 'U' || f === 'D' ? 'stroke: #1b1e25; stroke-width: 2.6px' : 'stroke: var(--stage)'}">${f}</tspan>`).join('');
+  const labA = new Array(12).fill(0), glowA = new Array(12).fill(0), trackA = new Array(12).fill(0), tagMap = new Map();
+  let ovCur = {key: '', state: SOLVED, arrows: true, focus: null, neutral: false, tri: null, ring: null}, ovPrev = null, ovT0 = 0, ovDelay = 0, frameNo = 0;
+  const ovKey = sp => (sp.morph ? key(sp.state) : sp.state.p.join()) + '|' + JSON.stringify(sp.arrows) + '|' + JSON.stringify(sp.focus) + '|' + sp.neutral;
+
+  // Arrow curves for [from, to, color] triples. Each bows to its left; ta/tb are the angles at which it leaves A and reaches B.
+  function arrowGeo(arr, G) {
+    const {pts, m, cx, cy, NR, RR} = G;
+    const geo = arr.map(([a, b, col]) => {
+      const A = pts[a], B = pts[b], dx = B[0] - A[0], dy = B[1] - A[1], len = Math.hypot(dx, dy) || 1;
+      const mx = (A[0] + B[0]) / 2, my = (A[1] + B[1]) / 2, bow = lerp(0.28, 0.1, m) * len;
+      // On the ring, long chords bend toward the middle; short hops (1–2 slots) keep to the ring.
+      const pull = 0.4 * m * clamp((len / G.RR - 0.75) / 0.6);
+      const qx = mx - dy / len * bow + (cx - mx) * pull, qy = my + dx / len * bow + (cy - my) * pull;
+      return {a, b, col, A, B, ta: Math.atan2(qy - A[1], qx - A[0]), tb: Math.atan2(qy - B[1], qx - B[0]),
+        ha: Math.hypot(qx - A[0], qy - A[1]), hb: Math.hypot(qx - B[0], qy - B[1])};
+    });
+    // Every node in a cycle has one arrow in and one out. Fan them apart so the two never touch.
+    const sep = lerp(1.05, 0.7, m), byNode = {};
+    geo.forEach(g => { (byNode[g.a] = byNode[g.a] || []).push([g, 'ta']); (byNode[g.b] = byNode[g.b] || []).push([g, 'tb']); });
+    for (const n in byNode) {
+      const xs = byNode[n]; if (xs.length !== 2) continue;
+      const [[g1, k1], [g2, k2]] = xs, d = wrapPi(g2[k2] - g1[k1]);
+      if (Math.abs(d) < sep) { const push = (sep - Math.abs(d)) / 2 * (d >= 0 ? 1 : -1); g1[k1] -= push; g2[k2] += push; }
+    }
+    const r = lerp(10, NR + 4, m), w = ss((m - 0.35) / 0.65), pairs = new Set(geo.map(g => g.a + '>' + g.b));
+    const L = (p, q, u) => [lerp(p[0], q[0], u), lerp(p[1], q[1], u)], unit = (p, q) => { const dx = q[0] - p[0], dy = q[1] - p[1], l = Math.hypot(dx, dy) || 1; return [dx / l, dy / l]; };
+    for (const g of geo) {
+      // On the cube: a cubic whose ends leave and arrive at the fanned angles.
+      const ua = [Math.cos(g.ta), Math.sin(g.ta)], ub = [Math.cos(g.tb), Math.sin(g.tb)];
+      let P0 = [g.A[0] + r * ua[0], g.A[1] + r * ua[1]], P3 = [g.B[0] + r * ub[0], g.B[1] + r * ub[1]];
+      const h0 = Math.max(8, 0.66 * g.ha - r * 0.4), h1 = Math.max(8, 0.66 * g.hb - r * 0.4);
+      let c1 = [P0[0] + h0 * ua[0], P0[1] + h0 * ua[1]], c2 = [P3[0] + h1 * ub[0], P3[1] + h1 * ub[1]];
+      if (w > 0) {
+        // On the ring: one smooth quadratic bend, like a chord diagram. Long chords bend toward the middle, short hops
+        // bow gently to their left, and a pair of opposite arrows bows apart.
+        const A = g.A, B = g.B, dx = B[0] - A[0], dy = B[1] - A[1], len = Math.hypot(dx, dy) || 1, mx = (A[0] + B[0]) / 2, my = (A[1] + B[1]) / 2;
+        const pull = 0.42 * clamp((len / RR - 0.55) / 0.85), side = (pairs.has(g.b + '>' + g.a) ? 0.22 : 0.08) * len;
+        const Q = [mx + (cx - mx) * pull - dy / len * side, my + (cy - my) * pull + dx / len * side];
+        const ea = unit(A, Q), eb = unit(B, Q), R0 = [A[0] + ea[0] * (NR + 4), A[1] + ea[1] * (NR + 4)], R3 = [B[0] + eb[0] * (NR + 4), B[1] + eb[1] * (NR + 4)];
+        P0 = L(P0, R0, w); P3 = L(P3, R3, w); c1 = L(c1, L(R0, Q, 2 / 3), w); c2 = L(c2, L(R3, Q, 2 / 3), w);
+      }
+      Object.assign(g, {P0, c1, c2, P3});
+    }
+    // Arrowheads go near the middle of each curve, but not where it crosses another one.
+    const at = (g, t) => { const o = 1 - t; return [o * o * o * g.P0[0] + 3 * o * o * t * g.c1[0] + 3 * o * t * t * g.c2[0] + t * t * t * g.P3[0], o * o * o * g.P0[1] + 3 * o * o * t * g.c1[1] + 3 * o * t * t * g.c2[1] + t * t * t * g.P3[1]]; };
+    const samples = geo.map(g => [...Array(25).keys()].map(k => at(g, k / 24)));
+    for (const [n, g] of geo.entries()) {
+      let best = 0.5, bestD = -1;
+      for (const t of [0.5, 0.44, 0.56, 0.38, 0.62, 0.32, 0.68]) {
+        const p = at(g, t); let d = 1e9;
+        samples.forEach((sm, k) => { if (k !== n) for (const q of sm) d = Math.min(d, Math.hypot(q[0] - p[0], q[1] - p[1])); });
+        if (d >= 16) { best = t; break; }
+        if (d > bestD) { bestD = d; best = t; }
+      }
+      const p = at(g, best), q = at(g, Math.min(1, best + 0.01)), o = at(g, Math.max(0, best - 0.01));
+      Object.assign(g, {th: best, hx: p[0], hy: p[1], ang: Math.atan2(q[1] - o[1], q[0] - o[0])});
+    }
+    return geo;
+  }
+
+  // Ring rearrangements. A stage moves pieces from state A to B (timing per piece); then every cycle is traced in from its
+  // first slot (UR when the buffer is in it), all cycles at once. Old arrows retract during the first tRet seconds.
+  function ringStage(A, B, timing) { // timing(i, j, k): {t0, dur} for the piece going from slot i to slot j, k-th mover in piece order
+    const slotB = []; B.p.forEach((h, j) => { slotB[h] = j; });
+    const list = []; for (let h = 0; h < 12; h++) { const i = A.p.indexOf(h), j = slotB[h]; if (i !== j || A.fl[i] !== B.fl[j]) list.push(h); }
+    const mv = A.p.map((h, i) => { const k = list.indexOf(h); return k < 0 ? {t0: 1e9, dur: 1} : timing(i, slotB[h], k); });
+    const real = mv.filter(x => x.t0 < 1e8);
+    return {A, B, slotB, mv, start: real.length ? Math.min(...real.map(x => x.t0)) : 0, end: real.length ? Math.max(...real.map(x => x.t0 + x.dur)) : 0};
+  }
+  function ringTail(A, B, t0, stages, drawStart, drawOnly, quiet) {
+    // Same order as arrowsOf: the buffer's cycle, then the rest longest first, each from its lowest slot.
+    const cs = cyclesOf(B).filter(c => c.length > 1);
+    const ordered = cs.filter(c => c.includes(0)).concat(cs.filter(c => !c.includes(0)).sort((x, y) => y.length - x.length));
+    const step = [], orders = [];
+    ordered.forEach((c, ci) => { c.forEach((_, q) => step.push(q)); orders.push({nodes: c.concat([c[0]]), col: c.includes(0) ? 1 : Math.min(6, ci + (cs.some(x => x.includes(0)) ? 1 : 2))}); });
+    const longest = Math.max(1, ...ordered.map(c => c.length)), per = Math.min(0.34, 2.4 / longest);
+    return {t0, A, B, stages, tRet: 0.45, drawStart, per, step, orders, solo: ordered.length === 1 && ordered[0][0] === 0, drawOnly, quiet,
+      end: drawStart + per * longest + 0.25};
+  }
+  // One jump from A to B (drawOnly: nothing moves, the arrows are just traced in, e.g. the ring reappearing).
+  function makeRingAnim(A, B, t0, drawOnly) {
+    if (drawOnly) return ringTail(A, B, t0, [], 0.25, true, false);
+    const st = ringStage(A, B, (i, j, k) => ({t0: 0.3 + 0.05 * k, dur: 0.55 + 0.07 * Math.abs(Math.round(wrapPi((j - i) * Math.PI / 6) / (Math.PI / 6)))}));
+    return ringTail(A, B, t0, [st], Math.max(0.45, st.end) + 0.12, false, false);
+  }
+  // A face-turn sequence: the ring doesn't follow each turn; every piece makes one move from the old scramble to the new one,
+  // staggered so the whole rearrangement takes as long as the cube's turns.
+  function makeRingSpread(A, tp, t0) {
+    const B = tp.path.states[tp.to], total = entryTotal(tp), n = A.p.filter((h, i) => B.p.indexOf(h) !== i || A.fl[i] !== B.fl[B.p.indexOf(h)]).length;
+    const dur = Math.min(total, Math.max(0.35, total * 0.5)), stag = n > 1 ? (total - dur) / (n - 1) : 0;
+    return ringTail(A, B, t0, [ringStage(A, B, (i, j, k) => ({t0: k * stag, dur}))], total + 0.15, false, true);
+  }
+  const stageAt = (R, t) => { let st = R.stages[0]; for (const x of R.stages) if (x.start <= t) st = x; return st; };
+  // A traveling ring piece at progress u from slot i to slot j: straight across, rising toward you (bigger, with a shadow)
+  // and bowing a little aside, like a cube piece passing over the others.
+  function ringMove(i, j, u, G, ez = ease) {
+    const {cx, cy, RR, NR} = G, a0 = (-90 + 30 * i) * Math.PI / 180, a1 = (-90 + 30 * j) * Math.PI / 180;
+    const P = [cx + RR * Math.cos(a0), cy + RR * Math.sin(a0)], Q = [cx + RR * Math.cos(a1), cy + RR * Math.sin(a1)];
+    const e = ez(u), b = Math.sin(Math.PI * u), dx = Q[0] - P[0], dy = Q[1] - P[1], l = Math.hypot(dx, dy) || 1, bow = Math.min(NR * 1.4, l * 0.25);
+    return {x: P[0] + dx * e - dy / l * b * bow, y: P[1] + dy * e + dx / l * b * bow, sc: 1 + 0.45 * b, lift: b};
+  }
+  function ringCaption(R, t) {
+    if (R.quiet) return null;
+    if (t < R.drawStart) return R.drawOnly ? null : 'Moving the pieces to a new scramble';
+    if (!R.solo) return null;
+    const nodes = R.orders[0].nodes, done = clamp(Math.floor((t - R.drawStart) / R.per), 0, nodes.length - 1);
+    return 'From UR: ' + nodes.slice(1, done + 1).map(i => POS[i]).join(' → ') + (done ? '' : '…');
+  }
+
+  // Arrows and nodes for one state; drawn twice while cross-fading between states.
+  function drawStateLayer(L, alpha, G) {
+    if (!L || alpha < 0.01) return '';
+    const {pts, vis, m, cx, cy, NR} = G;
+    const R = L.ring && G.now - L.ring.t0 < L.ring.end ? L.ring : null, t = R ? G.now - R.t0 : 0;
+    const stg = R && R.stages.length ? stageAt(R, t) : null;
+    const s = stg ? stg.A : R ? R.A : L.state; // during R the nodes are drawn from the stage's old state and travel to their new slots
+    const focus = L.focus ? new Set(L.focus.map(n => IDX[n])) : null;
+    let out = `<g opacity="${alpha.toFixed(3)}">`;
+    const trimTo = (P, qx, qy, d) => { const vx = qx - P[0], vy = qy - P[1], l = Math.hypot(vx, vy) || 1; return [P[0] + vx / l * d, P[1] + vy / l * d]; };
+    if (L.tri != null) {
+      // A triangle whose sides bow outward; the lines never move, only the arrowheads turn around.
+      const rev = L.triVal || 0, ids = [...new Set(TRI_EDGES.flat())];
+      const gx = ids.reduce((t, i) => t + pts[i][0], 0) / 3, gy = ids.reduce((t, i) => t + pts[i][1], 0) / 3;
+      for (const [a, b] of TRI_EDGES) {
+        const A = pts[a], B = pts[b], len = Math.hypot(B[0] - A[0], B[1] - A[1]) || 1;
+        const mx = (A[0] + B[0]) / 2, my = (A[1] + B[1]) / 2, ol = Math.hypot(mx - gx, my - gy) || 1;
+        const qx = mx + (mx - gx) / ol * 0.12 * len, qy = my + (my - gy) / ol * 0.12 * len;
+        const Sp = trimTo(A, qx, qy, NR + 5), E = trimTo(B, qx, qy, NR + 5);
+        out += `<path d="M${Sp[0].toFixed(1)} ${Sp[1].toFixed(1)}Q${qx.toFixed(1)} ${qy.toFixed(1)} ${E[0].toFixed(1)} ${E[1].toFixed(1)}" style="fill: none; stroke: var(--c2)" stroke-width="2.6" stroke-linecap="round"/>`;
+        const sp = lerp(0.6, 0.4, rev), o = 1 - sp;
+        const px = o * o * Sp[0] + 2 * o * sp * qx + sp * sp * E[0], py = o * o * Sp[1] + 2 * o * sp * qy + sp * sp * E[1];
+        const tx = 2 * o * (qx - Sp[0]) + 2 * sp * (E[0] - qx), ty = 2 * o * (qy - Sp[1]) + 2 * sp * (E[1] - qy);
+        const ang = Math.atan2(ty, tx) + Math.PI * rev;
+        out += `<path d="M9 0L-6 6.5L-6 -6.5Z" transform="translate(${px.toFixed(1)} ${py.toFixed(1)}) rotate(${(ang * 180 / Math.PI).toFixed(1)})" style="fill: var(--c2); stroke: var(--stage)" stroke-width="1.5"/>`;
+      }
+    } else {
+      // Ring rearrangement (R): old arrows retract, pieces travel round the ring, then the new arrows draw in.
+      const src = R ? (t < R.drawStart ? R.A : R.B) : s;
+      let arr = [];
+      if (L.arrows === true) arr = arrowsOf(src);
+      else if (L.arrows === 'buffer') arr = arrowsOf(src, true);
+      else if (Array.isArray(L.arrows)) arr = L.arrows.map(([a, b]) => [IDX[a], IDX[b], 1]);
+      const drawK = !R ? null : t < R.drawStart ? (R.drawOnly ? () => 0 : n => 1 - ss((t - n * 0.03) / R.tRet))
+        : n => ss((t - R.drawStart - R.step[n] * R.per) / R.per);
+      const HL = lerp(13, 12, m), HW = lerp(5.6, 5.2, m), sw = lerp(3, 2.4, m), f1 = v => v.toFixed(1);
+      const Lp = (p, q, u) => [lerp(p[0], q[0], u), lerp(p[1], q[1], u)];
+      let lines = '', heads = '';
+      arrowGeo(arr, G).forEach((g, n) => {
+        const k = drawK ? drawK(n) : 1;
+        if (k < 0.01) return;
+        let {P0, c1, c2, P3} = g;
+        if (k < 0.999) { const q1 = Lp(P0, c1, k), q2 = Lp(c1, c2, k), q3 = Lp(c2, P3, k), r1 = Lp(q1, q2, k); [c1, c2, P3] = [q1, r1, Lp(r1, Lp(q2, q3, k), k)]; }
+        const op = lerp(0.25 + 0.75 * Math.min(vis[g.a], vis[g.b]), 1, m) * (focus && !(focus.has(g.a) && focus.has(g.b)) ? 0.25 : 1);
+        lines += `<path d="M${f1(P0[0])} ${f1(P0[1])}C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(P3[0])} ${f1(P3[1])}" style="fill: none; stroke: var(--c${g.col})" stroke-width="${sw}" stroke-linecap="round" opacity="${op.toFixed(2)}"/>`;
+        // The head sits halfway along the full curve, pointing along it; it grows in as the line passes.
+        const hs = k >= 0.999 ? 1 : ss((k - g.th + 0.08) / 0.16);
+        if (hs < 0.01) return;
+        heads += `<path d="M${HL / 2} 0L${-HL / 2} ${HW}L${-HL / 2} ${-HW}Z" transform="translate(${f1(g.hx)} ${f1(g.hy)}) rotate(${f1(g.ang * 180 / Math.PI)}) scale(${hs.toFixed(3)})" style="fill: var(--c${g.col}); stroke: var(--stage)" stroke-width="1.2" stroke-linejoin="round" opacity="${op.toFixed(2)}"/>`;
+      });
+      out += lines + heads;
+      if (R) for (const o of R.orders) o.nodes.forEach((sl, q) => { // a ripple on each slot as its cycle's trace reaches it
+        const d = t - (R.drawStart + q * R.per);
+        if (d < 0 || d > 0.6) return;
+        out += `<circle cx="${f1(pts[sl][0])}" cy="${f1(pts[sl][1])}" r="${f1(NR + 3 + 13 * ss(d / 0.6))}" style="fill: none; stroke: var(--c${o.col})" stroke-width="2" opacity="${(0.85 * (1 - d / 0.6)).toFixed(2)}"/>`;
+      });
+    }
+    let movers = '';
+    if (m > 0.02) for (let i = 0; i < 12; i++) {
+      let [x, y] = pts[i];
+      if (L.neutral) {
+        const on = focus && focus.has(i);
+        out += `<circle cx="${x}" cy="${y}" r="${NR}" style="fill: var(--panel); stroke: var(${on ? '--ink' : '--ink-3'})" stroke-width="${on ? 2 : 1.2}" opacity="${(m * (on ? 1 : 0.35)).toFixed(2)}"/>`;
+        continue;
+      }
+      const pc = POS[s.p[i]];
+      let fl = s.fl[i], hk = s.p[i] === i && !fl ? 0.5 : 1, sc = 1, lift = 0, moving = false;
+      if (stg && stg.mv[i].t0 < 1e8) {
+        const j = stg.slotB[s.p[i]], ul = clamp((t - stg.mv[i].t0) / stg.mv[i].dur);
+        if (ul > 0) {
+          const P = ringMove(i, j, ul, G, stg.mv[i].ez); x = P.x; y = P.y; sc = P.sc; lift = P.lift; moving = ul < 1;
+          if (ul > 0.5) fl = stg.B.fl[j];
+          hk = lerp(hk, stg.B.p[j] === j && !stg.B.fl[j] ? 0.5 : 1, ss(ul));
+        }
+      }
+      let top = FCOL[pc[0]], bot = FCOL[pc[1]]; if (fl) [top, bot] = [bot, top];
+      const op = m * (focus && !focus.has(i) ? 0.3 : 1) * hk, f1 = v => v.toFixed(1);
+      let node = lift > 0.02 ? `<circle cx="${f1(x + 2 * lift)}" cy="${f1(y + 5 * lift)}" r="${f1(NR * sc)}" style="fill: #000" opacity="${(0.22 * lift).toFixed(2)}"/>` : '';
+      node += `<g opacity="${op.toFixed(2)}" transform="translate(${f1(x)} ${f1(y)}) scale(${sc.toFixed(3)})"><path d="M${-NR} 0A${NR} ${NR} 0 0 1 ${NR} 0Z" style="fill: ${top}"/><path d="M${NR} 0A${NR} ${NR} 0 0 1 ${-NR} 0Z" style="fill: ${bot}"/><circle r="${NR}" style="fill: none; stroke: var(--ink)" stroke-width="1.4"/></g>`;
+      if (!R && s.p[i] === i && s.fl[i]) node += `<circle cx="${x}" cy="${y}" r="${NR + 5}" style="fill: none; stroke: var(--no)" stroke-width="1.6" stroke-dasharray="3 3" opacity="${m}"/>`;
+      if (moving) movers += node; else out += node; // traveling pieces pass over the rest
+    }
+    out += movers;
+    return out + '</g>';
+  }
+
+  // spec: this frame's slide. As: the slide whose glows and tags show (the previous one until the pieces land).
+  // snap: jump every fade straight to its target (used when the stage reappears).
+  function drawOverlay(spec, As, m, now, dt, snap) {
+    const cx = W / 2, cy = H / 2 + 6, RR = Math.min(W, H) * 0.3, NR = clamp(Math.min(W, H) * 0.042, 11, 19);
+    const pts = [], lps = [], vis = [];
+    for (let i = 0; i < 12; i++) {
+      const ang = (-90 + i * 30) * Math.PI / 180, ca = Math.cos(ang), sa = Math.sin(ang);
+      const rp = [cx + RR * ca, cy + RR * sa], rl = [cx + (RR + NR + 18) * ca, cy + (RR + NR + 18) * sa + 4];
+      let ap = rp, lp = rl, f = 1;
+      if (has3D && m < 0.999) { ap = proj(DIRS[i], 1.85); lp = proj(DIRS[i], 2.42); lp[1] += 4; f = facing(i); }
+      pts[i] = [lerp(ap[0], rp[0], m), lerp(ap[1], rp[1], m)];
+      lps[i] = [lerp(lp[0], rl[0], m), lerp(lp[1], rl[1], m)];
+      vis[i] = lerp(ss((f + 0.12) / 0.4), 1, m);
+    }
+    const G = {pts, vis, m, cx, cy, NR, RR, now};
+    const b2 = reduce || snap ? 1 : 1 - Math.exp(-dt * 8);
+    let out = '';
+    if (m > 0.01) out += `<circle cx="${cx}" cy="${cy}" r="${RR}" style="fill: none; stroke: var(--rule)" stroke-dasharray="2 6" opacity="${m}"/>`;
+    bufA += ((spec.buf ? 1 : 0) - bufA) * b2;
+    out += drawBuffer(G, bufA);
+    // slotMark: slot names, or 'near3' = the three edges nearest the camera (follows dragging).
+    const wantMark = new Array(12).fill(0);
+    if (spec.slotMark === 'near3' && has3D) { const z = POS.map((_, i) => spin.localToWorld(DIRS[i].clone().multiplyScalar(1.85)).z); [...z.keys()].sort((a, b) => z[b] - z[a]).slice(0, 3).forEach(i => { wantMark[i] = 1; }); }
+    else if (Array.isArray(spec.slotMark)) spec.slotMark.forEach(n => { wantMark[IDX[n]] = 1; });
+    for (let i = 0; i < 12; i++) { markA[i] += (wantMark[i] - markA[i]) * b2; if (markA[i] > 0.02) out += drawSlotMarks(G, [i], markA[i]); }
+    let G2 = null; // the front page's ring, beside the cube
+    if (splitK > 0.01) {
+      const g = splitGeo(), NR2 = clamp(g.RR * 0.13, 7, 13), p2 = [];
+      for (let i = 0; i < 12; i++) { const a = (-90 + i * 30) * Math.PI / 180; p2.push([g.rx + g.RR * Math.cos(a), g.ry + g.RR * Math.sin(a)]); }
+      G2 = {pts: p2, vis: new Array(12).fill(1), m: 1, cx: g.rx, cy: g.ry, NR: NR2, RR: g.RR, now};
+      out += `<circle cx="${g.rx}" cy="${g.ry}" r="${g.RR}" style="fill: none; stroke: var(--rule)" stroke-dasharray="2 6" opacity="${splitK.toFixed(3)}"/>` + drawBuffer(G2, bufA * splitK) +
+        p2.map(([x, y], k) => { const a = (-90 + k * 30) * Math.PI / 180, rl = g.RR + NR2 + 11;
+          return `<text x="${(g.rx + rl * Math.cos(a)).toFixed(1)}" y="${(g.ry + rl * Math.sin(a) + 4).toFixed(1)}" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" style="${slotHalo}" opacity="${splitK.toFixed(3)}">${slotName(POS[k])}</text>`; }).join('');
+    }
+    const tt = now - ovT0;
+    const prevA = ovPrev ? 1 - ss(tt / 0.3) : 0, curA = reduce ? 1 : ss((tt - ovDelay) / 0.4);
+    const kc = G2 ? 1 - splitK : 1; // on the front page only the ring carries arrows
+    out += drawStateLayer(ovPrev, prevA * kc, G) + drawStateLayer(ovCur, curA * kc, G);
+    if (G2) out += drawStateLayer(ovPrev, prevA * splitK, G2) + drawStateLayer(ovCur, curA * splitK, G2);
+    // Tracked pieces: a pink outline on the piece itself (like the buffer's), following it through every turn.
+    const trk = new Set((spec.track || []).map(n => IDX[n]));
+    for (let h = 0; h < 12; h++) {
+      trackA[h] += ((trk.has(h) ? 1 : 0) - trackA[h]) * b2;
+      if (trackA[h] < 0.02 || !has3D || m > 0.98) continue;
+      const atBuf = ss((edges[h].g.position.distanceTo(POSE[0][h][0].position) - 0.35) / 0.9); // 0 at UR: highlights never overlap
+      if (atBuf > 0.02) out += drawQuads(pieceQuads(h), MARK_PINK, trackA[h] * (1 - m) * atBuf);
+    }
+    const gset = new Set(As.glow.map(n => IDX[n])), gcol = {};
+    if (As.arrows === true) arrowsOf(As.state).forEach(([a, , c]) => { gcol[a] = c; }); // a glow takes its cycle's color
+    for (let i = 0; i < 12; i++) {
+      glowA[i] += ((gset.has(i) ? 1 : 0) - glowA[i]) * b2;
+      if (glowA[i] < 0.02) continue;
+      const [x, y] = pts[i], r = lerp(22, NR + 8, m) + (reduce ? 0 : 2.2 * Math.sin(now * 5));
+      out += `<circle cx="${x}" cy="${y}" r="${r.toFixed(1)}" style="fill: none; stroke: var(${gcol[i] ? '--c' + gcol[i] : As.glowCol || '--accent'})" stroke-width="2.5" opacity="${(0.9 * vis[i] * glowA[i]).toFixed(2)}"/>`;
+    }
+    const lset = new Set(As.labels === 'all' ? POS.map((_, i) => i) : As.labels.map(n => IDX[n]));
+    const focus = spec.focus ? new Set(spec.focus.map(n => IDX[n])) : null;
+    for (let i = 0; i < 12; i++) {
+      labA[i] += ((lset.has(i) ? 1 : 0) - labA[i]) * b2;
+      const v = spec.showHidden ? Math.max(vis[i], 0.35) : vis[i];
+      const op = labA[i] * v * (focus && !focus.has(i) ? 0.4 : 1);
+      if (op < 0.03) continue;
+      out += `<text x="${lps[i][0].toFixed(1)}" y="${lps[i][1].toFixed(1)}" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="13" font-weight="600" style="fill: var(--ink); ${halo}" opacity="${op.toFixed(2)}">${POS[i]}</text>`;
+    }
+    for (const tg of As.tags) { const k = tg.text + (tg.pos || tg.p3.join()); const e = tagMap.get(k) || {a: 0}; e.d = tg; e.seen = frameNo; tagMap.set(k, e); }
+    for (const [k, e] of tagMap) {
+      e.a += ((e.seen === frameNo ? 1 : 0) - e.a) * b2;
+      if (e.a < 0.02 && e.seen !== frameNo) { tagMap.delete(k); continue; }
+      const tg = e.d, tone = tg.tone || '--accent';
+      if (tg.pos) {
+        const i = IDX[tg.pos], x = lps[i][0], y = lps[i][1] - 18;
+        out += `<text x="${x}" y="${y}" text-anchor="middle" font-family="Bricolage Grotesque, system-ui, sans-serif" font-size="14" font-weight="700" style="fill: var(${tone}); ${halo}" opacity="${(e.a * vis[i]).toFixed(2)}">${T(tg.text)}</text>`;
+      } else if (has3D) {
+        const p = proj(new THREE.Vector3(tg.p3[0], tg.p3[1], tg.p3[2]), 1), op = (e.a * (1 - m)).toFixed(2), x = p[0] + 10, y = p[1] - 10;
+        out += `<g opacity="${op}"><circle cx="${p[0]}" cy="${p[1]}" r="4" style="fill: var(${tone}); stroke: var(--stage)" stroke-width="2"/><line x1="${p[0]}" y1="${p[1]}" x2="${x + 2}" y2="${y + 3}" style="stroke: var(${tone})" stroke-width="1.5"/><text x="${x + 4}" y="${y}" font-family="Bricolage Grotesque, system-ui, sans-serif" font-size="15" font-weight="700" style="fill: var(${tone}); ${halo}">${T(tg.text)}</text></g>`;
+      }
+    }
+    dyn.innerHTML = out;
+  }
+
+  // ---------------- chart ----------------
+  const C = (n, k) => { let r = 1; for (let i = 1; i <= k; i++) r = r * (n - k + i) / i; return Math.round(r); };
+  const Fct = n => { let r = 1; for (let i = 2; i <= n; i++) r *= i; return r; };
+  const rows = [];
+  for (let k = 2; k <= 12; k++) { const naive = C(12, k) * Fct(k - 1), full = naive * 2 ** (k - 1); rows.push({k, naive, full, pn: 100 * naive / Fct(12), pf: 100 * full / (Fct(12) * 2048)}); }
+  const fmtP = x => x >= 0.01 ? x.toFixed(2) + '%' : x < 0.0001 ? '< 0.0001%' : x.toFixed(4) + '%';
+  document.getElementById('ktable').innerHTML =
+    `<tr><td>0 (solved)</td><td>1</td><td>&lt; 0.0001%</td><td>1</td><td>&lt; 0.0001%</td></tr><tr><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>` +
+    rows.map(r => `<tr><td>${r.k}</td><td>${r.naive.toLocaleString()}</td><td>${fmtP(r.pn)}</td><td>${r.full.toLocaleString()}</td><td>${fmtP(r.pf)}</td></tr>`).join('') +
+    `<tr><td><strong>Total</strong></td><td>119,481,285</td><td><strong>24.94%</strong></td><td>141,233,271,861</td><td><strong>14.40%</strong></td></tr>`;
+
+  function axes(ymax, step, fmt, cats, catFmt) {
+    const Wc = 640, Hc = 330, ml = 44, mr = 6, mt = 24, mb = 34;
+    const y = v => mt + (Hc - mt - mb) * (1 - v / ymax), band = (Wc - ml - mr) / cats.length;
+    let s = '';
+    for (let g = 0; g <= ymax + 1e-9; g += step) s += `<line x1="${ml}" x2="${Wc - mr}" y1="${y(g)}" y2="${y(g)}" style="stroke: var(--rule)" stroke-width="${g === 0 ? 1.3 : 0.8}"/><text x="${ml - 8}" y="${y(g) + 4}" text-anchor="end" font-size="12" font-family="JetBrains Mono, monospace" style="fill: var(--ink-3)">${fmt(g)}</text>`;
+    cats.forEach((c, i) => { s += `<text x="${ml + band * (i + 0.5)}" y="${Hc - mb + 20}" text-anchor="middle" font-size="12.5" font-family="JetBrains Mono, monospace" style="fill: var(--ink-2)">${catFmt(c)}</text>`; });
+    return {y, band, ml, s};
+  }
+  const barD = (x, top, w, base) => { const hh = base - top, r = Math.min(4, Math.max(0, hh), w / 2); if (hh < 0.6) return `M${x} ${base}h${w}v-0.6h${-w}z`; return `M${x} ${base}V${top + r}Q${x} ${top} ${x + r} ${top}H${x + w - r}Q${x + w} ${top} ${x + w} ${top + r}V${base}Z`; };
+  (function buildChart() {
+    const data = rows.filter(r => r.k >= 6), svg = document.getElementById('chart-svg');
+    const A = axes(10, 2, g => g + '%', data.map(d => d.k), k => 'k=' + k);
+    let s = A.s; const bw = Math.min(28, A.band * 0.34);
+    data.forEach((d, i) => {
+      const cx = A.ml + A.band * (i + 0.5);
+      [[d.pn, 1, -1], [d.pf, 2, 1]].forEach(([v, ser, side]) => {
+        const x = side < 0 ? cx - 1 - bw : cx + 1;
+        s += `<path class="bar s${ser}" style="fill: var(--c${ser}); transition-delay: ${(i * 0.06 + (ser - 1) * 0.15).toFixed(2)}s" d="${barD(x, A.y(v), bw, A.y(0))}"><title>${ser === 1 ? 'Ignoring' : 'Counting'} flips, k = ${d.k}: ${fmtP(v)}</title></path>`;
+        if (d.k >= 9) s += `<text class="vlabel v${ser}" x="${x + bw / 2}" y="${A.y(v) - 6}" text-anchor="middle" font-size="11" font-family="JetBrains Mono, monospace" style="fill: var(--ink-2)">${v.toFixed(1)}</text>`;
+      });
+    });
+    svg.innerHTML = s;
+  })();
+
+  // ---------------- arrows out of UR (beside the 1/12 table) ----------------
+  // Build b: arrow b+1 is leaving the last slot of the demo's buffer cycle so far; dashed lines are the homes it could pick.
+  const FAN_PATH = ['UR', 'DF', 'FL', 'UB'].map(n => IDX[n]);
+  const FAN_NOTE = [
+    '<b>Arrow 1</b> leaves UR. All 12 homes are free: <b>1</b> (UR\'s own) closes the loop at length 1; the other <b>11</b> move on.',
+    '<b>Arrow 2</b> leaves DF. DF\'s home is taken, so 11 are free: <b>1</b> goes back to UR (length 2); <b>10</b> move on.',
+    '<b>Arrow 3</b> leaves FL. 10 homes are free: <b>1</b> goes back to UR (length 3); <b>9</b> move on.',
+    'Multiply along a row: each “moves on” numerator cancels the next denominator, so every length comes out at <b>1/12</b>. This loop closed on arrow 4.'];
+  function drawFan(b) {
+    const C = 150, R = 108, NRf = 10, P = i => { const a = (-90 + 30 * i) * Math.PI / 180; return [C + R * Math.cos(a), C + R * Math.sin(a)]; };
+    const done = b >= 3, path = FAN_PATH.slice(0, done ? 4 : b + 1), cur = path[path.length - 1], used = new Set(path.slice(1)), f1 = v => v.toFixed(1);
+    const seg = (a, c, trim) => { const A = P(a), B = P(c), dx = B[0] - A[0], dy = B[1] - A[1], l = Math.hypot(dx, dy) || 1; return [A[0] + dx / l * trim, A[1] + dy / l * trim, B[0] - dx / l * trim, B[1] - dy / l * trim, Math.atan2(dy, dx)]; };
+    const head = (x, y, ang, col) => `<path d="M0 0L-9 4.5L-9 -4.5Z" transform="translate(${f1(x)} ${f1(y)}) rotate(${f1(ang * 180 / Math.PI)})" style="fill: var(${col})"/>`;
+    let s = `<circle cx="${C}" cy="${C}" r="${R}" style="fill: none; stroke: var(--rule)" stroke-dasharray="2 5"/>`;
+    if (!done) for (let i = 0; i < 12; i++) {
+      if (used.has(i)) continue;
+      if (i === cur) { // UR pointing at itself: a little loop outward
+        const [x, y] = P(i); s += `<path d="M${x - 6} ${y - NRf - 1}C${x - 22} ${y - 44} ${x + 22} ${y - 44} ${x + 6} ${y - NRf - 1}" style="fill: none; stroke: var(--c1)" stroke-width="2.2"/>` + head(x + 6, y - NRf - 1, Math.PI * 0.42, '--c1');
+        continue;
+      }
+      const [x1, y1, x2, y2, ang] = seg(cur, i, NRf + 3), back = i === 0;
+      s += `<line x1="${f1(x1)}" y1="${f1(y1)}" x2="${f1(x2)}" y2="${f1(y2)}" style="stroke: var(${back ? '--c1' : '--ink-3'})" stroke-width="${back ? 2.2 : 1.2}" ${back ? '' : 'stroke-dasharray="4 4" opacity="0.75"'}/>` + (back ? head(x2, y2, ang, '--c1') : '');
+    }
+    const hops = path.slice(1).map((n, k) => [path[k], n]); if (done) hops.push([path[3], 0]);
+    for (const [a, c] of hops) { const [x1, y1, x2, y2, ang] = seg(a, c, NRf + 3); s += `<line x1="${f1(x1)}" y1="${f1(y1)}" x2="${f1(x2)}" y2="${f1(y2)}" style="stroke: var(--accent)" stroke-width="2.6"/>` + head(x2, y2, ang, '--accent'); }
+    for (let i = 0; i < 12; i++) {
+      const [x, y] = P(i), on = path.includes(i), a = (-90 + 30 * i) * Math.PI / 180;
+      s += `<circle cx="${f1(x)}" cy="${f1(y)}" r="${NRf}" style="fill: ${on ? 'var(--accent)' : 'var(--panel)'}; stroke: var(${i === cur && !done ? '--ink' : on ? '--accent' : '--ink-3'})" stroke-width="${i === cur && !done ? 2.2 : 1.2}" opacity="${on || !used.has(i) ? 1 : 0.4}"/>`;
+      s += `<text x="${f1(C + (R + 24) * Math.cos(a))}" y="${f1(C + (R + 24) * Math.sin(a) + 4)}" text-anchor="middle" font-size="11" font-weight="${i === 0 ? 700 : 400}" font-family="JetBrains Mono, monospace" style="fill: var(${i === 0 ? '--ink' : '--ink-3'})">${POS[i]}</text>`;
+    }
+    document.getElementById('fan-svg').innerHTML = s;
+    document.getElementById('fan-note').innerHTML = T(FAN_NOTE[b]);
+  }
+
+  // ---------------- histogram + lab sampling ----------------
+  const P = new Int8Array(12), FLA = new Int8Array(12), SEEN = new Uint8Array(12);
+  function sample() {
+    for (let i = 0; i < 12; i++) P[i] = i;
+    for (let i = 11; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0, tmp = P[i]; P[i] = P[j]; P[j] = tmp; }
+    let par = 0; for (let i = 0; i < 11; i++) { FLA[i] = Math.random() < 0.5 ? 1 : 0; par ^= FLA[i]; } FLA[11] = par;
+  }
+  function classify() {
+    SEEN.fill(0); let bufLen = 0, j = 0;
+    do { SEEN[j] = 1; bufLen++; j = P[j]; } while (j !== 0);
+    let others = 0, flipOut = 0, misplaced = 0;
+    for (let i = 0; i < 12; i++) if (P[i] !== i) misplaced++;
+    for (let i = 1; i < 12; i++) {
+      if (SEEN[i]) continue; let L = 0, k = i;
+      while (!SEEN[k]) { SEEN[k] = 1; L++; k = P[k]; }
+      if (L > 1) others++; else if (FLA[i]) flipOut++;
+    }
+    const flipFixed = flipOut + (bufLen === 1 && FLA[0] ? 1 : 0);
+    const mathNaive = others + (bufLen > 1 ? 1 : 0) <= 1;
+    const cuberNaive = others === 0 && misplaced > 0;
+    return {bufLen, r: [mathNaive, mathNaive && flipFixed === 0, cuberNaive, cuberNaive && flipOut === 0]};
+  }
+  const MILLION = 1000000;
+  const hist = new Array(12).fill(0); let histN = 0, histCap = MILLION;
+  const histSvg = document.getElementById('hist-svg');
+  // A short strip: 12 bars (cycle length 1–12) against the 1/12 line, 0–15%.
+  const HS = {l: 6, r: 634, top: 10, base: 88}, hsY = v => HS.base - (HS.base - HS.top) * Math.min(15, v) / 15, hsBand = (HS.r - HS.l) / 12;
+  histSvg.innerHTML = [...Array(12).keys()].map(i => `<path id="hb${i}" style="fill: var(--c1)"/><text x="${HS.l + hsBand * (i + 0.5)}" y="${HS.base + 18}" text-anchor="middle" font-size="12" font-family="JetBrains Mono, monospace" style="fill: var(--ink-3)">${i + 1}</text>`).join('') +
+    `<line x1="${HS.l}" x2="${HS.r}" y1="${HS.base}" y2="${HS.base}" style="stroke: var(--rule)"/>` +
+    `<line x1="${HS.l}" x2="${HS.r}" y1="${hsY(100 / 12)}" y2="${hsY(100 / 12)}" style="stroke: var(--ink)" stroke-width="1.4" stroke-dasharray="6 4"/>` +
+    `<text x="${HS.r}" y="${hsY(100 / 12) - 6}" text-anchor="end" font-size="12" font-family="JetBrains Mono, monospace" style="fill: var(--ink); ${halo}">1/12</text>`;
+  const hbars = [...Array(12).keys()].map(i => document.getElementById('hb' + i));
+  const histCount = document.getElementById('hist-count'), histMore = document.getElementById('hist-more');
+  histMore.addEventListener('click', () => { histCap += MILLION; histMore.hidden = true; });
+  function stepHist() {
+    if (histN >= histCap) return;
+    const n = Math.min(4000, histCap - histN);
+    for (let i = 0; i < n; i++) { sample(); hist[classify().bufLen - 1]++; }
+    histN += n;
+    const bw = hsBand * 0.62;
+    hbars.forEach((b, i) => { const v = 100 * hist[i] / histN, x = HS.l + hsBand * (i + 0.5) - bw / 2; b.setAttribute('d', barD(x, hsY(v), bw, HS.base)); });
+    const done = histN >= histCap;
+    histCount.textContent = `${histN.toLocaleString()} scrambles${done ? ' · stopped' : ''}`;
+    histMore.hidden = !done;
+  }
+  const labHits = [0, 0, 0, 0]; let labN = 0, labCap = MILLION;
+  const simEls = [0, 1, 2, 3].map(i => document.getElementById('sim' + i)), fillEls = [0, 1, 2, 3].map(i => document.getElementById('fill' + i));
+  const labCount = document.getElementById('lab-count'), labMore = document.getElementById('lab-more');
+  labMore.addEventListener('click', () => { labCap += MILLION; labMore.hidden = true; });
+  function stepLab() {
+    if (labN >= labCap) return;
+    const n = Math.min(3000, labCap - labN);
+    for (let k = 0; k < n; k++) { sample(); const r = classify().r; for (let i = 0; i < 4; i++) labHits[i] += r[i]; }
+    labN += n;
+    for (let i = 0; i < 4; i++) { const v = 100 * labHits[i] / labN; simEls[i].textContent = v.toFixed(2) + '%'; fillEls[i].style.width = clamp(v / 30) * 100 + '%'; }
+    const done = labN >= labCap;
+    labCount.textContent = `${labN.toLocaleString()} scrambles${done ? ' · stopped' : ''}`;
+    labMore.hidden = !done;
+  }
+
+
+  // ---------------- drag to turn ----------------
+  let drag = null, dragOff = {x: 0, y: 0}, lastDrag = -10;
+  stageEl.addEventListener('pointerdown', e => { if (e.target.closest('button')) return; drag = {x: e.clientX, y: e.clientY, ox: dragOff.x, oy: dragOff.y}; });
+  window.addEventListener('pointermove', e => {
+    if (!drag) return;
+    dragOff.y = drag.oy + (e.clientX - drag.x) * 0.01;
+    dragOff.x = clamp(drag.ox + (e.clientY - drag.y) * 0.008, -0.9, 0.9);
+    lastDrag = performance.now() / 1000;
+  });
+  window.addEventListener('pointerup', () => { drag = null; });
+  window.addEventListener('pointercancel', () => { drag = null; });
+
+
+  // ---------------- slide navigation ----------------
+  const stepEls = [...document.querySelectorAll('.step')];
+  const nOf = el => (S[el.dataset.scene] || {n: 1}).n;
+  stepEls.forEach(el => { const n = nOf(el); el.classList.toggle('tall', n > 1); el.style.setProperty('--n', n); });
+  const stops = [];
+  stepEls.forEach((el, i) => { for (let b = 0; b < nOf(el); b++) stops.push({i, b}); });
+  stops.push({i: stepEls.length, b: 0});
+  const afterEl = document.getElementById('after');
+  const segsEl = document.getElementById('segs');
+  stepEls.forEach((s, i) => {
+    const b = document.createElement('button'); b.className = 'seg';
+    const h = s.querySelector('h1, h2'); b.setAttribute('aria-label', `Go to slide ${i + 1}: ${h ? h.textContent : ''}`); b.title = h ? h.textContent : '';
+    b.addEventListener('click', () => { backRun = false; goStop(stops.findIndex(x => x.i === i)); }); segsEl.appendChild(b);
+  });
+  const segEls = [...segsEl.children];
+  const slideNo = document.getElementById('slideno'), pipBar = document.getElementById('pipbar');
+  const readLine = () => innerWidth <= 900 ? innerHeight * 0.76 : innerHeight * 0.5;
+  function stopY(st) {
+    if (st.i >= stepEls.length) return afterEl.getBoundingClientRect().top + scrollY - 24;
+    const el = stepEls[st.i], r = el.getBoundingClientRect(), n = nOf(el);
+    return r.top + scrollY + ((st.b + 0.5) / n) * r.height - readLine();
+  }
+  let glide = null, activeIdx = 0, activeBuild = 0;
+  // A press moves the stage to the target stop at once while the text glides there (gentle sine ease).
+  function goStop(k) {
+    k = clamp(k, 0, stops.length - 1);
+    const target = Math.max(0, stopY(stops[k])), start = scrollY, dist = Math.abs(target - start);
+    if (dist < 2) { glide = null; return; }
+    const dur = reduce ? 0.01 : clamp(0.6 + dist / innerHeight * 0.6, 0.9, 1.6);
+    glide = {start, target, t0: performance.now() / 1000, dur, k};
+  }
+  const curStop = () => glide ? glide.k : Math.max(0, stops.findIndex(x => x.i === activeIdx && x.b === activeBuild));
+  // After one ←, further ← presses skip builds: each lands on the previous slide's last build.
+  let backRun = false;
+  const cancelGlide = () => { glide = null; backRun = false; };
+  window.addEventListener('wheel', cancelGlide, {passive: true});
+  window.addEventListener('touchstart', e => { if (!e.target.closest('button')) cancelGlide(); }, {passive: true});
+  const pressKey = id => { const k = document.getElementById(id); k.classList.add('press'); setTimeout(() => k.classList.remove('press'), 140); };
+  const hideHint = () => {};
+  // Chapters: jump to the start of each part from anywhere.
+  const CHAPTERS = [["Blindfolded Rubik's Cubing", 'hero'], ['The Question', 'ring'], ['The Answer', 'uniform'], ['My First Attempt', 'attempt']];
+  const chapEl = document.getElementById('chapters');
+  const chapStart = CHAPTERS.map(([, sc]) => stepEls.findIndex(el => el.dataset.scene === sc));
+  const chapBtns = CHAPTERS.map(([name], c) => {
+    const b = document.createElement('button'); b.className = 'chapter'; b.textContent = T(name);
+    b.addEventListener('click', () => { backRun = false; goStop(stops.findIndex(x => x.i === chapStart[c])); b.blur(); });
+    chapEl.appendChild(b); return b;
+  });
+  const next = () => { backRun = false; goStop(curStop() + 1); hideHint(); };
+  const prev = () => {
+    const c = curStop(), i = stops[c].i;
+    goStop(backRun && i < stepEls.length ? stops.findIndex(x => x.i === i) - 1 : c - 1);
+    backRun = true; hideHint();
+  };
+  document.getElementById('k-next').addEventListener('click', next);
+  document.getElementById('k-prev').addEventListener('click', prev);
+  window.addEventListener('keydown', e => {
+    if (e.metaKey || e.ctrlKey || e.altKey || e.target.closest('input, textarea, select, [contenteditable]')) return;
+    if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); next(); pressKey('k-next'); }
+    else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); prev(); pressKey('k-prev'); }
+  });
+
+  // ---------------- main loop ----------------
+  const layers = {cube: 'L-cube', chart: 'L-chart', cancel: 'L-cancel', lab: 'L-lab'};
+  for (const k in layers) layers[k] = document.getElementById(layers[k]);
+  const capEl = document.getElementById('cap'), tallyEl = document.getElementById('tally');
+  let heroSession = null, heroCounted = null;
+  let tallyKey = null, curFan = null; const cornerColA = new Array(8).fill(0);
+  let active = 'hero', enterT = 0, lastT = 0, curLayer = 'cube', curCap = null, curMode = 0, curSlide = '';
+  const cur = {rx: V0.rx, ry: V0.ry, m: has3D ? 0 : 1};
+  let mFrom = cur.m, mTo = cur.m, mT0 = 0;
+  let spinOff = 0, animKey = key(SOLVED), prevState = SOLVED, prevVia = null;
+  const XF_OUT = 0.35, XF_IN = 0.45; // cube ↔ ring cross-fade: out, then in (seconds)
+  let xf = null, lastSpec = null, annoPrev = Object.assign({}, DEF);
+  const flat = L => L && L.arrows === true && !L.neutral && L.tri == null; // a ring view whose arrows can be traced
+
+  function frame(ms) {
+    const now = ms / 1000, dt = Math.min(0.05, lastT ? now - lastT : 0.016); lastT = now; frameNo++;
+    if (glide) {
+      const u = clamp((now - glide.t0) / glide.dur);
+      window.scrollTo(0, lerp(glide.start, glide.target, (1 - Math.cos(Math.PI * u)) / 2));
+    }
+    const line = readLine(), gs = glide && stops[glide.k];
+    if (glide && clamp((now - glide.t0) / glide.dur) >= 1) glide = null;
+    if (gs && gs.i < stepEls.length) { // gliding: the stage is already at the target stop
+      const sc = stepEls[gs.i].dataset.scene;
+      if (sc !== active) { active = sc; enterT = now; }
+      activeIdx = gs.i; activeBuild = gs.b;
+    } else for (let i = 0; i < stepEls.length; i++) {
+      const s = stepEls[i], r = s.getBoundingClientRect();
+      if (r.top <= line && r.bottom > line) {
+        if (s.dataset.scene !== active) { active = s.dataset.scene; enterT = now; }
+        const n = nOf(s);
+        activeIdx = i; activeBuild = clamp(Math.floor((line - r.top) / r.height * n), 0, n - 1);
+        break;
+      }
+    }
+    const nAct = S[active].n, sk = activeIdx + '/' + activeBuild;
+    if (sk !== curSlide) {
+      curSlide = sk;
+      segEls.forEach((b, i) => { b.classList.toggle('done', i < activeIdx); b.classList.toggle('cur', i === activeIdx); });
+      stepEls.forEach((el, i) => el.classList.toggle('cur', i === activeIdx));
+      const ch = chapStart.filter(x => x <= activeIdx).length - 1;
+      chapBtns.forEach((b, c) => b.setAttribute('aria-current', String(c === ch)));
+      slideNo.innerHTML = `<span><b>${activeIdx + 1}</b> / ${stepEls.length}</span>`;
+      pipBar.innerHTML = nAct > 1 ? `<span class="pips">${[...Array(nAct).keys()].map(j => `<i class="pip${j <= activeBuild ? ' on' : ''}"></i>`).join('')}</span>` : '';
+    }
+    if (active === 'hero' && heroSession !== enterT) { heroSession = enterT; if (frameNo > 1) newHeroChain(); }
+    const spec = Object.assign({}, DEF, S[active].f(activeBuild, now - enterT));
+    if (spec.heroDone != null && heroCounted !== enterT + ':' + spec.heroDone) { heroCounted = enterT + ':' + spec.heroDone; tallyAdd(HERO_INFO[spec.heroDone % HERO_SEQ.length]); }
+    const onCube = spec.layer === 'cube', entering = onCube && curLayer !== 'cube';
+    if (spec.layer !== curLayer) { layers[curLayer].classList.remove('on'); layers[spec.layer].classList.add('on'); curLayer = spec.layer; }
+    if (spec.chartMode !== curMode) { layers.chart.classList.toggle('mode2', spec.chartMode === 2); curMode = spec.chartMode; }
+
+    // Stage motion rules:
+    // - While another layer (chart, table…) is up, the cube stage is frozen exactly as it left.
+    // - When the cube stage comes back, everything snaps to the new slide before it fades in (no replayed scramble).
+    // - Cube ↔ ring with a different state: fade out in place (xf), snap, fade back in. Same state: the unfold morph.
+    const a = reduce ? 1 : 1 - Math.exp(-dt * 6);
+    const mt = has3D ? spec.morph : 1;
+    let snap = false;
+    if (onCube) {
+      if (entering) { xf = null; snap = true; }
+      else if (!xf && !reduce && mt !== mTo && key(spec.state) !== key(prevState)) xf = {t0: now, done: false};
+      else if (!xf && !reduce && has3D && mTo === 0 && cur.m < 0.01 && key(spec.state) !== key(prevState) && !spec.poses && !spec.fly && !lastSpec?.poses
+        && !TURNS[key(prevState) + '>' + key(spec.state)] && !(anim && anim.path && anim.path.states.some(x => key(x) === key(spec.state)))
+        && !((spec.via === 'swaps' || prevVia === 'swaps') && (PATHS[key(prevState) + '>' + key(spec.state)] || (anim && anim.to)))) xf = {t0: now, done: false};
+      if (reduce && mt !== mTo) snap = true;
+      if (xf && !xf.done && now - xf.t0 >= XF_OUT) { xf.done = true; snap = true; }
+    } else xf = null;
+    const holding = onCube && xf && !xf.done;
+    let fadeK = 1;
+    if (xf) { const t = now - xf.t0; fadeK = xf.done ? ss((t - XF_OUT) / XF_IN) : 1 - ss(t / XF_OUT); if (xf.done && t > XF_OUT + XF_IN) xf = null; }
+    if (snap) { mFrom = mTo = cur.m = mt; cur.rx = spec.view.rx; cur.ry = spec.view.ry + spinOff; }
+
+    if (onCube && !holding) {
+      if (mt !== mTo) { mFrom = cur.m; mTo = mt; mT0 = now; }
+      cur.m = reduce ? mTo : lerp(mFrom, mTo, ease(clamp((now - mT0) / 1.1)));
+      const sk = spec.split ? 1 : 0, nk = snap || reduce || frameNo < 3 ? sk : splitK + (sk - splitK) * (1 - Math.exp(-dt * 3.5));
+      if (Math.abs(nk - splitK) > 1e-4 || (nk !== splitK)) { splitK = Math.abs(nk - sk) < 1e-3 ? sk : nk; applySplit(); }
+      if (spec.spin && !reduce) spinOff = wrapPi(spinOff + dt * 0.35); else spinOff *= reduce ? 0 : 0.96;
+      cur.rx += (spec.view.rx - cur.rx) * a;
+      cur.ry += wrapPi(spec.view.ry + spinOff - cur.ry) * a;
+      if (has3D) {
+        if (snap) setCubies(spec.cornerSet || 'home'); // corners follow every face turn physically; they're only reset when the cube snaps
+        if (snap || (mTo === 1 && cur.m > 0.8)) { // cube out of sight: go straight to the target
+          anim = null; animCap = null; setPoses(spec.poses || posesOf(spec.state)); animKey = spec.poses ? null : key(spec.state);
+        } else if (spec.poses) { anim = null; animKey = null; followTo(spec.poses, dt); }
+        else {
+          const k = key(spec.state);
+          if (k !== animKey) { startTransition(prevState, spec.state, spec.via === 'swaps' || prevVia === 'swaps', now); animKey = k; if (reduce) setCubies(spec.cornerSet); } // reduced motion: no turns, so the corners jump too
+          let Pz = anim ? animPoses(now) : null;
+          if (anim && !Pz) {
+            let landed = anim.to; anim = null; animCap = null;
+            while (pend && landed && !anim) { // play the queued hops one after another
+              const hops = pend, nx = hops[0]; setPoses(posesOf(landed));
+              startTransition(landed, nx, !!PATHS[key(landed) + '>' + key(nx)], now); pend = hops.length > 1 ? hops.slice(1) : null;
+              if (!anim) landed = nx;
+            }
+            if (anim) Pz = animPoses(now);
+          }
+          if (Pz) setPoses(Pz); else followTo(posesOf(spec.state), dt);
+        }
+      }
+      prevState = spec.state; prevVia = spec.via;
+      const ok = ovKey(spec);
+      if (snap) {
+        ovPrev = null; ovT0 = now; ovDelay = -1; annoPrev = spec;
+        const ring = !reduce && mt === 1 && flat(spec) ? makeRingAnim(spec.state, spec.state, now, true) : null; // the ring fades back in: trace its cycles
+        ovCur = {key: ok, state: spec.state, arrows: spec.arrows, focus: spec.focus, neutral: spec.neutral, tri: spec.tri, ring};
+      } else if (!ovCur || ok !== ovCur.key) {
+        // On the flat ring a change of scramble is choreographed (makeRingAnim) instead of cross-faded.
+        const ring = !reduce && flat(ovCur) && flat(spec) && key(spec.state) !== key(ovCur.state) && (spec.split || (cur.m > 0.99 && mTo === 1))
+          ? (spec.split && TURNS[key(ovCur.state) + '>' + key(spec.state)] ? makeRingSpread(ovCur.state, TURNS[key(ovCur.state) + '>' + key(spec.state)], now)
+            : makeRingAnim(ovCur.state, spec.state, now)) : null;
+        ovPrev = ring ? null : ovCur; ovT0 = now; annoPrev = lastSpec || spec;
+        ovDelay = ring ? -1 : (!spec.poses && anim && cur.m < 0.5) ? Math.max(0, animLeft(now) - 0.3) : 0;
+        ovCur = {key: ok, state: spec.state, arrows: spec.arrows, focus: spec.focus, neutral: spec.neutral, tri: spec.tri, ring};
+      }
+      ovCur.triVal = spec.tri || 0;
+    }
+    if (!drag && now - lastDrag > 1.6) { dragOff.x *= 0.95; dragOff.y = wrapPi(dragOff.y) * 0.95; }
+    // Glows and tags of the new slide wait until its pieces have landed.
+    // During a ring rearrangement they wait until it ends.
+    const RA = onCube && ovCur && ovCur.ring && now - ovCur.ring.t0 < ovCur.ring.end ? ovCur.ring : null;
+    // While a slide's face turns play, the overlay is cleared (labels, tags, glows); it comes back when they land.
+    const turning = onCube && anim && anim.path && !spec.split;
+    const As = turning ? Object.assign({}, spec, {glow: [], tags: [], labels: []}) : RA ? Object.assign({}, spec, {glow: [], tags: []}) : now - ovT0 >= ovDelay ? spec : annoPrev;
+
+    const tk = onCube && spec.tally ? JSON.stringify(spec.tally) : '';
+    if (tk !== tallyKey) {
+      tallyKey = tk; tallyEl.hidden = !tk;
+      if (tk) {
+        const {c, n, now: nw} = spec.tally, pct = x => n ? Math.round(100 * x / n) + '%' : '–', lab = ['1 cycle', '2 cycles', '3 cycles', '4 or more'];
+        if (!tallyEl.firstChild) tallyEl.innerHTML = `<div class="tb-head"><span>${T('Running tally')}</span><span class="tb-n"></span></div><div class="tb-bar">` +
+          lab.map((l, k) => `<div class="tb-seg" style="background: var(--c${k + 1})"><span></span></div>`).join('') + `</div><div class="tb-key">` +
+          lab.map((l, k) => `<span><i style="background: var(--c${k + 1})"></i>${T(l)}</span>`).join('') + `</div><div class="tb-foot"><span class="tb-nb"></span><span>${T('exact 22.65%')}</span></div>`;
+        tallyEl.querySelector('.tb-n').innerHTML = `<b>${n}</b> ${T(n === 1 ? 'scramble' : 'scrambles')}`;
+        tallyEl.querySelectorAll('.tb-seg').forEach((el, k) => {
+          const share = n ? c[k] / n : 0;
+          el.style.flexBasis = (100 * share).toFixed(2) + '%'; el.classList.toggle('now', !!nw && Math.min(4, nw) === k + 1);
+          el.firstChild.textContent = share >= 0.1 ? pct(c[k]) : '';
+          el.title = `${lab[k]}: ${c[k]} of ${n} (${pct(c[k])})`;
+        });
+        tallyEl.querySelector('.tb-nb').innerHTML = `${T('no cycle break')}: <b>${c[4]}</b> (${pct(c[4])})`;
+      }
+    }
+    if (spec.layer === 'cancel' && spec.fan !== curFan) { curFan = spec.fan; layers.cancel.dataset.b = curFan; drawFan(curFan); }
+    const cap = onCube ? (animCap || (RA && ringCaption(RA, now - RA.t0)) || spec.caption) : '';
+    if (cap !== curCap && document.activeElement !== capEl) { capEl.textContent = T(cap); curCap = cap; }
+
+    if (curLayer === 'cube') {
+      if (has3D && !holding) {
+        tilt.rotation.x = cur.rx + dragOff.x; spin.rotation.y = cur.ry + dragOff.y;
+        const pieceAt = spec.state.p;
+        const glowP = new Set(As.glow.map(n => pieceAt[IDX[n]]));
+        const focusP = spec.focus ? new Set(spec.focus.map(n => pieceAt[IDX[n]])) : null;
+        const trackP = new Set((spec.track || []).map(n => IDX[n])); // pieces (by home) highlighted wherever they go, turns included
+        const pulse = reduce ? 0.18 : 0.13 + 0.09 * Math.sin(now * 5), ka = snap ? 1 : a;
+        edges.forEach((e, h) => {
+          e.glow += ((spec.glowEdges ? 0.6 : glowP.has(h) ? 1 : 0) - e.glow) * ka;
+          const homeDim = spec.dimHome && spec.dimHome.p[h] === h && !spec.dimHome.fl[h] ? 0.6 : 0; // front page: edges at home are dimmed, like home nodes on the ring
+          e.dim += ((focusP && !focusP.has(h) && !trackP.has(h) ? 1 : homeDim) - e.dim) * ka;
+          e.mats.forEach(({m, base, dimC}) => { m.color.copy(base).lerp(dimC, e.dim); m.roughness = lerp(0.35, 0.7, e.dim); m.emissive.copy(base).multiplyScalar(e.glow * pulse * (1 - e.dim)); });
+        });
+        if (!anim) turnNow = null;
+        // cornerCol: 0/1 for all corners, or a list of corner indices to color.
+        for (let c = 0; c < 8; c++) cornerColA[c] += ((Array.isArray(spec.cornerCol) ? +spec.cornerCol.includes(c) : spec.cornerCol) - cornerColA[c]) * (snap ? 1 : a);
+        cornerMats.forEach(({m, ci, base, gray}) => { m.color.copy(gray).lerp(base, cornerColA[ci]); m.roughness = lerp(0.7, 0.35, cornerColA[ci]); });
+        placeCubies();
+        scene.updateMatrixWorld();
+        if (cur.m < 0.995) renderer.render(scene, camera);
+      }
+      if (has3D) canvas.style.opacity = (clamp(1 - cur.m * 1.25) * fadeK).toFixed(3);
+      ov.style.opacity = fadeK.toFixed(3);
+      if (!holding) drawOverlay(spec, As, has3D ? cur.m : 1, now, dt, snap);
+    } else if (curLayer === 'cancel') stepHist();
+    else if (curLayer === 'lab') stepLab();
+    lastSpec = spec;
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  // ---------------- text editor ----------------
+  let publishTX = async (next, setMsg) => setMsg('Saving needs the artifact page.'); // replaced once the artifact capability answers
+  // Owner/editors only (needs the artifact capability). Save regenerates the page with the new #sc-text and republishes it.
+  (function editor() {
+    const bar = document.getElementById('editbar'), tools = bar.querySelector('.ed-tools'), msg = document.getElementById('ed-msg');
+    const toggle = document.getElementById('ed-toggle'), panel = document.getElementById('edpanel'), list = document.getElementById('ed-list');
+    let artifact = null, editing = false;
+    // Collect every stage string: run each slide's spec over its builds and a few moments, plus the swap captions.
+    for (const sc in S) for (let b = 0; b < S[sc].n; b++) for (const el of [0, 1, 2, 3, 5, 8, 12]) {
+      const sp = S[sc].f(b, el); if (sp.caption) T(sp.caption); (sp.tags || []).forEach(tg => T(tg.text));
+    }
+    for (const k in PATHS) PATHS[k].forEach(g => g.cap && T(g.cap));
+    T('Moving the pieces to a new scramble'); T('Scrambling…'); FAN_NOTE.forEach(T); ['Running tally', 'scramble', 'scrambles', '1 cycle', '2 cycles', '3 cycles', '4 or more', 'no cycle break', 'exact 22.65%'].forEach(T);
+    const setMsg = t => { msg.textContent = t; };
+    function start() {
+      editing = true; document.body.classList.add('editing'); toggle.hidden = true; tools.hidden = false; setMsg('Click any text to edit it.');
+      textEls.forEach(el => { el.contentEditable = 'true'; el.spellcheck = true; });
+    }
+    function stop(revert) {
+      editing = false; document.body.classList.remove('editing'); toggle.hidden = false; tools.hidden = true; panel.hidden = true;
+      textEls.forEach(el => { el.removeAttribute('contenteditable'); if (revert) { const k = el.dataset.tk; el.innerHTML = TX[k] != null ? TX[k] : el.dataset.orig; } });
+    }
+    function fillPanel() {
+      list.innerHTML = '';
+      [...STAGE_TX].sort().forEach(str => {
+        const inp = document.createElement('input'), k = 't' + hash(str);
+        inp.value = TX[k] != null ? TX[k] : str; inp.dataset.k = k; inp.dataset.orig = str; inp.title = str;
+        inp.addEventListener('input', () => inp.classList.toggle('changed', inp.value !== str));
+        inp.classList.toggle('changed', inp.value !== str);
+        list.appendChild(inp);
+      });
+    }
+    async function save() {
+      const next = Object.assign({}, TX);
+      textEls.forEach(el => { const k = el.dataset.tk; if (el.innerHTML === el.dataset.orig) delete next[k]; else next[k] = el.innerHTML; });
+      list.querySelectorAll('input').forEach(inp => { if (inp.value === inp.dataset.orig) delete next[inp.dataset.k]; else next[inp.dataset.k] = inp.value; });
+      return publishTX(next, setMsg);
+    }
+    publishTX = async (next, setMsg) => {
+      if (!artifact) { setMsg('Saving needs the artifact page.'); return; }
+      const json = JSON.stringify(next).replace(/</g, '\\u003c');
+      const body = SRC.replace(/(<script type="application\/json" id="sc-text">)[\s\S]*?(<\/script>)/, (m, a, b) => a + json + b);
+      const doc = '<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>\n' + body + '</body></html>';
+      setMsg('Saving…');
+      try { await artifact.publish(doc); setMsg('Saved'); }
+      catch (e) { setMsg(e && e.code === 'conflict' ? 'Someone saved first; reloading their version.' : 'Could not save (' + ((e && (e.code || e.message)) || 'error') + ').'); }
+    };
+    toggle.addEventListener('click', start);
+    document.getElementById('ed-cancel').addEventListener('click', () => stop(true));
+    document.getElementById('ed-save').addEventListener('click', save);
+    document.getElementById('ed-stage').addEventListener('click', () => { panel.hidden = !panel.hidden; if (!panel.hidden) fillPanel(); });
+    document.getElementById('ed-close').addEventListener('click', () => { panel.hidden = true; });
+    document.addEventListener('click', e => { if (editing && e.target.closest('[data-tk] a, a[data-tk]')) e.preventDefault(); }, true); // links don't navigate while editing
+    (async () => {
+      if (!window.claude || !window.claude.use) return;
+      artifact = await window.claude.use('artifact');
+      if (!artifact) return;
+      const user = await window.claude.use('user');
+      if (user && user.canEdit && !(await user.canEdit())) return;
+      bar.hidden = false;
+    })();
+  })();
+
+})();
+</script>

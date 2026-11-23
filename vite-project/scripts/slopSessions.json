@@ -1,0 +1,3296 @@
+{
+    "13e1b157-d597-4977-8ef3-a3e640002ba9": {
+        "project": "trivia",
+        "started": "2026-11-14",
+        "bytes": 2249973,
+        "agents": [
+            {
+                "project": "trivia",
+                "hours": 0.729
+            }
+        ]
+    },
+    "5547b3bf-a9f6-4b8d-a6e9-cfa979f14aa2": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-22",
+        "bytes": 650598,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.047
+            }
+        ]
+    },
+    "cdad85b3-0ffb-485e-a4b7-7609077c80df": {
+        "project": "algorhythms",
+        "started": "2026-11-19",
+        "bytes": 1267632,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.325
+            }
+        ]
+    },
+    "e4ef60d7-ec54-4b59-8f65-4378b84c898f": {
+        "project": "algorhythms",
+        "started": "2026-11-19",
+        "bytes": 6035768,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.9
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.002
+            }
+        ]
+    },
+    "055ca57d-767f-4463-b535-32f84a4ca5a6": {
+        "project": "unknown",
+        "started": "2026-11-22",
+        "bytes": 372631,
+        "agents": [
+            {
+                "project": "unknown",
+                "hours": 0.004
+            }
+        ]
+    },
+    "d59e56e8-0d75-45f5-a60f-417c5b6f15a6": {
+        "project": "unknown",
+        "started": "2026-11-22",
+        "bytes": 382644,
+        "agents": [
+            {
+                "project": "unknown",
+                "hours": 0.005
+            }
+        ]
+    },
+    "6097f803-7156-4894-9f4e-57bb7ce954b7": {
+        "project": "unknown",
+        "started": "2026-11-22",
+        "bytes": 346603,
+        "agents": [
+            {
+                "project": "unknown",
+                "hours": 0.003
+            }
+        ]
+    },
+    "035b0b63-461e-447e-b086-f93f13f88fb2": {
+        "project": "craft-prs",
+        "started": "2026-11-21",
+        "bytes": 3457486,
+        "agents": [
+            {
+                "project": "craft-prs",
+                "hours": 1.338
+            },
+            {
+                "project": "craft-prs",
+                "hours": 0.005
+            },
+            {
+                "project": "craft-prs",
+                "hours": 0.008
+            }
+        ]
+    },
+    "03f413fd-705d-47b9-ab76-f406b7515ec7": {
+        "project": "unknown",
+        "started": "2026-11-11",
+        "bytes": 310041,
+        "agents": [
+            {
+                "project": "unknown",
+                "hours": 0.002
+            }
+        ]
+    },
+    "0d4ea566-8621-43ad-8198-e3066fb6dceb": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-28",
+        "bytes": 760247,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.076
+            }
+        ]
+    },
+    "10450675-f89e-4c0a-ad74-12c9819435aa": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 4366739,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.343
+            }
+        ]
+    },
+    "108e25fd-87c7-4c64-987b-aab63308cf2a": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-28",
+        "bytes": 5529845,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.605
+            }
+        ]
+    },
+    "1211ae17-1af1-4b97-a989-3c6419a49b96": {
+        "project": "paper-othello",
+        "started": "2026-11-12",
+        "bytes": 610537,
+        "agents": [
+            {
+                "project": "paper-othello",
+                "hours": 0.022
+            }
+        ]
+    },
+    "1322d72f-c1f2-4d52-a8db-db526ac3244b": {
+        "project": "paper-othello",
+        "started": "2026-11-12",
+        "bytes": 1618710,
+        "agents": [
+            {
+                "project": "paper-othello",
+                "hours": 0.245
+            }
+        ]
+    },
+    "2716f383-276e-4ce8-be60-6c495041055f": {
+        "project": "paper-othello",
+        "started": "2026-11-13",
+        "bytes": 1317155,
+        "agents": [
+            {
+                "project": "paper-othello",
+                "hours": 0.198
+            }
+        ]
+    },
+    "29bf38aa-ac60-47a5-a3bd-896673b00695": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 1207354,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.159
+            }
+        ]
+    },
+    "2c86dc6b-976e-473d-ac8e-6e6f5192ede9": {
+        "project": "paper-othello",
+        "started": "2026-11-12",
+        "bytes": 1622328,
+        "agents": [
+            {
+                "project": "paper-othello",
+                "hours": 1.13
+            }
+        ]
+    },
+    "33ea7c5e-b684-405a-a088-0ab7c6ae56c6": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-28",
+        "bytes": 1961828,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.058
+            }
+        ]
+    },
+    "48dff739-0f1d-4814-a6c4-9d6f22243448": {
+        "project": "slop-zone",
+        "started": "2026-11-04",
+        "bytes": 564795,
+        "agents": [
+            {
+                "project": "slop-zone",
+                "hours": 0.056
+            }
+        ]
+    },
+    "49ecd1a5-6e73-4f22-ad4a-13794a020e96": {
+        "project": "algorhythms",
+        "started": "2026-11-19",
+        "bytes": 24505409,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 3.222
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.683
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.112
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.018
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.353
+            },
+            {
+                "project": "algorhythms",
+                "hours": 1.038
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.366
+            },
+            {
+                "project": "algorhythms",
+                "hours": 1.756
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.623
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.457
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.209
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.437
+            },
+            {
+                "project": "algorhythms",
+                "hours": 1.588
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.008
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.019
+            }
+        ]
+    },
+    "4f69eb9b-15f3-40f3-98ee-1bb0e4d9027d": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 5544996,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 1.15
+            }
+        ]
+    },
+    "50cd1a47-eedd-4c6e-9ea6-728421f6bb2e": {
+        "project": "paper-othello",
+        "started": "2026-11-11",
+        "bytes": 705280,
+        "agents": [
+            {
+                "project": "paper-othello",
+                "hours": 0.065
+            }
+        ]
+    },
+    "571c7bbb-a7ba-4b29-9896-4d018c219f86": {
+        "project": "paper-othello",
+        "started": "2026-11-13",
+        "bytes": 409344,
+        "agents": [
+            {
+                "project": "paper-othello",
+                "hours": 0.007
+            }
+        ]
+    },
+    "5a825368-7868-4c7b-b056-c6b026a1af6d": {
+        "project": "single-cycles",
+        "started": "2026-11-19",
+        "bytes": 23566789,
+        "agents": [
+            {
+                "project": "single-cycles",
+                "hours": 1.379
+            }
+        ]
+    },
+    "65ce7477-4a20-45f0-adf8-eb6fcc908cf1": {
+        "project": "paper-othello",
+        "started": "2026-11-12",
+        "bytes": 3130020,
+        "agents": [
+            {
+                "project": "paper-othello",
+                "hours": 1.407
+            }
+        ]
+    },
+    "6ef1b810-615c-4ffd-8b95-43f7b0046756": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-28",
+        "bytes": 3250280,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.306
+            }
+        ]
+    },
+    "727f9b2c-f0d1-413f-819a-553f3e6f27ec": {
+        "project": "paper-othello",
+        "started": "2026-11-11",
+        "bytes": 2508340,
+        "agents": [
+            {
+                "project": "paper-othello",
+                "hours": 0.866
+            }
+        ]
+    },
+    "76646c6d-eeb3-4a15-bbcb-ee293800ce54": {
+        "project": "paper-othello",
+        "started": "2026-11-13",
+        "bytes": 411822,
+        "agents": [
+            {
+                "project": "paper-othello",
+                "hours": 0.009
+            }
+        ]
+    },
+    "766e2e2a-0097-4095-a77b-7fd7a216073a": {
+        "project": "paper-othello",
+        "started": "2026-11-11",
+        "bytes": 1549194,
+        "agents": [
+            {
+                "project": "paper-othello",
+                "hours": 0.24
+            }
+        ]
+    },
+    "76a2e06d-a125-4591-9ef2-188f371dc3bb": {
+        "project": "single-cycles",
+        "started": "2026-11-19",
+        "bytes": 39358495,
+        "agents": [
+            {
+                "project": "single-cycles",
+                "hours": 4.036
+            }
+        ]
+    },
+    "77fc9b57-e3a9-40be-b454-1d165450fc33": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-28",
+        "bytes": 3170100,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.309
+            }
+        ]
+    },
+    "7996bdce-6859-4df2-a9de-88939b9bc326": {
+        "project": "unknown",
+        "started": "2026-10-28",
+        "bytes": 2569,
+        "agents": [
+            {
+                "project": "unknown",
+                "hours": 0
+            }
+        ]
+    },
+    "82a1cad2-6090-4f63-91ae-8a9a9e1007c7": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 340298,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.113
+            }
+        ]
+    },
+    "832583f0-21f6-42a4-a1a4-51c443dfd380": {
+        "project": "paper-othello",
+        "started": "2026-11-13",
+        "bytes": 812663,
+        "agents": [
+            {
+                "project": "paper-othello",
+                "hours": 0.066
+            }
+        ]
+    },
+    "84482cc7-2afb-4505-a72a-0c2f7eb733ec": {
+        "project": "paper-othello",
+        "started": "2026-11-11",
+        "bytes": 1868640,
+        "agents": [
+            {
+                "project": "paper-othello",
+                "hours": 0.633
+            }
+        ]
+    },
+    "850a3224-b6f3-444b-bd29-346732709b42": {
+        "project": "paper-othello",
+        "started": "2026-11-12",
+        "bytes": 1303572,
+        "agents": [
+            {
+                "project": "paper-othello",
+                "hours": 0.348
+            }
+        ]
+    },
+    "8728451f-5de3-40b0-94df-cf5408746515": {
+        "project": "paper-othello",
+        "started": "2026-11-11",
+        "bytes": 1598026,
+        "agents": [
+            {
+                "project": "paper-othello",
+                "hours": 0.246
+            }
+        ]
+    },
+    "88ce91f8-448a-4478-b061-a4298e4268f5": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-28",
+        "bytes": 1435934,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 1.045
+            }
+        ]
+    },
+    "8f0701f8-4fce-4285-bb5d-7f378e16d9d8": {
+        "project": "paper-othello",
+        "started": "2026-11-12",
+        "bytes": 1605085,
+        "agents": [
+            {
+                "project": "paper-othello",
+                "hours": 0.536
+            }
+        ]
+    },
+    "99e9007a-823e-4f43-8573-d04ac578cbf7": {
+        "project": "paper-othello",
+        "started": "2026-11-12",
+        "bytes": 5625675,
+        "agents": [
+            {
+                "project": "paper-othello",
+                "hours": 1.061
+            }
+        ]
+    },
+    "9c88324b-00ca-4137-b871-da5f87734ef8": {
+        "project": "trivia",
+        "started": "2026-11-13",
+        "bytes": 5329093,
+        "agents": [
+            {
+                "project": "trivia",
+                "hours": 0.682
+            }
+        ]
+    },
+    "9db1dd71-aade-490f-8e9d-751921fafb50": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-28",
+        "bytes": 1994348,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.424
+            }
+        ]
+    },
+    "9db3fb77-bcfc-4871-943c-0c221cf541a7": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-28",
+        "bytes": 70656194,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 5.893
+            }
+        ]
+    },
+    "9dc50dfb-114d-44cf-a583-b9f32127549e": {
+        "project": "paper-othello",
+        "started": "2026-11-11",
+        "bytes": 1845633,
+        "agents": [
+            {
+                "project": "paper-othello",
+                "hours": 0.935
+            }
+        ]
+    },
+    "a3b3608b-ad47-49ed-9472-78a2d4a05398": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 8948957,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.758
+            }
+        ]
+    },
+    "a775554b-892c-4f45-84c6-c4ce3b68f414": {
+        "project": "paper-othello",
+        "started": "2026-11-13",
+        "bytes": 1479661,
+        "agents": [
+            {
+                "project": "paper-othello",
+                "hours": 0.235
+            }
+        ]
+    },
+    "a7cf7086-28bb-4d65-9124-b7deb3d6ee25": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-28",
+        "bytes": 4480595,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.222
+            }
+        ]
+    },
+    "b1448f70-5441-4c9c-83e8-51ddf09bb1c8": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 6472676,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 1.585
+            }
+        ]
+    },
+    "b51e6f75-0bbf-4cf2-9e72-409558a5c389": {
+        "project": "paper-othello",
+        "started": "2026-11-11",
+        "bytes": 1837071,
+        "agents": [
+            {
+                "project": "paper-othello",
+                "hours": 0.456
+            }
+        ]
+    },
+    "b7ac9c27-ecb8-4527-83e3-5ffd309b2f3e": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-28",
+        "bytes": 1447244,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.322
+            }
+        ]
+    },
+    "c65b50f8-1c71-499f-b501-23e992aeeb19": {
+        "project": "unknown",
+        "started": "2026-11-11",
+        "bytes": 188506,
+        "agents": [
+            {
+                "project": "unknown",
+                "hours": 0
+            }
+        ]
+    },
+    "c8f1b897-ad11-4863-89d7-ecd9e79cb64b": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-28",
+        "bytes": 55188996,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 2.885
+            }
+        ]
+    },
+    "ced2edd1-d086-433f-8480-d4e25ca1ee8c": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-28",
+        "bytes": 4317287,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.85
+            }
+        ]
+    },
+    "d4b8a7df-f0d4-4bbd-b620-09841d442857": {
+        "project": "paper-othello",
+        "started": "2026-11-11",
+        "bytes": 13345961,
+        "agents": [
+            {
+                "project": "paper-othello",
+                "hours": 1.085
+            }
+        ]
+    },
+    "d645cf0e-22a1-434f-b8a9-b1d0f4e642c6": {
+        "project": "paper-othello",
+        "started": "2026-11-12",
+        "bytes": 4284743,
+        "agents": [
+            {
+                "project": "paper-othello",
+                "hours": 1.392
+            }
+        ]
+    },
+    "d8c9b292-b5d0-4438-8457-676cfb1fc7ca": {
+        "project": "single-cycles",
+        "started": "2026-11-19",
+        "bytes": 30042425,
+        "agents": [
+            {
+                "project": "single-cycles",
+                "hours": 1.729
+            }
+        ]
+    },
+    "e0076917-8773-4a37-8245-ee8047fc4473": {
+        "project": "paper-othello",
+        "started": "2026-11-11",
+        "bytes": 1203341,
+        "agents": [
+            {
+                "project": "paper-othello",
+                "hours": 0.83
+            }
+        ]
+    },
+    "ec3205a3-1bb0-445d-ae5e-b8034e0df44d": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-28",
+        "bytes": 7492198,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.592
+            }
+        ]
+    },
+    "eebbebf7-20c8-4bfe-8625-117ebf574c1d": {
+        "project": "paper-othello",
+        "started": "2026-11-13",
+        "bytes": 2987093,
+        "agents": [
+            {
+                "project": "paper-othello",
+                "hours": 4.33
+            }
+        ]
+    },
+    "ef6338bc-efab-446c-9062-0074a699d6d4": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-28",
+        "bytes": 851632,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.054
+            }
+        ]
+    },
+    "f659f533-9096-46e0-96f8-b40a1bec799f": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-28",
+        "bytes": 805881,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.438
+            }
+        ]
+    },
+    "fea0393c-6470-4446-b997-bd0f7687bf6f": {
+        "project": "slop-zone",
+        "started": "2026-11-11",
+        "bytes": 466436,
+        "agents": [
+            {
+                "project": "slop-zone",
+                "hours": 0.101
+            }
+        ]
+    },
+    "ff1b34ce-3da9-48d8-8e49-015bdf4bd782": {
+        "project": "paper-othello",
+        "started": "2026-11-11",
+        "bytes": 36313084,
+        "agents": [
+            {
+                "project": "paper-othello",
+                "hours": 1.039
+            }
+        ]
+    },
+    "04e9e647-bc0d-4cb4-a4bd-166f3dc82535": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-01",
+        "bytes": 720691,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.007
+            }
+        ]
+    },
+    "06e757bc-ff76-4a55-80e2-a09a5b77d152": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-01",
+        "bytes": 395519,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.013
+            }
+        ]
+    },
+    "0764fbd2-b5f2-418a-9977-b85e3712ec9c": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-03",
+        "bytes": 4904886,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.859
+            }
+        ]
+    },
+    "083a41a5-b33f-4e53-bbc6-fee3008b5449": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 786479,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.043
+            }
+        ]
+    },
+    "0dade61e-a384-4c2c-b52f-c40201970b29": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-01",
+        "bytes": 4702496,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.585
+            }
+        ]
+    },
+    "0e3a4d52-9cb6-45ff-bf31-b65f7ccdf41a": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-22",
+        "bytes": 2297196,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 1.092
+            }
+        ]
+    },
+    "0e9c9693-feab-4ae1-b556-5e50545499ad": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-22",
+        "bytes": 2116793,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.704
+            }
+        ]
+    },
+    "11347430-f24c-4bdf-8d2a-227bda389306": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 2193434,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.503
+            }
+        ]
+    },
+    "1164f438-e4c8-4d23-9cbe-12631c91c806": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 5897490,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.577
+            }
+        ]
+    },
+    "1246114f-23d2-418a-baa6-203a4763f9ed": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 4492217,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.398
+            }
+        ]
+    },
+    "13ea0e20-4cf7-4e8f-b5f4-ff1589af5b1e": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-30",
+        "bytes": 5558030,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.578
+            }
+        ]
+    },
+    "163de4ab-34b1-4b26-9f34-5a2f018ae6c4": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-01",
+        "bytes": 830393,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.324
+            }
+        ]
+    },
+    "1696a216-4f12-458d-9ec4-1c964ec09bbb": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 6638213,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.642
+            }
+        ]
+    },
+    "16b1ad17-ea69-44c0-9bea-50e1e58b4b6d": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-01",
+        "bytes": 1274736,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.444
+            }
+        ]
+    },
+    "17c39c29-5781-4b1d-913a-5a9e980f72bb": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-30",
+        "bytes": 855814,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.075
+            }
+        ]
+    },
+    "1bb58a01-e23c-4145-b5a3-44f37885b04a": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-30",
+        "bytes": 3870827,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.499
+            }
+        ]
+    },
+    "1d48ad8c-59dd-4f00-b8e2-e4750325804a": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-01",
+        "bytes": 1097335,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.349
+            }
+        ]
+    },
+    "21ba8a08-00e2-4e53-aef7-8f312c282192": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-04",
+        "bytes": 750920,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.05
+            }
+        ]
+    },
+    "2505c1b6-9f0a-4dd5-a6aa-1abeaea6b40e": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-02",
+        "bytes": 1534031,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.407
+            }
+        ]
+    },
+    "2685202c-f492-49ac-a650-7797e90a2689": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-05",
+        "bytes": 7918341,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.573
+            }
+        ]
+    },
+    "2b2345fd-5e0d-4ca0-8b49-debd11258d52": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-01",
+        "bytes": 631329,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.103
+            }
+        ]
+    },
+    "2b449906-250e-4895-831f-f838dada68ef": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-22",
+        "bytes": 2327572,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 1.094
+            }
+        ]
+    },
+    "2ff844a6-7935-460d-90df-d42a0ff599f3": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-01",
+        "bytes": 4623691,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.385
+            }
+        ]
+    },
+    "3209edc9-da2f-452a-8145-e0e14cbeba76": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-22",
+        "bytes": 1577903,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.488
+            },
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.011
+            },
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.004
+            },
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.006
+            }
+        ]
+    },
+    "3418b864-616f-487a-aa11-9f94d8f2a1d4": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-01",
+        "bytes": 1569073,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.451
+            }
+        ]
+    },
+    "346cbf63-479a-4718-97cf-077359b96bcd": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-30",
+        "bytes": 4236876,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.772
+            }
+        ]
+    },
+    "35e0e241-2f6f-4fcd-bf9b-c36946e4e1b9": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-01",
+        "bytes": 488185,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.005
+            }
+        ]
+    },
+    "3c0fa075-edc2-4d8d-950c-e9bf09bee144": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-02",
+        "bytes": 13658338,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 1.531
+            }
+        ]
+    },
+    "3d35cbb7-bbe0-47f4-bc79-65ee749916aa": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-02",
+        "bytes": 2313122,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.031
+            }
+        ]
+    },
+    "3e763004-bdce-43f8-9e7d-5fb23e637bf6": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-31",
+        "bytes": 2062601,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.57
+            }
+        ]
+    },
+    "3ee39c65-a800-4af5-94fb-d13e6632e2ef": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-22",
+        "bytes": 2472283,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 1.227
+            }
+        ]
+    },
+    "411b5ffa-db32-41c4-a70d-7caced7ccc7d": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-02",
+        "bytes": 655856,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.114
+            }
+        ]
+    },
+    "44664d81-bc2b-47ec-ae3b-94ae27cbf3ed": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-02",
+        "bytes": 2424068,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.253
+            }
+        ]
+    },
+    "45b49c08-8ea0-40be-912a-aaf99c3dbe7c": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 5197703,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.526
+            }
+        ]
+    },
+    "47add926-ae04-4e07-a749-bb006bf980df": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-04",
+        "bytes": 436522,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.024
+            }
+        ]
+    },
+    "47d5395f-f351-4329-97e0-5f0ccbb62b0a": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-01",
+        "bytes": 2355909,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.425
+            }
+        ]
+    },
+    "48cdef32-e5b2-4a82-a224-5c4c54371a04": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-02",
+        "bytes": 2722837,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.541
+            }
+        ]
+    },
+    "4acf4277-3926-4ad6-a39c-0889a8d9e7d1": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-04",
+        "bytes": 1793084,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.348
+            }
+        ]
+    },
+    "4f654677-8e45-44e2-8308-ecbccb02b9ee": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-02",
+        "bytes": 1084467,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.267
+            }
+        ]
+    },
+    "4f6dbb1c-7d08-4e53-9451-15ac5de4b74a": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 1961234,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.191
+            }
+        ]
+    },
+    "5246a525-5bec-4528-af2e-4f45ebacd497": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-04",
+        "bytes": 4364637,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.507
+            }
+        ]
+    },
+    "52a0197d-dda7-4962-8ac5-fa802113cbc9": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 2066254,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.211
+            }
+        ]
+    },
+    "531e9ac1-b7b2-474b-98bb-6dba512b9110": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-02",
+        "bytes": 650718,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.114
+            }
+        ]
+    },
+    "55f1ab09-7894-4f47-9e97-f84d0c7f95d5": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-02",
+        "bytes": 1032289,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.237
+            }
+        ]
+    },
+    "57017303-7c90-46b9-984b-c6e1a3a37ccc": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-01",
+        "bytes": 1865715,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.099
+            }
+        ]
+    },
+    "59f0aaef-c6af-4f5e-913f-146330370a11": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-01",
+        "bytes": 2312271,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.1
+            }
+        ]
+    },
+    "5a521930-5b04-4108-a933-6b3a70de56c4": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-30",
+        "bytes": 2229517,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.654
+            }
+        ]
+    },
+    "5c885610-85de-4b83-8d4a-4a5b13fd1274": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-04",
+        "bytes": 424598,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.024
+            }
+        ]
+    },
+    "5c8ba9e2-1e1c-4219-af82-20a5362b93ef": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-30",
+        "bytes": 781090,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.046
+            }
+        ]
+    },
+    "5da4f4a5-19eb-4bd0-a314-c50e7615a541": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-22",
+        "bytes": 2771887,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 1.172
+            }
+        ]
+    },
+    "5e64dee1-9c88-484b-be72-c1790c80417b": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-02",
+        "bytes": 2140644,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.423
+            }
+        ]
+    },
+    "62c7f353-5198-4f3a-a4bf-b7d596334562": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 1393851,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.147
+            }
+        ]
+    },
+    "6736bf34-4eab-4f69-88bb-6804465142c8": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 623714,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.075
+            }
+        ]
+    },
+    "68124993-f2be-4f11-a4b5-a0ec58221c9e": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-04",
+        "bytes": 3239501,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.476
+            }
+        ]
+    },
+    "6928b504-5d2e-4bc9-b55c-b5c6ba0d2d7b": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 1599335,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.189
+            }
+        ]
+    },
+    "6f94c834-3f10-44fa-8cd0-43d220cbd4d1": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 4137727,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.302
+            }
+        ]
+    },
+    "70ffed3d-d8f5-4be4-a251-aa6e7ca72ea6": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-22",
+        "bytes": 4161674,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 1.321
+            }
+        ]
+    },
+    "715be0f6-4ce3-4fc3-be37-711474460890": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-02",
+        "bytes": 2746230,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.733
+            }
+        ]
+    },
+    "7233ddd1-d1d5-445f-8615-3b12fb439eb0": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-30",
+        "bytes": 2810504,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.241
+            }
+        ]
+    },
+    "738da4b8-2ca5-43e3-8eb9-cc0d8ca0271b": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-01",
+        "bytes": 3198378,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.319
+            }
+        ]
+    },
+    "75fbb89e-0365-4d3f-8646-7528c757704e": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-30",
+        "bytes": 2279912,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.37
+            }
+        ]
+    },
+    "76adab78-fa7a-461a-b590-e4359b33f9e3": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-01",
+        "bytes": 19431379,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 1.035
+            },
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.733
+            },
+            {
+                "project": "spotify-unwrapped",
+                "hours": 1.11
+            },
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.348
+            },
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.636
+            },
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.076
+            },
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.197
+            }
+        ]
+    },
+    "76bc21e1-5f80-45e0-8529-77b804fae7d7": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-04",
+        "bytes": 816918,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.058
+            }
+        ]
+    },
+    "7a3903ff-5518-468f-a226-2aa4b1b89d2b": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 817879,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.122
+            }
+        ]
+    },
+    "7ce8fa2b-dc8f-40d0-8eb1-1dd23789e556": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-02",
+        "bytes": 369284,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.013
+            }
+        ]
+    },
+    "7ea12cf5-19cb-479c-b724-2b91b3c72069": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-02",
+        "bytes": 1247980,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.174
+            }
+        ]
+    },
+    "871174c6-b00c-43e6-9656-0948396f6560": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-22",
+        "bytes": 5263647,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 1.133
+            }
+        ]
+    },
+    "8747b7ac-1520-48b6-b0cf-1b9f2963fc8e": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-31",
+        "bytes": 2848050,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.25
+            }
+        ]
+    },
+    "89754f28-b25f-43fb-acba-1670c963b931": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-30",
+        "bytes": 8633642,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.644
+            }
+        ]
+    },
+    "8a50da8e-f874-49b1-ac0c-2ab54667440c": {
+        "project": "craft-prs",
+        "started": "2026-11-22",
+        "bytes": 444207,
+        "agents": [
+            {
+                "project": "craft-prs",
+                "hours": 0.009
+            }
+        ]
+    },
+    "8b35ce3b-98ee-4126-8d41-0176e2eec527": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-22",
+        "bytes": 3464723,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 1.11
+            }
+        ]
+    },
+    "8e9de3f9-1a59-45cf-ba3f-252a528180f5": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-01",
+        "bytes": 591639,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.05
+            }
+        ]
+    },
+    "8eba9a12-55fa-4395-b445-fb942ee78147": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 1801154,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.241
+            }
+        ]
+    },
+    "8f67aeb9-1dbe-4286-a8b3-97807b8414c8": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 1832709,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.138
+            }
+        ]
+    },
+    "90852739-938d-492b-96f0-b5def5703bac": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-02",
+        "bytes": 3868136,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.542
+            }
+        ]
+    },
+    "9086f783-6e90-4c09-923e-48f20a3d8e07": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-30",
+        "bytes": 7067592,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.843
+            }
+        ]
+    },
+    "915d609f-3c47-4d3c-a8c8-149633d05f21": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-02",
+        "bytes": 2925304,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.201
+            }
+        ]
+    },
+    "92821bcc-7946-4256-a8ba-a9e6b9066ac4": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-31",
+        "bytes": 1564845,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.122
+            }
+        ]
+    },
+    "9339f4d0-3932-400f-b7db-066e6bb5dd3e": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-02",
+        "bytes": 4827887,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.585
+            }
+        ]
+    },
+    "93d106fd-c4c5-4e8e-8b0a-f7249f7fd151": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-01",
+        "bytes": 2455999,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.048
+            }
+        ]
+    },
+    "9531587f-04a6-4de0-bf97-9a71e8c117d2": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-01",
+        "bytes": 984994,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.18
+            }
+        ]
+    },
+    "9b3367e1-091f-47ee-94eb-52d3b72d7269": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-01",
+        "bytes": 1102900,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.531
+            }
+        ]
+    },
+    "9b42bbfc-abb6-4cff-a552-62462f8de040": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-04",
+        "bytes": 1081598,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.592
+            }
+        ]
+    },
+    "9cd3beb3-ffb6-4ab4-8c28-afb3bb203389": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 2749981,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.357
+            }
+        ]
+    },
+    "9d42b536-e3b6-4a6e-9b2d-bbf048bdfce3": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-01",
+        "bytes": 1783179,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.095
+            }
+        ]
+    },
+    "9d8ded6f-402a-42f6-9269-f190a28ad539": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-04",
+        "bytes": 1071887,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.35
+            }
+        ]
+    },
+    "9ea77f24-3bb3-4ccd-8a34-cd567353a2cf": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-30",
+        "bytes": 2627716,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.227
+            }
+        ]
+    },
+    "a242ec44-4676-47ec-bb8b-83034e57756c": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 1514208,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.132
+            }
+        ]
+    },
+    "a5dbcb07-e866-4676-b5d0-8661e52175a1": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-02",
+        "bytes": 767396,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.097
+            }
+        ]
+    },
+    "a69fa22f-0f61-482c-9a6f-7e21a03f203c": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 2108198,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.251
+            }
+        ]
+    },
+    "a91b650b-73d9-4acb-83d2-41e5a6805935": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-31",
+        "bytes": 3391099,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.239
+            },
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.076
+            },
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.064
+            },
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.095
+            }
+        ]
+    },
+    "ab1e5c6f-74fe-4731-b448-7c8cc0d4d688": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 15623608,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 2.036
+            }
+        ]
+    },
+    "ac219da9-97d2-4912-ad2d-6a13fd2fd6b3": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-01",
+        "bytes": 8833666,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.787
+            }
+        ]
+    },
+    "af5a01da-36e0-436e-88e7-a483203c10d4": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-02",
+        "bytes": 695690,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.007
+            }
+        ]
+    },
+    "afea6322-39db-4471-b43b-445bd7a5b0f7": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-04",
+        "bytes": 375943,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.005
+            }
+        ]
+    },
+    "b1fbcb22-7743-4913-b44b-76c8653448b4": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-02",
+        "bytes": 5351228,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.665
+            }
+        ]
+    },
+    "b33de7c8-6619-4f72-a2f6-1ba89ba4747f": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-31",
+        "bytes": 3281543,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.92
+            }
+        ]
+    },
+    "b4e089cf-84af-4015-ada6-52112dc0bb25": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 823184,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.055
+            }
+        ]
+    },
+    "b5f0f868-a99a-490c-9bba-cbfd50fda974": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 7352034,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.702
+            }
+        ]
+    },
+    "b61f63a3-2a10-4950-a050-4d4548901898": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-02",
+        "bytes": 6076627,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 1.176
+            }
+        ]
+    },
+    "b667cde0-8af0-4db6-b9c9-74af6a1c667d": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 944419,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.07
+            }
+        ]
+    },
+    "b6e5540f-5dfa-49bd-816b-238ccc4a3830": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 2247600,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.519
+            }
+        ]
+    },
+    "b8ba2c0b-f2fb-4da4-b614-3809f043c71b": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-01",
+        "bytes": 1096810,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.09
+            }
+        ]
+    },
+    "bb2f702e-4ecc-4f36-a348-3c52a8f1c497": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-02",
+        "bytes": 3822089,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.862
+            }
+        ]
+    },
+    "bbb8e8aa-921e-40dd-bd29-a11798046ce4": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-01",
+        "bytes": 912589,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.067
+            }
+        ]
+    },
+    "bcbc67af-d37a-4e02-b341-d9bf3589ce1a": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-30",
+        "bytes": 3967266,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.634
+            }
+        ]
+    },
+    "c007ada9-e9d4-4729-87da-093a9c7da534": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 3500268,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.199
+            }
+        ]
+    },
+    "c45711e5-199e-488a-8dfc-99d169b2aa3a": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-30",
+        "bytes": 9609107,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 2.633
+            },
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.157
+            },
+            {
+                "project": "spotify-unwrapped",
+                "hours": 1.263
+            }
+        ]
+    },
+    "c5f80fde-68cb-45e9-b131-000addbbda10": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-30",
+        "bytes": 4336555,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.566
+            }
+        ]
+    },
+    "c70cfdf0-fe8f-462a-adfe-4809ef16d94a": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-04",
+        "bytes": 696715,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.131
+            }
+        ]
+    },
+    "c861b8e7-5a69-4519-b266-50be02030f7b": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-01",
+        "bytes": 609396,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.055
+            }
+        ]
+    },
+    "caec52a1-df33-4037-a191-6d464972a550": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 3686468,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.518
+            }
+        ]
+    },
+    "cc5f9001-4347-4ad5-88f0-fecc6f5f5921": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-31",
+        "bytes": 1206011,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.421
+            }
+        ]
+    },
+    "ceb87837-96c1-44ca-b20e-bb9a8af1ab3d": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-22",
+        "bytes": 2136542,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 1.147
+            }
+        ]
+    },
+    "d438ff30-528d-427b-b19e-739c5464b5f5": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-30",
+        "bytes": 1137904,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.172
+            }
+        ]
+    },
+    "d4508ca6-933a-413a-944c-8a90b5089a24": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-04",
+        "bytes": 895381,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.063
+            }
+        ]
+    },
+    "d9427f45-aa15-47fe-92ef-7e2c51266560": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-02",
+        "bytes": 4473889,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.454
+            }
+        ]
+    },
+    "d9962198-cf04-42fd-8460-7fd49c0d1f53": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-02",
+        "bytes": 5052290,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.735
+            }
+        ]
+    },
+    "db1120a1-9254-4fa1-9914-f3ac1b2a08cd": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-04",
+        "bytes": 1023883,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.123
+            }
+        ]
+    },
+    "db126c97-0d1a-4c6b-86a5-9825f2ae5403": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 9899427,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.989
+            }
+        ]
+    },
+    "dd066f36-cdee-4bdd-be29-aa6caaf65ea0": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-30",
+        "bytes": 2396629,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.195
+            }
+        ]
+    },
+    "dd8b9317-c205-4c44-bd66-12be57fe6ea6": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-30",
+        "bytes": 3493198,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 1.056
+            }
+        ]
+    },
+    "dfcdf44f-8a82-4215-be7d-985fdf2c1276": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 883815,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.043
+            }
+        ]
+    },
+    "dfd08b82-428a-45ba-bb8a-5736b7ecc7f6": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-04",
+        "bytes": 1031365,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.496
+            }
+        ]
+    },
+    "e075b7da-329d-4c32-9d61-bc7c576023c3": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-02",
+        "bytes": 754970,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.035
+            }
+        ]
+    },
+    "e4b48d06-c943-405c-8e2b-06f722f301a9": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-04",
+        "bytes": 1916558,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.47
+            }
+        ]
+    },
+    "e97e1db5-c7c8-42d3-8008-5e1c37dfa0aa": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-30",
+        "bytes": 592108,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.037
+            }
+        ]
+    },
+    "eacedf48-0733-4385-884e-28e36bc6f83f": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-30",
+        "bytes": 1049387,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.157
+            }
+        ]
+    },
+    "ebf90a2b-dfdf-40be-b598-d5b8dc13eb4e": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-02",
+        "bytes": 4467711,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 1.129
+            }
+        ]
+    },
+    "ec67816d-6193-4182-a838-680b5596967a": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 10465662,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.588
+            }
+        ]
+    },
+    "ed4f63cb-4055-495a-a571-db627abba135": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 1493609,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.141
+            }
+        ]
+    },
+    "ef71e766-810d-4c1c-bbaa-94d2520f2a46": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-04",
+        "bytes": 372321,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.11
+            }
+        ]
+    },
+    "ef969419-abb7-4a76-8644-b9d58172f168": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 1845415,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.15
+            }
+        ]
+    },
+    "f13e90ca-2c08-47d0-b899-317b3cefe486": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-22",
+        "bytes": 3614187,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.326
+            }
+        ]
+    },
+    "f577ab6e-c516-48b3-84b1-c8bca2514b3e": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-04",
+        "bytes": 1387381,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.783
+            }
+        ]
+    },
+    "f8341f87-b526-441c-8951-a8dcd0bb30c5": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 6707194,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 1.91
+            }
+        ]
+    },
+    "fb8e41a1-771e-4acc-830a-fd8a6ab5ffda": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-01",
+        "bytes": 2313676,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.21
+            }
+        ]
+    },
+    "fcfeb9df-4e74-4800-b881-78b36be6cb63": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 3885767,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 1.103
+            },
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.352
+            }
+        ]
+    },
+    "fd3f5230-8e39-48d8-b881-68129edd7103": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-29",
+        "bytes": 804119,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.102
+            }
+        ]
+    },
+    "ffc473c0-4706-4b20-9814-1c6159cabd36": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-02",
+        "bytes": 2485793,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.741
+            }
+        ]
+    },
+    "9e6bc5af-7f14-41a4-94d3-9fe0259d0b06": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-05",
+        "bytes": 685263,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.357
+            }
+        ]
+    },
+    "68009a4f-c229-4bf2-8b31-db5246e3c7f6": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-28",
+        "bytes": 1828577,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.894
+            }
+        ]
+    },
+    "5c1f559d-66bf-4841-80b4-bcccdd3dad60": {
+        "project": "spotify-unwrapped",
+        "started": "2026-10-28",
+        "bytes": 9289314,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 2.011
+            }
+        ]
+    },
+    "4fd01aa5-7a2d-4ae4-a850-8d5203d131be": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-04",
+        "bytes": 1442751,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.619
+            }
+        ]
+    },
+    "7ed5c94a-e3e9-42c8-8536-35fe2bd3c8ca": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-22",
+        "bytes": 6333980,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 1.502
+            }
+        ]
+    },
+    "c29b6db4-55a1-4900-9acc-78112639f30a": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-01",
+        "bytes": 1179815,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.345
+            }
+        ]
+    },
+    "2a907e3f-6c21-4ff1-bbe8-cff3fbbb8d67": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-01",
+        "bytes": 1437544,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.601
+            }
+        ]
+    },
+    "1820acac-d3fb-4509-b41d-f510d7a8f840": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-02",
+        "bytes": 1368669,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.127
+            }
+        ]
+    },
+    "03e9b862-d0eb-4c4f-b9a8-abdc3e342929": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-01",
+        "bytes": 1490664,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.292
+            }
+        ]
+    },
+    "88c61c4b-8363-4a15-8a55-6e5c7c6f8344": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-22",
+        "bytes": 621852,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.046
+            }
+        ]
+    },
+    "6e512c5a-6c37-4cd4-88da-e4d7d845732b": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-02",
+        "bytes": 5353094,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 1.169
+            }
+        ]
+    },
+    "e4c6549d-6484-4e2c-90f9-6884273c5431": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-03",
+        "bytes": 4779811,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 1.041
+            }
+        ]
+    },
+    "016818e9-c392-4850-a81c-9af61080755a": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-04",
+        "bytes": 1994102,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.06
+            }
+        ]
+    },
+    "ca374016-0e33-42b3-8c3f-319abddeb428": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-02",
+        "bytes": 5374939,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.772
+            },
+            {
+                "project": "spotify-unwrapped",
+                "hours": 0.067
+            }
+        ]
+    },
+    "0f92539b-c0e3-41f7-867d-5e95f293477b": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-22",
+        "bytes": 3825566,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 2.018
+            }
+        ]
+    },
+    "35096442-8ecd-4d24-8c37-cbc1ba9df657": {
+        "project": "spotify-unwrapped",
+        "started": "2026-11-22",
+        "bytes": 17110562,
+        "agents": [
+            {
+                "project": "spotify-unwrapped",
+                "hours": 2.664
+            }
+        ]
+    },
+    "1485641e-32cb-498f-820b-7aa9cad9def6": {
+        "project": "comma-pump",
+        "started": "2026-11-22",
+        "bytes": 27193754,
+        "agents": [
+            {
+                "project": "comma-pump",
+                "hours": 1.972
+            }
+        ]
+    },
+    "1634a60f-0daf-414f-a02d-1380d3a36e0d": {
+        "project": "rhyme-xray",
+        "started": "2026-11-22",
+        "bytes": 20012630,
+        "agents": [
+            {
+                "project": "rhyme-xray",
+                "hours": 1.918
+            },
+            {
+                "project": "rhyme-xray",
+                "hours": 0.002
+            },
+            {
+                "project": "rhyme-xray",
+                "hours": 0.007
+            },
+            {
+                "project": "rhyme-xray",
+                "hours": 0.004
+            },
+            {
+                "project": "rhyme-xray",
+                "hours": 0.005
+            },
+            {
+                "project": "rhyme-xray",
+                "hours": 0.013
+            }
+        ]
+    },
+    "921eb66e-de31-40fb-97a0-6d9b579e0f3b": {
+        "project": "craft-prs",
+        "started": "2026-11-22",
+        "bytes": 533273,
+        "agents": [
+            {
+                "project": "craft-prs",
+                "hours": 0.063
+            }
+        ]
+    },
+    "966868aa-203f-4414-b81e-32e4244201f7": {
+        "project": "rhyme-xray",
+        "started": "2026-11-22",
+        "bytes": 6170158,
+        "agents": [
+            {
+                "project": "rhyme-xray",
+                "hours": 0.595
+            },
+            {
+                "project": "rhyme-xray",
+                "hours": 0.005
+            }
+        ]
+    },
+    "a2ba61e3-8965-4676-8018-a1ed9af1b8c3": {
+        "project": "craft-prs",
+        "started": "2026-11-22",
+        "bytes": 449014,
+        "agents": [
+            {
+                "project": "craft-prs",
+                "hours": 0.022
+            }
+        ]
+    },
+    "d5138c02-4ca5-4ec1-88b1-5b097c195fe2": {
+        "project": "craft-prs",
+        "started": "2026-11-21",
+        "bytes": 993156,
+        "agents": [
+            {
+                "project": "craft-prs",
+                "hours": 0.366
+            }
+        ]
+    },
+    "f7d403d0-89cf-45f8-808e-943c3817d82e": {
+        "project": null,
+        "started": "2026-11-22",
+        "bytes": 492018,
+        "agents": [
+            {
+                "project": null,
+                "hours": 0.158
+            }
+        ]
+    },
+    "70ae6219-f387-47f5-8b2d-1af2fe5fbff1": {
+        "project": "slop-zone",
+        "started": "2026-11-22",
+        "bytes": 62319975,
+        "agents": [
+            {
+                "project": "slop-zone",
+                "hours": 3.44
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.804
+            }
+        ]
+    },
+    "5f0e0a7d-7882-48c5-8d1d-63d59b799f70": {
+        "project": "rhyme-xray",
+        "started": "2026-11-22",
+        "bytes": 2953752,
+        "agents": [
+            {
+                "project": "rhyme-xray",
+                "hours": 0.283
+            }
+        ]
+    },
+    "b9dd6fb7-8262-42cc-828f-0c01a6ac05cc": {
+        "project": "rhyme-xray",
+        "started": "2026-11-22",
+        "bytes": 23854604,
+        "agents": [
+            {
+                "project": "rhyme-xray",
+                "hours": 1.891
+            }
+        ]
+    },
+    "1c46bd02-011c-45cc-9b74-f5b9ab1b3c62": {
+        "project": "trivia",
+        "started": "2026-11-14",
+        "bytes": 1113718,
+        "agents": [
+            {
+                "project": "trivia",
+                "hours": 0.127
+            }
+        ]
+    },
+    "5703e936-e71b-4a1e-8a29-935409e339ec": {
+        "project": "trivia",
+        "started": "2026-11-14",
+        "bytes": 421654,
+        "agents": [
+            {
+                "project": "trivia",
+                "hours": 0.009
+            }
+        ]
+    },
+    "840f577e-4d76-4694-991a-a5222fb94f3f": {
+        "project": "trivia",
+        "started": "2026-11-15",
+        "bytes": 827690,
+        "agents": [
+            {
+                "project": "trivia",
+                "hours": 0.112
+            }
+        ]
+    },
+    "871744c3-1f34-4eff-9c6c-398bd64c2bca": {
+        "project": "unknown",
+        "started": "2026-11-19",
+        "bytes": 656591,
+        "agents": [
+            {
+                "project": "unknown",
+                "hours": 0.011
+            }
+        ]
+    },
+    "01b5e230-be38-46d2-b5d4-d57b1a4c505e": {
+        "project": "algorhythms",
+        "started": "2026-11-22",
+        "bytes": 7945698,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.187
+            }
+        ]
+    },
+    "04967627-e193-45f4-80ad-d763e8567b21": {
+        "project": "algorhythms",
+        "started": "2026-11-22",
+        "bytes": 962498,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.03
+            }
+        ]
+    },
+    "1c2aa236-cc47-43da-ba96-49154323dd48": {
+        "project": "algorhythms",
+        "started": "2026-11-20",
+        "bytes": 7908340,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 2.306
+            }
+        ]
+    },
+    "1def9a5d-03b4-4ef1-b972-e756f1e76f51": {
+        "project": "algorhythms",
+        "started": "2026-11-22",
+        "bytes": 16446279,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 1.763
+            }
+        ]
+    },
+    "440418cf-15cc-4442-8b77-5f083aeb0f36": {
+        "project": "algorhythms",
+        "started": "2026-11-22",
+        "bytes": 427618,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.002
+            }
+        ]
+    },
+    "4842df7b-4ae1-44ea-bb73-4bdf26551b18": {
+        "project": "algorhythms",
+        "started": "2026-11-20",
+        "bytes": 17397152,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 2.159
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.031
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.059
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.069
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.148
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.174
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.053
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.105
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.949
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.444
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.104
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.171
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.147
+            }
+        ]
+    },
+    "629dd10b-2efb-4975-8a38-54e541f0b9d2": {
+        "project": "algorhythms",
+        "started": "2026-11-22",
+        "bytes": 4769470,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.896
+            }
+        ]
+    },
+    "62e92c7c-148b-43b3-b1ef-555f98db3c22": {
+        "project": "algorhythms",
+        "started": "2026-11-20",
+        "bytes": 7899951,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 1.151
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.312
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.147
+            }
+        ]
+    },
+    "72a16550-def3-4a04-aed2-9a4c48ea2665": {
+        "project": "algorhythms",
+        "started": "2026-11-20",
+        "bytes": 1474431,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.087
+            }
+        ]
+    },
+    "995682c1-2c72-4869-8784-9f416070835f": {
+        "project": "algorhythms",
+        "started": "2026-11-20",
+        "bytes": 149578129,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 18.641
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.169
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.384
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.91
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.252
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.116
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.391
+            },
+            {
+                "project": "algorhythms",
+                "hours": 1.139
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.039
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.295
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.161
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.377
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.376
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.311
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.411
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.237
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.507
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.277
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.618
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.532
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.491
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.298
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.274
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.848
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.185
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.048
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.025
+            },
+            {
+                "project": "algorhythms",
+                "hours": 1.175
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.018
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.049
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.136
+            },
+            {
+                "project": "algorhythms",
+                "hours": 1.355
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.196
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.054
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.069
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.251
+            },
+            {
+                "project": "algorhythms",
+                "hours": 1.544
+            },
+            {
+                "project": "algorhythms",
+                "hours": 1.433
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.375
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.514
+            },
+            {
+                "project": "algorhythms",
+                "hours": 1.665
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.392
+            },
+            {
+                "project": "algorhythms",
+                "hours": 1.461
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.459
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.637
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.215
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.429
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.162
+            },
+            {
+                "project": "algorhythms",
+                "hours": 2.77
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.361
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.42
+            },
+            {
+                "project": "algorhythms",
+                "hours": 1.548
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.322
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.073
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.385
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.767
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.309
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.812
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.347
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.362
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.277
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.885
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.773
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.267
+            },
+            {
+                "project": "algorhythms",
+                "hours": 1.4
+            },
+            {
+                "project": "algorhythms",
+                "hours": 3.022
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.055
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.143
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.431
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.084
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.596
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.261
+            }
+        ]
+    },
+    "9f09c35e-968e-408e-b967-e6faa4fcfed8": {
+        "project": "algorhythms",
+        "started": "2026-11-20",
+        "bytes": 16625618,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 1.261
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.264
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.271
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.215
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.041
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.326
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.698
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.179
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.274
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.176
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.008
+            }
+        ]
+    },
+    "c21f878a-964a-48d3-a8c3-ae16cecd189b": {
+        "project": "algorhythms",
+        "started": "2026-11-22",
+        "bytes": 1639596,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.442
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.14
+            }
+        ]
+    },
+    "c2b0cce6-15cb-4e0f-b1aa-51cff0013f0d": {
+        "project": "algorhythms",
+        "started": "2026-11-20",
+        "bytes": 2152065,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.307
+            }
+        ]
+    },
+    "d4ca39b3-964c-4a99-9db1-26e44a9a1f7f": {
+        "project": "algorhythms",
+        "started": "2026-11-21",
+        "bytes": 7042303,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 1.449
+            }
+        ]
+    },
+    "eace55cc-5d37-421c-83d5-d96672db6dd9": {
+        "project": "algorhythms",
+        "started": "2026-11-22",
+        "bytes": 4857755,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.16
+            }
+        ]
+    },
+    "f59f6e87-1925-4e05-9b9a-b44b88261ea8": {
+        "project": "algorhythms",
+        "started": "2026-11-22",
+        "bytes": 2772914,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.618
+            }
+        ]
+    },
+    "f9bd859b-cae4-46c6-a7a0-2435cb98b6ad": {
+        "project": "algorhythms",
+        "started": "2026-11-22",
+        "bytes": 5130288,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.795
+            }
+        ]
+    }
+}
