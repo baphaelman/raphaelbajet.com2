@@ -1,5 +1,6 @@
 {
     "updated": "2026-11-22",
+    "since": "2026-10-28",
     "projects": {
         "rhyme-xray": {
             "commits": 15,
@@ -8,10 +9,10 @@
             "hours": 4.7
         },
         "algorhythms": {
-            "commits": 652,
-            "agents": 132,
-            "sessions": 20,
-            "hours": 89.6
+            "commits": 675,
+            "agents": 136,
+            "sessions": 22,
+            "hours": 93.6
         },
         "spotify-unwrapped": {
             "commits": 656,
@@ -27,15 +28,15 @@
         },
         "comma-pump": {
             "commits": 2,
-            "agents": 1,
-            "sessions": 1,
-            "hours": 2
+            "agents": 2,
+            "sessions": 2,
+            "hours": 2.3
         },
         "single-cycles": {
             "commits": null,
-            "agents": 3,
+            "agents": 4,
             "sessions": 3,
-            "hours": 7.1
+            "hours": 7.3
         },
         "craft-prs": {
             "commits": 6,
@@ -45,9 +46,9 @@
         },
         "slop-zone": {
             "commits": null,
-            "agents": 3,
-            "sessions": 3,
-            "hours": 3.6
+            "agents": 4,
+            "sessions": 4,
+            "hours": 5.2
         },
         "trivia": {
             "commits": null,

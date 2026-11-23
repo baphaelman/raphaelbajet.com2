@@ -3,11 +3,62 @@ import { Link } from 'react-router-dom';
 import ExternalLink from '/components/ExternalLink.jsx';
 import SlopEditor from '/components/SlopEditor.jsx';
 import Words from '/components/SlopWords.jsx';
-import { plain, readable, share, allTexts, percent } from '/components/slopText.js';
+import { plain, readable, share, unslop, allTexts, percent } from '/components/slopText.js';
 import slopStats from '/src/slopStats.json';
+import { CATCHPHRASES } from '/components/slopCatchphrases.js';
 
 // `npm run edit` (vite --mode edit): the Edit text panel, how much of the text is mine, and the parts still to write
 const EDITING = import.meta.env.MODE === 'edit';
+
+// Behind everything, like the static in the rupture: the classics in dim rows, each in its own order, drifting
+// sideways at its own pace and its own way, picked fresh on every visit. Plain random clumps (two rows in step read
+// as one band), so this is random that looks it: speeds spread evenly by ratio, never close to a nearby row's, and
+// no direction more than two rows running
+const BACKDROP_SLOWEST = 0.6; // characters a second
+const BACKDROP_FASTEST = 4;
+
+function shuffled(list) {
+    const copy = [...list];
+    for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+}
+
+// how different two speeds look: by ratio, so 1 to 2 is as far as 2 to 4
+const apart = (a, b) => Math.max(a / b, b / a);
+
+function backdropRows(count) {
+    const rows = [];
+    while (rows.length < count) {
+        const near = rows.slice(-2);
+        const reverse = near.length === 2 && near[0].reverse === near[1].reverse ? !near[1].reverse : Math.random() < 0.5;
+        // a row going the same way as one just above needs a clearly different speed; one going the other way, less so
+        let speed;
+        do speed = BACKDROP_SLOWEST * (BACKDROP_FASTEST / BACKDROP_SLOWEST) ** Math.random();
+        while (near.some((row) => apart(speed, row.speed) < (row.reverse === reverse ? 1.5 : 1.2)));
+        const text = shuffled(CATCHPHRASES).join('   ·   ');
+        const seconds = text.length / speed;
+        rows.push({ text, speed, reverse, seconds, delay: -Math.random() * seconds }); // starting anywhere in its loop
+    }
+    return rows;
+}
+
+const BACKDROP_ROWS = backdropRows(40);
+
+function Backdrop() {
+    return (
+        <div className="slop-backdrop" aria-hidden="true">
+            {BACKDROP_ROWS.map((row, i) => (
+                <div className={`slop-backdrop-row${row.reverse ? ' slop-backdrop-reverse' : ''}`} key={i} style={{ animationDuration: `${row.seconds}s`, animationDelay: `${row.delay}s` }}>
+                    <span>{row.text}</span>
+                    <span>{row.text}</span>
+                </div>
+            ))}
+        </div>
+    );
+}
 
 // the clip's controls, drawn in currentColor
 const CLIP_ICONS = {
@@ -269,14 +320,37 @@ function Thumb({ project }) {
     );
 }
 
-function Labels({ labels }) {
+function Labels({ labels, picked }) {
     if (!labels?.length) return null;
     return (
         <ul className="slop-labels" aria-label="Labels">
-            {labels.map((label, i) => <li key={i}><Words value={label} /></li>)}
+            {labels.map((label, i) => (
+                <li key={i} className={picked?.has(labelKey(label)) ? 'slop-label-on' : undefined}><Words value={label} /></li>
+            ))}
         </ul>
     );
 }
+
+// a label by its words, case aside, so "Math" on one card and "math" on another are one label
+const labelKey = (label) => readable(label).trim().toLowerCase();
+
+// every label in the zone, in the order they first appear, with how many projects, games and articles carry it
+function allLabels(projects) {
+    const found = new Map();
+    projects.flatMap((project) => project.items ?? [project]).forEach((entry) => {
+        const own = new Map((entry.labels ?? []).map((label) => [labelKey(label), readable(label).trim()]));
+        own.forEach((name, key) => {
+            if (!key) return;
+            if (found.has(key)) found.get(key).count++;
+            else found.set(key, { key, name, count: 1 });
+        });
+    });
+    return [...found.values()];
+}
+
+// whether a project, game or article carries a picked label (a section of games or articles: any of them)
+const carries = (entry, picked) => (entry.labels ?? []).some((label) => picked.has(labelKey(label)))
+    || (entry.items ?? []).some((item) => carries(item, picked));
 
 // "What is it?", "How did it do it?" (the agents' part) and "What did I do?" (mine). A part with nothing in it
 // is left out of the site, and marked as still to write while running `npm run edit`
@@ -284,9 +358,11 @@ function Story({ entry, headings }) {
     return ['what', 'how', 'role'].map((part) => {
         const written = entry[part].filter((paragraph) => plain(paragraph).trim());
         if (!written.length && !EDITING) return null;
+        // a heading is an agent's until you write anything in its section: then it's yours, in that card alone
+        const heading = share(entry[part]).fraction > 0 ? unslop(headings[part]) : headings[part];
         return (
             <section className="slop-story" key={part}>
-                <h4><Words value={headings[part]} /></h4>
+                <h4><Words value={heading} /></h4>
                 {written.map((paragraph, i) => <p key={i}><Words value={paragraph} links /></p>)}
                 {!written.length && <p className="slop-story-empty">Not written yet</p>}
             </section>
@@ -297,20 +373,27 @@ function Story({ entry, headings }) {
 // [key, label, label for one]
 const STATS = [['commits', 'commits', 'commit'], ['agents', 'agents', 'agent'], ['sessions', 'sessions', 'session'], ['hours', 'agent hours', 'agent hours']];
 
+// the oldest transcript counted (2026-10-28 → Oct 28, 2026): Claude Code had already deleted the ones before it
+const STATS_SINCE = slopStats.since
+    && new Date(slopStats.since).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+
 // What went into a project, counted from git and Claude Code's transcripts by scripts/slop-stats.mjs (which runs
-// before `npm run dev`): numbers, so nobody's words
+// before `npm run dev`): numbers, so nobody's words. Commits are all of git's; the rest only go back to STATS_SINCE
 function Stats({ id }) {
     const counts = slopStats.projects[id];
     if (!counts) return null;
     return (
-        <dl className="slop-card-stats">
-            {STATS.map(([key, label, one]) => (
-                <div key={key}>
-                    <dt>{counts[key] === null ? `${label} (not in git)` : counts[key] === 1 ? one : label}</dt>
-                    <dd>{key === 'hours' && counts.hours < 10 ? counts.hours.toFixed(1) : Math.round(counts[key] ?? 0).toLocaleString('en-US')}</dd>
-                </div>
-            ))}
-        </dl>
+        <>
+            <dl className="slop-card-stats">
+                {STATS.map(([key, label, one]) => (
+                    <div key={key}>
+                        <dt>{counts[key] === null ? `${label} (not in git)` : counts[key] === 1 ? one : label}</dt>
+                        <dd>{key === 'hours' && counts.hours < 10 ? counts.hours.toFixed(1) : Math.round(counts[key] ?? 0).toLocaleString('en-US')}</dd>
+                    </div>
+                ))}
+            </dl>
+            {STATS_SINCE && <p className="slop-card-stats-since">Agents, sessions and hours since {STATS_SINCE}</p>}
+        </>
     );
 }
 
@@ -347,10 +430,10 @@ function CardLink({ link }) {
     );
 }
 
-function ProjectCard({ project, headings, lit }) {
+function ProjectCard({ project, headings, lit, picked }) {
     return (
         <article
-            className={`slop-card${lit ? ' slop-card-lit' : ''}`}
+            className={`slop-card${lit ? ' slop-card-lit' : ''}${picked.size && carries(project, picked) ? ' slop-picked' : ''}`}
             id={`slop-${project.id}`}
             style={{ '--c': project.color }}
         >
@@ -358,7 +441,7 @@ function ProjectCard({ project, headings, lit }) {
                 <div>
                     <h3><span className="slop-card-tab" aria-hidden="true" /><Words value={project.title} /></h3>
                     <p className="slop-card-sub"><Words value={project.when} /> · <Words value={project.status} /></p>
-                    <Labels labels={project.labels} />
+                    <Labels labels={project.labels} picked={picked} />
                 </div>
                 {project.links.length > 0 && (
                     <div className="slop-card-links">
@@ -383,17 +466,18 @@ function ProjectCard({ project, headings, lit }) {
 
 // A game or an article, in its section's grid: a preview, its name and its short description, which open on a click
 // into the same story as a project's, and the button to the page itself
-function EntryCard({ item, color, headings, lit }) {
+function EntryCard({ item, color, headings, lit, picked }) {
     const [open, setOpen] = useState(false);
     const more = `slop-${item.id}-more`;
     const opens = { href: item.href, target: '_blank', rel: 'noopener noreferrer' };
     return (
         <article
-            className={`slop-card slop-entry${open ? ' slop-entry-open' : ''}${lit ? ' slop-card-lit' : ''}`}
+            className={`slop-card slop-entry${open ? ' slop-entry-open' : ''}${lit ? ' slop-card-lit' : ''}${picked.size && carries(item, picked) ? ' slop-picked' : ''}`}
             id={`slop-${item.id}`}
             style={{ '--c': item.color ?? color }}
         >
-            {/* the whole face is the button's to click (see .slop-entry-toggle::after) */}
+            {/* the whole face is the button's to click (see .slop-entry-toggle::after), except the way in: that's
+                there from the start, no opening or scrolling needed */}
             <div className="slop-entry-face">
                 <div className="slop-entry-preview"><Shot entry={item} /></div>
                 <div className="slop-entry-text">
@@ -406,22 +490,22 @@ function EntryCard({ item, color, headings, lit }) {
                             <span className="slop-entry-chevron" aria-hidden="true" />
                         </h3>
                         <p className="slop-card-sub"><Words value={item.when} /></p>
-                        <Labels labels={item.labels} />
+                        <Labels labels={item.labels} picked={picked} />
                     </header>
                     <p className="slop-card-lede"><Words value={item.tagline} /></p>
+                    <a className="slop-button slop-button-primary slop-entry-go" {...opens}><Words value={item.open} /> ↗</a>
                 </div>
             </div>
             <div className="slop-entry-text slop-entry-more" id={more} hidden={!open}>
                 <Story entry={item} headings={headings} />
                 <Stats id={item.id} />
-                <div className="slop-entry-actions">
-                    <a className="slop-button slop-button-primary" {...opens}><Words value={item.open} /> ↗</a>
-                    {item.links.length > 0 && (
+                {item.links.length > 0 && (
+                    <div className="slop-entry-actions">
                         <div className="slop-card-links">
                             {item.links.map((link) => <CardLink key={link.href} link={link} />)}
                         </div>
-                    )}
-                </div>
+                    </div>
+                )}
             </div>
         </article>
     );
@@ -444,14 +528,39 @@ function sections(projects) {
     return out;
 }
 
+// the labels you can pick: what carries any of them lights up, in the bar, the dock and the cards below
+function LabelPicker({ labels, picked, onPick, onClear }) {
+    return (
+        <div className="slop-label-bar" role="group" aria-label="Labels">
+            <span className="slop-label-bar-title">Labels</span>
+            {labels.map((label) => (
+                <button key={label.key} className="slop-label-pick" aria-pressed={picked.has(label.key)} onClick={() => onPick(label.key)}>
+                    {label.name}<span className="slop-label-count">{label.count}</span>
+                </button>
+            ))}
+            {picked.size > 0 && <button className="slop-label-clear" onClick={onClear}>Clear</button>}
+        </div>
+    );
+}
+
 function SlopZone({ text, savedText, onEdit, onLeave, leaveRef }) {
     const [lit, setLit] = useState(null); // the card a tile just jumped to
+    const [picked, setPicked] = useState(() => new Set()); // labels picked in the bar: their projects light up
     const [editing, setEditing] = useState(false);
     const [pastBar, setPastBar] = useState(false); // scrolled below the bar, so the top row needs its own edge
     const barRef = useRef(null);
+    const topbarRef = useRef(null);
+    const dockRef = useRef(null);
+    const innerRef = useRef(null);
     const { intro, headings, projects } = text;
     const groups = sections(projects);
+    const labels = allLabels(projects);
     const yours = share(allTexts(text));
+    const pick = (key) => setPicked((now) => {
+        const next = new Set(now);
+        if (!next.delete(key)) next.add(key);
+        return next;
+    });
 
     useEffect(() => { // Esc closes the text panel first, then leaves
         const handleKey = (e) => {
@@ -472,6 +581,24 @@ function SlopZone({ text, savedText, onEdit, onLeave, leaveRef }) {
         return () => observer.disconnect();
     }, []);
 
+    useEffect(() => { // where the top row and the dock end, for jumps to land below: they change with the window
+        let frame;
+        const measure = () => {
+            cancelAnimationFrame(frame);
+            frame = requestAnimationFrame(() => {
+                const bottom = topbarRef.current.offsetHeight + dockRef.current.offsetHeight;
+                innerRef.current.style.setProperty('--dock-bottom', `${bottom}px`);
+            });
+        };
+        const observer = new ResizeObserver(measure);
+        observer.observe(topbarRef.current);
+        observer.observe(dockRef.current);
+        return () => {
+            observer.disconnect();
+            cancelAnimationFrame(frame);
+        };
+    }, []);
+
     useEffect(() => {
         if (lit === null) return;
         const timer = setTimeout(() => setLit(null), 1800);
@@ -484,8 +611,9 @@ function SlopZone({ text, savedText, onEdit, onLeave, leaveRef }) {
     }
 
     return (
-        <div className={`slop-inner${editing ? ' slop-inner-editing' : ''}`}>
-            <div className={`slop-topbar${pastBar ? ' slop-topbar-edge' : ''}`}>
+        <div className={`slop-inner${editing ? ' slop-inner-editing' : ''}${picked.size ? ' slop-picking' : ''}`} ref={innerRef}>
+            <Backdrop />
+            <div className={`slop-topbar${pastBar ? ' slop-topbar-edge' : ''}`} ref={topbarRef}>
                 <div className="slop-topbar-row">
                     <span className="slop-wordmark"><Words value={intro.title} /></span>
                     <div className="slop-topbar-actions">
@@ -499,22 +627,50 @@ function SlopZone({ text, savedText, onEdit, onLeave, leaveRef }) {
                         </button>
                     </div>
                 </div>
+                {/* once the bar is scrolled past, a slim copy of it hangs under the top row: every project to jump
+                    to, and the labels. It floats over the page, so nothing moves when it shows */}
+                <div className={`slop-dock${pastBar ? ' slop-dock-on' : ''}`} ref={dockRef} aria-hidden={!pastBar}>
+                    <div className="slop-dock-inner">
+                        <div className="slop-dock-row">
+                            <span className="slop-dock-title"><Words value={intro.overviewTitle} /></span>
+                            <ol className="slop-dock-tiles">
+                                {groups.flatMap((group) => group.projects).map((project) => (
+                                    <li
+                                        key={project.id}
+                                        style={{ '--c': project.color }}
+                                        className={picked.size && carries(project, picked) ? 'slop-picked' : undefined}
+                                    >
+                                        <button className="slop-dock-tile" onClick={() => jumpTo(project.id)} tabIndex={pastBar ? 0 : -1}>
+                                            <Thumb project={project} />
+                                            <Words value={project.title} />
+                                        </button>
+                                    </li>
+                                ))}
+                            </ol>
+                        </div>
+                        <LabelPicker labels={labels} picked={picked} onPick={pick} onClear={() => setPicked(new Set())} />
+                    </div>
+                </div>
             </div>
 
             {/* the bar: part of the top band, every project at a glance, by category */}
             <nav className="slop-bar" ref={barRef} aria-label={readable(intro.overviewTitle)}>
                 <div className="slop-bar-inner">
-                    <p className="slop-disclaimer"><Words value={intro.disclaimer} links /></p>
+                    {/* what the zone is and which color is whose, set apart from the jump-to tiles below by a rule */}
+                    <div className="slop-intro">
+                        <p className="slop-disclaimer"><Words value={intro.disclaimer} links /></p>
+                        <p className="slop-color-key"><Words value={intro.colorKey} links /></p>
+                    </div>
                     <div className="slop-bar-head">
                         <h2><Words value={intro.overviewTitle} /></h2>
                         <span><Words value={intro.overviewNote} /></span>
                         <span className="slop-legend">
                             <span className="slop-mine">My words</span>
                             <span className="slop-ai">AI-generated</span>
-                            <span className="slop-data">Data &amp; quotes</span>
                             {EDITING && <span>{percent(yours.fraction)} mine so far</span>}
                         </span>
                     </div>
+                    <LabelPicker labels={labels} picked={picked} onPick={pick} onClear={() => setPicked(new Set())} />
                     <div className="slop-bar-groups">
                         {groups.map((group) => (
                             <div
@@ -526,7 +682,11 @@ function SlopZone({ text, savedText, onEdit, onLeave, leaveRef }) {
                                 <span className="slop-bar-label">{group.label ? <Words value={group.label} /> : '\u00a0'}</span>
                                 <ol className="slop-tiles">
                                     {group.projects.map((project) => (
-                                        <li key={project.id} style={{ '--c': project.color }}>
+                                        <li
+                                            key={project.id}
+                                            style={{ '--c': project.color }}
+                                            className={picked.size && carries(project, picked) ? 'slop-picked' : undefined}
+                                        >
                                             <button className="slop-tile" onClick={() => jumpTo(project.id)}>
                                                 <Thumb project={project} />
                                                 <span className="slop-tile-who">
@@ -561,6 +721,7 @@ function SlopZone({ text, savedText, onEdit, onLeave, leaveRef }) {
                                     color={group.collection.color}
                                     headings={headings}
                                     lit={lit === item.id}
+                                    picked={picked}
                                 />
                             ))}
                         </div>
@@ -572,7 +733,7 @@ function SlopZone({ text, savedText, onEdit, onLeave, leaveRef }) {
                             <span className="slop-category-count">{group.projects.length === 1 ? '1 project' : `${group.projects.length} projects`}</span>
                         </h2>
                         {group.projects.map((project) => (
-                            <ProjectCard key={project.id} project={project} headings={headings} lit={lit === project.id} />
+                            <ProjectCard key={project.id} project={project} headings={headings} lit={lit === project.id} picked={picked} />
                         ))}
                     </section>
                 ))}

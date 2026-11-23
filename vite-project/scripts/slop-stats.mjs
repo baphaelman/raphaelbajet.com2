@@ -4,7 +4,8 @@
 //
 // Claude Code deletes transcripts after a while (30 days unless `cleanupPeriodDays` says otherwise), so every session
 // counted is kept in scripts/slopSessions.json and stays counted once its transcript is gone. Only new transcripts,
-// and ones that have grown, are read again.
+// and ones that have grown, are read again: one that shrank (part of it cleaned up) keeps what was counted from it,
+// so no count ever goes down. `since` is the day the oldest counted session started, which the zone states.
 import { readFileSync, writeFileSync, existsSync, readdirSync, statSync, createReadStream } from 'node:fs';
 import { createInterface } from 'node:readline';
 import { execFileSync } from 'node:child_process';
@@ -116,7 +117,7 @@ async function countSessions(known) {
             const subagents = existsSync(subDir) ? readdirSync(subDir).filter((name) => name.endsWith('.jsonl')) : [];
             const paths = [join(dir, file), ...subagents.map((name) => join(subDir, name))];
             const bytes = paths.reduce((sum, path) => sum + statSync(path).size, 0);
-            if (known[id]?.bytes === bytes) continue;
+            if (known[id]?.bytes >= bytes) continue;
 
             // The session counts for the project its own agent worked on, and each of its subagents for the one that
             // subagent did (its session's, if it touched no project's files)
@@ -158,6 +159,7 @@ Object.entries(PROJECTS).forEach(([id, project]) => {
 });
 
 writeFileSync(SESSIONS, JSON.stringify(sessions, null, 4) + '\n');
-const changed = JSON.stringify(projects) !== JSON.stringify(before.projects);
-if (changed) writeFileSync(STATS, JSON.stringify({ updated: day(Date.now() / 1000), projects }, null, 4) + '\n');
+const since = Object.values(sessions).map((session) => session.started).filter(Boolean).sort()[0] ?? null;
+const changed = JSON.stringify({ since, projects }) !== JSON.stringify({ since: before.since, projects: before.projects });
+if (changed) writeFileSync(STATS, JSON.stringify({ updated: day(Date.now() / 1000), since, projects }, null, 4) + '\n');
 console.log(`slop stats: ${Object.keys(sessions).length} sessions${changed ? ', numbers updated' : ', no change'}`);
