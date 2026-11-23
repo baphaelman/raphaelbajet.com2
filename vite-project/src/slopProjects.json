@@ -141,7 +141,8 @@
             "visual": "image",
             "image": "/slop/slop-editor.jpg",
             "imageLight": "/slop/slop-editor-light.jpg",
-            "thumb": "pie"
+            "thumb": "pie",
+            "demo": true
         }
     ]
 }

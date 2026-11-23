@@ -358,6 +358,8 @@ button > .image-text {
   /* the slop editor's colors for an agent's words and mine, in its pies, and its fonts */
   --slop-ai: var(--slop);
   --slop-me: var(--zone-text);
+  --slop-ok: #5ccf9c; /* and its green, for an agent's words I approved */
+  --slop-data: #e6b45c; /* the slop editor's amber, for text pulled from elsewhere */
   --slop-font: var(--zone-sans);
   --slop-glow: rgba(186, 137, 255, 0.55);
   --void-ink: #F0EBD8;
@@ -379,21 +381,25 @@ button > .image-text {
      here wrote (numbers counted from the record, other people's words), which only stays out of my share */
   --mine: var(--zone-text);
   --ai: var(--slop);
-  --data: var(--mine);
+  --data: var(--slop-data);
 
   /* the phrases drifting behind the zone, and the same phrases seen through the crack, a little brighter */
   --backdrop-ink: color-mix(in srgb, var(--slop) 13%, transparent);
   --crack-ink: color-mix(in srgb, var(--slop) 44%, transparent);
 }
 
-/* the slop editor's classes for each author's words: approved words (slop-ok) look like mine. While its editor is
-   open, it colors every word on the page (html.slop-on); in here, the zone's own colors stay */
+/* the slop editor's classes for each author's words: approved words (slop-ok) look like mine, and turn green while
+   the Slop-o-meter is on or the editor is open (html.slop-on); otherwise the zone's own colors stay */
 .slop-me,
 .slop-ok,
 .rupture :is(.slop-me, .slop-ok),
 .slop-zone :is(.slop-me, .slop-ok),
-html.slop-on :is(.rupture, .slop-zone) :is(.slop-me, .slop-ok) {
+html.slop-on :is(.rupture, .slop-zone) .slop-me {
   color: var(--mine);
+}
+
+html.slop-on :is(.rupture, .slop-zone) .slop-ok {
+  color: var(--slop-ok);
 }
 
 .slop-ai,
@@ -420,7 +426,7 @@ html.slop-on :is(.rupture, .slop-zone) .slop-data {
 .slop-labels {
   --mine: var(--zone-text-secondary);
   --ai: color-mix(in srgb, var(--slop) 72%, var(--zone-text-muted));
-  --data: var(--mine);
+  --data: var(--slop-data);
 }
 
 .slop-zone [data-slop] a {
@@ -1800,5 +1806,95 @@ html:has(.slop-meter[data-show="colors"]):not(.slop-on) :is(.rupture, .slop-zone
 @media (prefers-reduced-motion: reduce) {
   .slop-backdrop-row {
     animation: none;
+  }
+}
+
+/* words on a filled button take the button's own text color, whoever wrote them, so they stay readable */
+.slop-zone .slop-button-primary :is(.slop-ai, .slop-me, .slop-ok, .slop-data) {
+  color: inherit !important;
+}
+
+/* the slop editor's premise in its own card (SlopDemo): a switch that colors just that card, its pie and its tags */
+.slop-demo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0 0 22px;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--zone-text) 12%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--zone-text) 3%, transparent);
+  font-family: var(--zone-sans);
+  font-size: 13px;
+}
+
+.slop-demo .slop-demo-pie {
+  width: 58px;
+  height: 58px;
+  transition: filter .2s;
+}
+
+.slop-demo-off .slop-demo-pie {
+  filter: grayscale(1) brightness(.8);
+}
+
+.slop-demo-side {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.slop-demo .slop-demo-note {
+  margin: 0;
+  font-size: 14px;
+}
+
+.slop-demo-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+}
+
+.slop-demo .slop-meter-btn[aria-pressed="true"] {
+  border-color: var(--slop);
+}
+
+.slop-demo .slop-meter-btn[aria-pressed="true"] .slop-switch {
+  background: var(--slop);
+}
+
+.slop-demo .slop-key {
+  cursor: default;
+  transition: color .2s;
+}
+
+/* the card's own switch wins over the page's, either way */
+.slop-card.slop-demo-on .slop-ai { color: var(--ai) !important; }
+.slop-card.slop-demo-on .slop-me { color: var(--mine) !important; }
+.slop-card.slop-demo-on .slop-ok { color: var(--slop-ok) !important; }
+.slop-card.slop-demo-on .slop-data { color: var(--data) !important; }
+
+.slop-card.slop-demo-off :is(.slop-ai, .slop-me, .slop-ok, .slop-data) {
+  color: inherit !important;
+}
+
+/* a hovered tag: its author's words stand out, the rest step back */
+.slop-card:is([data-only="me"], [data-only="ok"], [data-only="data"], [data-only="ai"]) :is(.slop-ai, .slop-me, .slop-ok, .slop-data) {
+  opacity: .3;
+  transition: opacity .2s;
+}
+
+.slop-card[data-only="me"] .slop-me,
+.slop-card[data-only="ok"] .slop-ok,
+.slop-card[data-only="data"] .slop-data,
+.slop-card[data-only="ai"] .slop-ai,
+.slop-card[data-only] .slop-demo :is(.slop-ai, .slop-me, .slop-ok, .slop-data) {
+  opacity: 1;
+}
+
+@media (max-width: 600px) {
+  .slop-demo {
+    align-items: flex-start;
   }
 }

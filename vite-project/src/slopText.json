@@ -1,5 +1,5 @@
 {
-    "version": 55,
+    "version": 75,
     "rupture": {
         "title": [
             {
@@ -23,7 +23,7 @@
         ],
         "disclaimer": [
             {
-                "me": "The code for these projects was written almost entirely by agents. I incepted, directed, linted, and reviewed it myself, (many of these for hours) and am proud enough of this stuff to show it off, or at least let everyone else play with. Some of this stuff I really do think is pretty cool, projects I've been thinking about for years but felt I haven't been able to put together until recently, with agents."
+                "me": "The code for these project, and the Slop Zone, was written entirely by agents. I incepted, directed, linted, and reviewed it myself, (many of these for hours) and am proud enough of this stuff to show it off, or at least let everyone else play with. Some of this stuff I really do think is pretty cool, projects I've been thinking about for years but felt I haven't been able to put together until recently, with agents."
             }
         ],
         "colorKey": [
@@ -51,12 +51,22 @@
     "headings": {
         "what": "What is it?",
         "how": "How did it do it?",
-        "role": "What did I do?"
+        "role": "What did I do?",
+        "statsSince": [
+            {
+                "me": "Data"
+            },
+            " ",
+            {
+                "me": "since "
+            },
+            "{since}"
+        ]
     },
     "algorhythms": {
         "title": [
             {
-                "me": "AlgoRhythms"
+                "data": "AlgoRhythms"
             }
         ],
         "category": [
@@ -66,10 +76,14 @@
         ],
         "when": [
             {
-                "me": "Nov 2026"
+                "data": "Nov 2026"
             }
         ],
-        "status": "Live, growing",
+        "status": [
+            {
+                "ok": "Live, growing"
+            }
+        ],
         "tagline": [
             {
                 "me": "Pure music in the browser with a beautiful display"
@@ -93,17 +107,17 @@
         "what": {
             "p1": [
                 {
-                    "me": "Animating simple melodies and progressions, so every line you see is a note you hear."
+                    "me": "A simple music editor with a powerful video export. Compose abstract pieces by dragging moments into the editor, and tweaking with the mix panel. When you're done, you can leave with a unique audio-visual experience---downloaded on an mp4 file."
                 }
             ],
             "p2": [
                 {
-                    "me": "Design pieces in the editor from scratch. Drag moments into the "
+                    "me": "Inspired by Bounce Gravity's amazing (completely independent) [video](https://www.youtube.com/watch?v=TnSs5w5F5YA)."
                 }
             ],
             "p3": [
                 {
-                    "me": "Inspired by Bounce Gravity's [video](https://www.youtube.com/watch?v=TnSs5w5F5YA), completely independent."
+                    "me": "(del)"
                 }
             ]
         },
@@ -149,7 +163,7 @@
     "spotify-unwrapped": {
         "title": [
             {
-                "me": "Spotify (Un)Wrapped"
+                "data": "Spotify (Un)Wrapped"
             }
         ],
         "category": [
@@ -159,7 +173,7 @@
         ],
         "when": [
             {
-                "me": "Oct – Nov 2026"
+                "data": "Oct – Nov 2026"
             }
         ],
         "status": [
@@ -182,20 +196,25 @@
                 "me": "Data viz"
             }
         ],
+        "label3": [
+            {
+                "me": "UI/UX"
+            }
+        ],
         "what": {
             "p1": [
                 {
-                    "me": "Create beautiful visualizations of your Spotify extended streaming data (free with Premium). "
+                    "me": "Create beautiful visualizations of your Spotify extended streaming data (free with Premium). The navbar settings cascade to all the graphs, so you can dig into one time period, artist, or more."
                 }
             ],
             "p2": [
                 {
-                    "me": "The navbar settings cascade to all the graphs, so you can dig into one time period or artist."
+                    "me": "(del)"
                 }
             ],
             "p3": [
                 {
-                    "me": "Nothing leaves your browser. Unless you opt-in to share your (very) compressed analytics for the community page, which you can revert at any time. "
+                    "me": "Nothing leaves your browser, unless you opt-in to share your compressed and anonymized analytics for the community page. Remove it at any time with one click."
                 }
             ]
         },
@@ -230,7 +249,7 @@
     "rhyme-xray": {
         "title": [
             {
-                "me": "Rhyme X-ray"
+                "data": "Rhyme X-ray"
             }
         ],
         "category": [
@@ -240,7 +259,7 @@
         ],
         "when": [
             {
-                "me": "Nov 2026"
+                "data": "Nov 2026"
             }
         ],
         "status": [
@@ -315,12 +334,12 @@
         "paper-othello": {
             "title": [
                 {
-                    "me": "Paper Othello"
+                    "data": "Paper Othello"
                 }
             ],
             "when": [
                 {
-                    "me": "Nov 2026"
+                    "data": "Nov 2026"
                 }
             ],
             "tagline": [
@@ -366,10 +385,14 @@
             }
         ],
         "comma-pump": {
-            "title": "The Comma Pump",
+            "title": [
+                {
+                    "data": "The Comma Pump"
+                }
+            ],
             "when": [
                 {
-                    "me": "Nov 2026"
+                    "data": "Nov 2026"
                 }
             ],
             "tagline": "Why every keyboard is slightly out of tune, on purpose",
@@ -403,12 +426,12 @@
         "single-cycles": {
             "title": [
                 {
-                    "me": "Single Cycles"
+                    "data": "Single Cycles"
                 }
             ],
             "when": [
                 {
-                    "me": "Nov 2026"
+                    "data": "Nov 2026"
                 }
             ],
             "tagline": [
@@ -455,7 +478,7 @@
     "craft-prs": {
         "title": [
             {
-                "me": "Craft Libraries PRs"
+                "data": "Craft Libraries PRs"
             }
         ],
         "category": [
@@ -465,10 +488,14 @@
         ],
         "when": [
             {
-                "me": "Nov 2026"
+                "data": "Nov 2026"
             }
         ],
-        "status": "4 PRs in review",
+        "status": [
+            {
+                "ok": "4 PRs in review"
+            }
+        ],
         "tagline": [
             {
                 "me": "An agent fixing issues in an AI-first open-source repo"
@@ -489,38 +516,157 @@
         "role": {
             "p1": [
                 {
-                    "me": "Have tokens to spare at the end of my week, so I launched agents to solve issues."
+                    "me": "Have tokens to spare at the end of my week, so I launched agents to solve issues. Set up a simple command for agents to monitor my PRs."
                 }
             ]
         },
-        "link1": "craft-libs",
+        "link1": [
+            {
+                "data": "craft-libs"
+            }
+        ],
         "caption": "All waiting on review.",
-        "pr1": "audio: hostile sweeps honour CRAFT_HOSTILE_DIVISOR",
-        "pr2": "tests: the remaining hostile sweeps honour CRAFT_HOSTILE_DIVISOR",
-        "pr3": "docx: the mutated Standard-encryption sweep encrypts its seed once",
-        "pr4": "docx: the radar caps case uses just over each cap instead of 100 MB of XML"
+        "pr1": [
+            {
+                "data": "audio: hostile sweeps honour CRAFT_HOSTILE_DIVISOR"
+            }
+        ],
+        "pr2": [
+            {
+                "data": "tests: the remaining hostile sweeps honour CRAFT_HOSTILE_DIVISOR"
+            }
+        ],
+        "pr3": [
+            {
+                "data": "docx: the mutated Standard-encryption sweep encrypts its seed once"
+            }
+        ],
+        "pr4": [
+            {
+                "data": "docx: the radar caps case uses just over each cap instead of 100 MB of XML"
+            }
+        ]
     },
     "slop-editor": {
-        "title": "Slop Editor",
-        "category": "Open source",
-        "when": "Nov 2026",
-        "status": "On npm",
-        "tagline": "Tracks who wrote every word on a page",
-        "label1": "JavaScript",
+        "title": [
+            {
+                "data": "Slop Editor"
+            }
+        ],
+        "category": [
+            {
+                "ok": "Open source"
+            }
+        ],
+        "when": [
+            {
+                "data": "Nov 2026"
+            }
+        ],
+        "status": [
+            {
+                "ok": "On npm "
+            },
+            {
+                "data": "v0.1.0 (Nov 23, 2026)"
+            }
+        ],
+        "tagline": [
+            {
+                "ok": "Tracks who wrote every word on a page"
+            },
+            {
+                "me": ", including the Slop Zone"
+            }
+        ],
+        "demo": [
+            {
+                "ok": "This card, by who wrote it. "
+            },
+            {
+                "me": "Toggle the meter, or hover a tag:"
+            }
+        ],
+        "label1": [
+            {
+                "ok": "JavaScript"
+            }
+        ],
+        "label2": [
+            {
+                "me": "UI/UX"
+            }
+        ],
         "what": {
-            "p1": "Two files that track who wrote each word on a page: an agent, me, or a source. Readers see a pie, or switch on the colors; I get an editor to fix and approve the agent's words. This page runs on it."
+            "p1": [
+                {
+                    "ok": "Two files that track who wrote each word on a page. Readers see a pie, or switch on the colors; I get an editor to fix and approve the agent's words."
+                },
+                {
+                    "me": " (newline)\nChanges to this page, like adding Slop Editor to the Projects, are automatically handled and ready to edit."
+                }
+            ]
         },
         "how": {
-            "p1": "Agents wrote it, plus a CLI that moves a page's text into it and a Claude Code plugin that makes agents write new text in its format."
+            "p1": [
+                {
+                    "me": "Made a "
+                },
+                {
+                    "ok": "CLI that moves a page's text into it"
+                },
+                {
+                    "me": ","
+                },
+                {
+                    "ok": " and a Claude Code plugin that makes agents write new text in its format."
+                }
+            ]
         },
         "role": {
-            "p1": ""
+            "p1": [
+                {
+                    "me": "Wanted to differentiate between the slop and the not in places like this website, or my AI-rticles, and I already had this sort of overlay-editor set up. I was also curious about the process of making my own (admittedly awful) package."
+                }
+            ]
         },
-        "link1": "Try it",
-        "link2": "Code",
-        "link3": "npm",
-        "caption": "The demo page, itself tracked by the slop editor.",
-        "imageAlt": "The slop editor's demo page, with the editor open beside it"
+        "link1": [
+            {
+                "ok": "Try it"
+            }
+        ],
+        "link2": [
+            {
+                "ok": "Code"
+            }
+        ],
+        "link3": [
+            {
+                "ok": "npm"
+            }
+        ],
+        "caption": [
+            {
+                "ok": "The demo page, "
+            },
+            {
+                "me": "which"
+            },
+            {
+                "ok": " "
+            },
+            {
+                "me": "I edited and exposited with "
+            },
+            {
+                "ok": "the slop editor."
+            }
+        ],
+        "imageAlt": [
+            {
+                "ok": "The slop editor's demo page, with the editor open beside it"
+            }
+        ]
     },
-    "_show": "pie"
+    "_show": "colors"
 }

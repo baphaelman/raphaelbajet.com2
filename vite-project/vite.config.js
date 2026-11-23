@@ -10,7 +10,10 @@ import { fileURLToPath } from 'node:url'
 // The file's `version` goes up with every save, so a page that loaded an older version can't save over what changed
 // since; edit the file directly and the open page reloads
 const slopText = fileURLToPath(new URL('./src/slopText.json', import.meta.url))
-const slopFile = (name) => createRequire(import.meta.url).resolve(`slop-editor/${name}`)
+// slop.js comes from vendor/slop-editor: the package's, with changes not yet in the package (see its CHANGES.md)
+const slopFile = (name) => name === 'slop.js'
+  ? fileURLToPath(new URL('./vendor/slop-editor/slop.js', import.meta.url))
+  : createRequire(import.meta.url).resolve(`slop-editor/${name}`)
 
 function slopEditor() {
   let editing = false

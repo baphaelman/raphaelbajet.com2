@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import ExternalLink from '/components/ExternalLink.jsx';
 import Words from '/components/SlopWords.jsx';
-import Slop, { textAt, readable, keysOf, useMeter } from '/components/slop.js';
+import Slop, { textAt, readable, keysOf, useMeter, useSlop } from '/components/slop.js';
 import slopStats from '/src/slopStats.json';
 
 // `npm run edit` (vite --mode edit): the slop editor, how much of the text is mine, and the parts still to write
@@ -350,6 +350,8 @@ const STATS = [['commits', 'commits', 'commit'], ['agents', 'agents', 'agent'], 
 // the oldest transcript counted (2026-10-28 → Oct 28, 2026): Claude Code had already deleted the ones before it
 const STATS_SINCE = slopStats.since
     && new Date(slopStats.since).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+// a fact, so it shows as data in "Agents, sessions and hours since {since}" (headings.statsSince)
+Slop.vars.since = STATS_SINCE;
 
 // What went into a project, counted from git and Claude Code's transcripts by scripts/slop-stats.mjs (which runs
 // before `npm run dev`): numbers, so nobody's words. Commits are all of git's; the rest only go back to STATS_SINCE
@@ -366,7 +368,7 @@ function Stats({ id }) {
                     </div>
                 ))}
             </dl>
-            {STATS_SINCE && <p className="slop-card-stats-since">Agents, sessions and hours since {STATS_SINCE}</p>}
+            {STATS_SINCE && <p className="slop-card-stats-since"><Words path="headings.statsSince" /></p>}
         </>
     );
 }
@@ -412,6 +414,69 @@ function CardLinks({ links, base }) {
     );
 }
 
+// the colors each author's words take in the demo's pie
+const AUTHOR_COLORS = { me: 'var(--mine)', ok: 'var(--slop-ok)', data: 'var(--slop-data)', ai: 'var(--slop)' };
+
+// The slop editor's premise, in one card (`demo` in slopProjects.json): a Slop-o-meter switch for this card alone, a
+// pie of who wrote the card's words, and a tag for each author. The switch follows the page's until it's flipped here
+function SlopDemo({ base }) {
+    useSlop();
+    const ref = useRef(null);
+    const [pageOn, setPageOn] = useState(() => document.documentElement.classList.contains('slop-on'));
+    const [own, setOwn] = useState(null); // this card's switch, once flipped: true or false
+    const [only, setOnly] = useState(null); // the author whose tag is hovered: their words stand out
+    useEffect(() => {
+        const html = document.documentElement;
+        const watch = new MutationObserver(() => setPageOn(html.classList.contains('slop-on')));
+        watch.observe(html, { attributes: true, attributeFilter: ['class'] });
+        return () => watch.disconnect();
+    }, []);
+    const on = own ?? pageOn;
+    useEffect(() => {
+        const card = ref.current.closest('.slop-card');
+        card.classList.toggle('slop-demo-on', on);
+        card.classList.toggle('slop-demo-off', !on);
+        card.dataset.only = only ?? '';
+        return () => card.classList.remove('slop-demo-on', 'slop-demo-off');
+    }, [on, only]);
+
+    const m = Slop.makeup(Slop.entries().filter(([path]) => path.startsWith(`${base}.`)).map(([, value]) => value));
+    const authors = Slop.categories().filter((c) => m.counts[c.id] && AUTHOR_COLORS[c.id]);
+    let at = 0;
+    const stops = authors.map((c) => {
+        const from = at;
+        at += (m.counts[c.id] / m.letters) * 100;
+        return `${AUTHOR_COLORS[c.id]} ${from}% ${at}%`;
+    });
+
+    return (
+        <div className="slop-demo" ref={ref}>
+            <span className="slop-pie slop-demo-pie" role="img" aria-label={authors.map((c) => `${c.label} ${Slop.percent(m.counts[c.id] / m.letters)}`).join(', ')} style={{ background: `conic-gradient(${stops.join(', ')})` }} />
+            <div className="slop-demo-side">
+                <p className="slop-demo-note"><Words path={`${base}.demo`} /></p>
+                <div className="slop-demo-row">
+                    <button type="button" className="slop-meter-btn" aria-pressed={on} onClick={() => setOwn(!on)}>
+                        <span className="slop-switch" aria-hidden="true" />Slop-o-meter
+                    </button>
+                    <span className="slop-legend">
+                        {authors.map((c) => (
+                            <span
+                                key={c.id}
+                                className="slop-key"
+                                style={{ color: on ? AUTHOR_COLORS[c.id] : undefined }}
+                                onMouseEnter={() => setOnly(c.id)}
+                                onMouseLeave={() => setOnly(null)}
+                            >
+                                <i style={{ background: AUTHOR_COLORS[c.id] }} />{c.label}<b className="slop-pct">{Slop.percent(m.counts[c.id] / m.letters)}</b>
+                            </span>
+                        ))}
+                    </span>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 function ProjectCard({ project, lit, picked }) {
     const base = project.id;
     return (
@@ -431,6 +496,7 @@ function ProjectCard({ project, lit, picked }) {
             <div className="slop-card-body">
                 <div className="slop-card-text">
                     <p className="slop-card-lede"><Words path={`${base}.tagline`} links /></p>
+                    {project.demo && <SlopDemo base={base} />}
                     <Story base={base} />
                     <Stats id={project.id} />
                 </div>

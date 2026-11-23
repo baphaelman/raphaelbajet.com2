@@ -9,10 +9,10 @@
             "hours": 5
         },
         "algorhythms": {
-            "commits": 795,
-            "agents": 181,
-            "sessions": 64,
-            "hours": 132.8
+            "commits": 807,
+            "agents": 184,
+            "sessions": 67,
+            "hours": 136
         },
         "spotify-unwrapped": {
             "commits": 656,
@@ -40,15 +40,15 @@
         },
         "craft-prs": {
             "commits": 6,
-            "agents": 9,
-            "sessions": 7,
-            "hours": 2.1
+            "agents": 10,
+            "sessions": 8,
+            "hours": 2.3
         },
         "slop-zone": {
             "commits": null,
             "agents": 8,
             "sessions": 8,
-            "hours": 9.8
+            "hours": 11.4
         },
         "trivia": {
             "commits": null,

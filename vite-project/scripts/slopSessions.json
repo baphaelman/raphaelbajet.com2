@@ -2736,11 +2736,11 @@
     "04967627-e193-45f4-80ad-d763e8567b21": {
         "project": "algorhythms",
         "started": "2026-11-22",
-        "bytes": 11887506,
+        "bytes": 12795408,
         "agents": [
             {
                 "project": "algorhythms",
-                "hours": 11.108
+                "hours": 12.939
             }
         ]
     },
@@ -3613,11 +3613,11 @@
     "a2eccf88-1c8b-4663-8975-d7b63d8c2422": {
         "project": "algorhythms",
         "started": "2026-11-23",
-        "bytes": 1296721,
+        "bytes": 1500522,
         "agents": [
             {
                 "project": "algorhythms",
-                "hours": 0.263
+                "hours": 0.564
             }
         ]
     },
@@ -3701,11 +3701,11 @@
     "dbb602bc-b0a7-483a-93b5-bbc808c0cb6f": {
         "project": "algorhythms",
         "started": "2026-11-23",
-        "bytes": 1018527,
+        "bytes": 1310135,
         "agents": [
             {
                 "project": "algorhythms",
-                "hours": 0.175
+                "hours": 0.72
             }
         ]
     },
@@ -3789,11 +3789,11 @@
     "472a9b60-835a-443d-9e8b-c6a79fe88268": {
         "project": "slop-zone",
         "started": "2026-11-23",
-        "bytes": 532757,
+        "bytes": 7405779,
         "agents": [
             {
                 "project": "slop-zone",
-                "hours": 0.04
+                "hours": 1.628
             }
         ]
     },
@@ -3919,6 +3919,50 @@
             {
                 "project": "algorhythms",
                 "hours": 1.082
+            }
+        ]
+    },
+    "1e3d7bc6-1313-48b0-9914-cee4ebd5b19b": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 592355,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.069
+            }
+        ]
+    },
+    "23eb3d34-4625-4d23-8df7-0ab0a95b02a5": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 1011381,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.206
+            }
+        ]
+    },
+    "a72d89b2-b69d-4561-86d3-ef2905311f31": {
+        "project": "algorhythms",
+        "started": "2026-11-23",
+        "bytes": 1864719,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.263
+            }
+        ]
+    },
+    "db48bc19-315d-4d4b-b4bc-e2b80c3f83b5": {
+        "project": "craft-prs",
+        "started": "2026-11-23",
+        "bytes": 485844,
+        "agents": [
+            {
+                "project": "craft-prs",
+                "hours": 0.196
             }
         ]
     }
