@@ -236,82 +236,215 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
 }
 @media (prefers-reduced-motion: reduce) { .layer, .bar, .vlabel, #L-cancel tbody tr, .x::after { transition: none !important; } }
 </style>
-<style id="article-text-css">
-/* Slop editor: who wrote what (see the article-text script). Canonical copy: ~/Desktop/Coding/slop-editor/article-text.css.
-   Uses the article's tokens: --bg, --panel, --ink, --ink-2, --ink-3, --rule, --accent, --f-display, --f-mono. */
-:root {
-  /* my words in the body ink, anything AI-generated in purple, facts and quotes in amber */
-  --mine: var(--ink); --ai: #6e36d0; --data: #8f5a00;
+<style id="slop-css">
+/* Slop editor: who wrote what (see slop.js). MIT license.
+   Each category's color comes from the page's text block (picked in the editor), or --slop-<id> in the page's CSS
+   (--slop-ai, --slop-ok, --slop-data, --slop-me), or a default for the page's background: slop.js puts .slop-dark on
+   <html> when it's dark, and writes the colors into a stylesheet of its own. --slop-font and --slop-mono set the
+   editor's fonts. */
+html {
+  --_accent: #6d35d0;
+  --_font: var(--slop-font, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif);
+  --_mono: var(--slop-mono, ui-monospace, "SF Mono", Menlo, Consolas, monospace);
+  /* the editor's own surface */
+  --_bg: #fdfcfa; --_sunk: #f4f2ee; --_ink: #1e1b24; --_ink-2: #57525f; --_ink-3: #8b8694; --_rule: #e5e1e8;
+  --_shadow: 0 1px 2px rgb(30 20 40 / 0.06), 0 18px 48px rgb(30 20 40 / 0.16);
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) { --ai: #ba89ff; --data: #e8b65a; }
+html.slop-dark {
+  --_accent: #b892ff;
+  --_bg: #1b1920; --_sunk: #131217; --_ink: #f1eef5; --_ink-2: #bdb7c6; --_ink-3: #8a8494; --_rule: #2f2c36;
+  --_shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 18px 48px rgb(0 0 0 / 0.5);
 }
-:root[data-theme="dark"] { --ai: #ba89ff; --data: #e8b65a; }
+.slop-data { font-variant-numeric: tabular-nums; }
 
-/* the colors show while the Slop-o-meter is on */
-.slop-on .tx-mine { color: var(--tx-mine, var(--mine)); }
-.slop-on .tx-ai { color: var(--tx-ai, var(--ai)); }
-.slop-on .tx-data { color: var(--tx-data, var(--data)); }
-.tx-data { font-variant-numeric: tabular-nums; }
-/* quieter text keeps the three colors, a step down */
-.note, .lede, .dek, .hint, .eyebrow, .lay-sub, .cta-sub, .fan-note {
-  --tx-mine: var(--ink-2);
-  --tx-ai: color-mix(in srgb, var(--ai) 74%, var(--ink-3));
-  --tx-data: color-mix(in srgb, var(--data) 74%, var(--ink-3));
+/* ---------- Slop-o-meter ---------- */
+.slop-meter { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 0 0 16px; font: 0.78rem/1.4 var(--_font); }
+.slop-meter-btn {
+  display: inline-flex; align-items: center; gap: 8px; padding: 4px 11px 4px 5px; border-radius: 99px;
+  border: 1px solid color-mix(in srgb, currentColor 22%, transparent); background: transparent; color: inherit;
+  font: 600 0.78rem var(--_font); letter-spacing: 0.01em; cursor: pointer;
 }
+.slop-meter-btn:hover { border-color: var(--slop-c-ai, var(--_accent)); }
+.slop-meter-btn:focus-visible { outline: 2px solid var(--_accent); outline-offset: 2px; }
+.slop-switch { position: relative; width: 26px; height: 15px; border-radius: 99px; background: color-mix(in srgb, currentColor 22%, transparent); transition: background .2s; }
+.slop-switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 11px; height: 11px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgb(0 0 0 / 0.3); transition: transform .2s; }
+.slop-meter-btn[aria-pressed="true"] { border-color: var(--slop-c-ai, var(--_accent)); }
+.slop-meter-btn[aria-pressed="true"] .slop-switch { background: var(--slop-c-ai, var(--_accent)); }
+.slop-meter-btn[aria-pressed="true"] .slop-switch::after { transform: translateX(11px); }
+.slop-meter-key { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+/* what readers see: nothing (the default), the pie with its legend, or that and the switch that colors the words */
+.slop-meter:not([data-show]), .slop-meter[data-show="nothing"] { display: none; }
+.slop-meter[data-show="pie"] .slop-meter-btn { display: none; }
+.slop-pct { margin-left: 5px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.slop-pie { flex: none; width: 18px; height: 18px; border-radius: 50%; background: color-mix(in srgb, currentColor 20%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 15%, transparent); }
+.slop-legend { display: inline-flex; flex-wrap: wrap; gap: 2px 10px; font-weight: 600; }
+.slop-key { display: inline-flex; align-items: center; gap: 5px; }
+.slop-key i { width: 8px; height: 8px; border-radius: 50%; }
 
-/* Slop-o-meter: a switch at the top of the article */
-.tx-meter { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 0 0 14px; font-family: var(--f-mono); font-size: 0.74rem; color: var(--ink-3); }
-.tx-meter-btn { display: inline-flex; align-items: center; gap: 8px; padding: 4px 10px 4px 5px; border-radius: 99px; border: 1px solid var(--rule); background: var(--panel); color: var(--ink-2); font: 600 0.74rem var(--f-mono); letter-spacing: 0.04em; cursor: pointer; }
-.tx-meter-btn:hover { border-color: var(--ai); }
-.tx-switch { position: relative; width: 26px; height: 15px; border-radius: 99px; background: var(--rule); transition: background .2s; }
-.tx-switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 11px; height: 11px; border-radius: 50%; background: var(--panel); box-shadow: 0 1px 2px rgb(0 0 0 / 0.3); transition: transform .2s; }
-.tx-meter-btn[aria-pressed="true"] { border-color: var(--ai); color: var(--ink); }
-.tx-meter-btn[aria-pressed="true"] .tx-switch { background: var(--ai); }
-.tx-meter-btn[aria-pressed="true"] .tx-switch::after { transform: translateX(11px); }
-.tx-meter-key { display: none; flex-wrap: wrap; gap: 2px 12px; }
-.slop-on .tx-meter-key { display: inline-flex; }
-.tx-legend .tx-mine { color: var(--mine); } .tx-legend .tx-ai { color: var(--ai); } .tx-legend .tx-data { color: var(--data); }
-.tx-legend { font-weight: 600; }
+/* ---------- the editor ---------- */
+.slop-edit-btn, .slop-panel { font-family: var(--_font); color: var(--_ink); -webkit-font-smoothing: antialiased; }
+.slop-edit-btn, .slop-panel *, .slop-panel { box-sizing: border-box; }
+.slop-edit-btn {
+  position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: max(16px, env(safe-area-inset-bottom, 0px)); z-index: 2147483000;
+  display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px 10px 12px; border-radius: 99px;
+  border: 1px solid var(--_accent); background: var(--_bg); color: var(--_accent); font: 600 0.88rem var(--_font); cursor: pointer; box-shadow: var(--_shadow);
+}
+.slop-edit-btn::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--slop-c-ai, var(--_accent)); }
+.slop-edit-btn:hover { background: color-mix(in srgb, var(--_accent) 10%, var(--_bg)); }
+.slop-edit-btn[hidden], .slop-panel[hidden], .slop-panel [hidden] { display: none !important; }
 
-/* Edit text: only under tools/edit.mjs */
-.tx-edit-btn { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: max(14px, env(safe-area-inset-bottom, 0px)); z-index: 60; font: 600 0.86rem var(--f-display); padding: 9px 15px; border-radius: 99px; border: 1px solid var(--ai); background: var(--panel); color: var(--ai); cursor: pointer; box-shadow: 0 6px 24px rgb(0 0 0 / 0.14); }
-.tx-edit-btn[hidden], .tx-panel[hidden] { display: none; }
-.tx-panel { position: fixed; top: 12px; right: 12px; bottom: 12px; z-index: 60; width: min(400px, calc(100vw - 24px)); display: flex; flex-direction: column; background: var(--panel); color: var(--ink); border: 1px solid var(--rule); border-radius: 16px; box-shadow: 0 16px 48px rgb(0 0 0 / 0.28); font-family: var(--f-display); }
-.tx-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; padding: 14px 16px 10px; border-bottom: 1px solid var(--rule); }
-.tx-head h2 { font-size: 1.1rem; margin: 0; }
-.tx-status { margin: 2px 0 0; font: 0.74rem var(--f-mono); color: var(--ink-3); }
-.tx-status[data-kind="dirty"] { color: var(--ink-2); }
-.tx-status[data-kind="error"] { color: #d0453a; }
-.tx-close { font-size: 1.3rem; line-height: 1; width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--rule); background: none; color: var(--ink); cursor: pointer; }
-.tx-cover { padding: 10px 16px; border-bottom: 1px solid var(--rule); display: grid; gap: 6px; font: 0.78rem var(--f-mono); color: var(--ink-2); }
-.tx-cover-nums { display: flex; justify-content: space-between; gap: 8px; }
-.tx-cover-nums .tx-mine { color: var(--mine); font-weight: 600; }
-.tx-track { height: 6px; border-radius: 3px; background: color-mix(in srgb, var(--ai) 35%, var(--rule)); overflow: hidden; }
-.tx-track span { display: block; height: 100%; background: var(--mine); transition: width .3s; }
-.tx-body { overflow-y: auto; padding: 6px 12px 16px; overscroll-behavior: contain; }
-.tx-group { border-bottom: 1px solid var(--rule); }
-.tx-group summary { display: flex; justify-content: space-between; gap: 10px; padding: 10px 4px; cursor: pointer; font-weight: 700; font-size: 0.92rem; }
-.tx-gshare { font: 0.72rem var(--f-mono); color: var(--ink-3); white-space: nowrap; padding-top: 2px; }
-.tx-gshare.tx-some { color: var(--ink); }
-.tx-field { display: grid; gap: 4px; margin: 0 4px 12px; }
-.tx-flabel { display: flex; justify-content: space-between; gap: 8px; font: 0.72rem var(--f-mono); color: var(--ink-3); }
-.tx-fmine { color: var(--ink); }
-.tx-field input, .tx-field textarea { width: 100%; font: 0.88rem/1.45 var(--f-mono); color: var(--ink); background: var(--bg); border: 1px solid var(--rule); border-radius: 8px; padding: 6px 8px; resize: vertical; }
-.tx-field input:focus, .tx-field textarea:focus { outline: 2px solid var(--ai); outline-offset: 0; border-color: transparent; }
-.tx-reslop { font: 600 0.7rem var(--f-mono); padding: 3px 9px; border-radius: 99px; border: 1px solid color-mix(in srgb, var(--ai) 55%, var(--rule)); background: none; color: var(--ai); cursor: pointer; white-space: nowrap; }
-.tx-reslop:hover:not(:disabled) { background: color-mix(in srgb, var(--ai) 12%, transparent); }
-.tx-unslop, .tx-unslop-all, .tx-unslop-group { border-color: var(--rule); color: var(--mine); }
-.tx-unslop:hover:not(:disabled), .tx-unslop-all:hover:not(:disabled), .tx-unslop-group:hover:not(:disabled) { background: color-mix(in srgb, var(--mine) 8%, transparent); }
-.tx-reslop:disabled { opacity: 0.35; cursor: default; background: none; }
-.tx-actions { display: flex; flex-wrap: wrap; gap: 6px; }
-.tx-group-actions { margin: 0 4px 12px; }
-.tx-flabel { align-items: center; }
-.tx-fmine { margin-left: auto; }
-.tx-flabel .tx-reslop { padding: 0 7px; font-size: 0.66rem; }
-.tx-focus { outline: 2px dashed var(--ai); outline-offset: 3px; border-radius: 3px; }
+.slop-panel {
+  position: fixed; top: 12px; right: 12px; bottom: 12px; z-index: 2147483000; width: min(420px, calc(100vw - 24px));
+  display: flex; flex-direction: column; background: var(--_bg); border: 1px solid var(--_rule); border-radius: 16px;
+  box-shadow: var(--_shadow); font-size: 14px; line-height: 1.4; text-align: left;
+}
+.slop-panel button { font-family: inherit; color: inherit; }
+.slop-panel :focus-visible { outline: 2px solid var(--_accent); outline-offset: 1px; }
+.slop-panel p { margin: 0; }
+
+.sp-head { position: relative; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; padding: 16px 14px 10px 16px; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; }
+.slop-dragging, .slop-dragging * { user-select: none !important; -webkit-user-select: none !important; }
+.slop-dragging .sp-head { cursor: grabbing; }
+.sp-grip { position: absolute; top: 6px; left: 50%; width: 36px; height: 4px; margin-left: -18px; border-radius: 2px; background: var(--_rule); }
+.sp-head:hover .sp-grip { background: var(--_ink-3); }
+.sp-head h2 { margin: 0; font: 700 1.02rem/1.3 var(--_font); color: var(--_ink); }
+.sp-status { margin-top: 2px; font-size: 0.78rem; color: var(--_ink-3); min-height: 1.4em; }
+.sp-status[data-kind="dirty"] { color: var(--_ink-2); }
+.sp-status[data-kind="error"] { color: #d0453a; }
+.sp-link { padding: 0; border: 0; background: none; color: var(--_accent) !important; font: 600 0.78rem var(--_font); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+.sp-save { flex: none; margin-left: auto; height: 30px; padding: 0 13px; border-radius: 8px; border: 1px solid var(--_accent); background: var(--_accent); color: var(--_bg) !important; font: 600 0.82rem var(--_font); font-variant-numeric: tabular-nums; cursor: pointer; }
+.sp-save:hover:not(:disabled) { filter: brightness(1.1); }
+.sp-save:disabled { border-color: var(--_rule); background: none; color: var(--_ink-3) !important; cursor: default; }
+.sp-revert { flex: none; padding: 0 2px; border: 0; background: none; font: 600 0.72rem var(--_font); color: var(--_ink-3) !important; text-decoration: underline; text-decoration-color: var(--_rule); text-underline-offset: 2px; cursor: pointer; }
+.sp-revert:hover { color: var(--_ink) !important; text-decoration-color: currentColor; }
+.sp-close { flex: none; width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--_rule); background: none; font-size: 1.2rem; line-height: 1; cursor: pointer; }
+.sp-close:hover { background: var(--_sunk); }
+/* resize handles along every edge and corner */
+.sp-edge { position: absolute; z-index: 2; touch-action: none; }
+.sp-edge[data-edge="n"], .sp-edge[data-edge="s"] { left: 14px; right: 14px; height: 8px; cursor: ns-resize; }
+.sp-edge[data-edge="e"], .sp-edge[data-edge="w"] { top: 14px; bottom: 14px; width: 8px; cursor: ew-resize; }
+.sp-edge[data-edge="n"] { top: -4px; } .sp-edge[data-edge="s"] { bottom: -4px; }
+.sp-edge[data-edge="e"] { right: -4px; } .sp-edge[data-edge="w"] { left: -4px; }
+.sp-edge[data-edge="ne"], .sp-edge[data-edge="nw"], .sp-edge[data-edge="se"], .sp-edge[data-edge="sw"] { width: 16px; height: 16px; }
+.sp-edge[data-edge="ne"] { top: -4px; right: -4px; cursor: nesw-resize; } .sp-edge[data-edge="sw"] { bottom: -4px; left: -4px; cursor: nesw-resize; }
+.sp-edge[data-edge="nw"] { top: -4px; left: -4px; cursor: nwse-resize; } .sp-edge[data-edge="se"] { bottom: -4px; right: -4px; cursor: nwse-resize; }
+
+/* the whole page: how much is slop, the page's switch, and the categories */
+.sp-cover { display: grid; gap: 10px; padding: 0 16px 14px; }
+.sp-cover-row { display: flex; align-items: center; gap: 10px; }
+.sp-big { font-size: 0.9rem; color: var(--_ink-2); }
+.sp-big b { font: 700 1.55rem/1 var(--_font); color: var(--slop-c-ai, var(--_accent)); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+.sp-words { margin-right: auto !important; font-size: 0.78rem; color: var(--_ink-3); font-variant-numeric: tabular-nums; }
+.sp-cover-row .sp-pie { width: 22px; height: 22px; }
+.sp-cats { display: flex; flex-wrap: wrap; gap: 6px; }
+.sp-cat { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 9px 0 4px; border: 1px solid var(--_rule); border-radius: 99px; font-size: 0.78rem; }
+.sp-swatch { position: relative; flex: none; width: 18px; height: 18px; border-radius: 50%; overflow: hidden; cursor: pointer; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--_ink) 18%, transparent); }
+.sp-swatch:hover { box-shadow: 0 0 0 2px var(--_rule), inset 0 0 0 1px color-mix(in srgb, var(--_ink) 18%, transparent); }
+.sp-swatch input { position: absolute; inset: -4px; width: calc(100% + 8px); height: calc(100% + 8px); padding: 0; border: 0; opacity: 0; cursor: pointer; }
+.sp-cat-name { min-width: 3ch; padding: 0; border: 0; border-radius: 4px; background: none; font: 600 0.78rem var(--_font); color: var(--_ink); }
+.sp-cat-name:hover { background: var(--_sunk); }
+.sp-cat-name:focus { outline: none; background: var(--_sunk); }
+.sp-cat-pct { font-weight: 500; color: var(--_ink-3); font-variant-numeric: tabular-nums; }
+.sp-cat-x { margin: 0 -3px 0 -2px; padding: 0 3px; border: 0; background: none; color: var(--_ink-3) !important; font-size: 1rem; line-height: 1; cursor: pointer; }
+.sp-cat-x:hover { color: var(--_ink) !important; }
+.sp-show { display: flex; align-items: center; gap: 10px; font-size: 0.78rem; color: var(--_ink-3); }
+.sp-seg { display: flex; flex: 1; gap: 2px; padding: 2px; border-radius: 8px; background: var(--_sunk); }
+.sp-seg button { flex: 1; padding: 4px 6px; border: 0; border-radius: 6px; background: none; font-size: 0.76rem; font-weight: 600; color: var(--_ink-2); cursor: pointer; white-space: nowrap; }
+.sp-seg button[aria-checked="true"] { background: var(--_bg); color: var(--_ink); box-shadow: 0 1px 2px rgb(0 0 0 / 0.12); }
+.sp-seg button:hover:not([aria-checked="true"]) { color: var(--_ink); }
+.sp-cat-add, .sp-cat-new { height: 28px; padding: 0 11px; border: 1px dashed var(--_rule); border-radius: 99px; background: none; font: 600 0.78rem var(--_font); color: var(--_ink-2); cursor: pointer; }
+.sp-cat-add:hover { border-color: var(--_ink-3); color: var(--_ink); }
+.sp-cat-new { width: 150px; border-style: solid; border-color: var(--_accent); color: var(--_ink); cursor: text; outline: none; }
+
+/* tabs */
+.sp-tabs { display: flex; gap: 2px; margin: 0 12px; padding: 3px; border-radius: 10px; background: var(--_sunk); }
+.sp-tabs button { flex: 1; padding: 6px 8px; border: 0; border-radius: 7px; background: none; color: var(--_ink-2); font-size: 0.82rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.sp-tabs button span { margin-left: 3px; font-weight: 500; color: var(--_ink-3); font-variant-numeric: tabular-nums; }
+.sp-tabs button[aria-selected="true"] { background: var(--_bg); color: var(--_ink); box-shadow: 0 1px 2px rgb(0 0 0 / 0.12); }
+.sp-tabs button:hover:not([aria-selected="true"]) { color: var(--_ink); }
+
+.sp-body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 8px 12px 20px; }
+.sp-intro { padding: 6px 4px 10px; font-size: 0.8rem; color: var(--_ink-3); }
+.sp-empty { padding: 28px 12px; text-align: center; color: var(--_ink-3); font-size: 0.86rem; }
+
+/* sections */
+.sp-group { border-bottom: 1px solid var(--_rule); }
+.sp-group summary { display: flex; align-items: center; gap: 8px; padding: 10px 4px; cursor: pointer; list-style: none; }
+.sp-group summary::-webkit-details-marker { display: none; }
+.sp-group summary::before { content: ""; flex: none; width: 6px; height: 6px; margin: 0 3px 0 1px; border: solid var(--_ink-3); border-width: 0 1.5px 1.5px 0; transform: rotate(-45deg); transition: transform .15s; }
+.sp-group[open] summary::before { transform: rotate(45deg) translate(-2px, 0); }
+.sp-gname { font-weight: 700; font-size: 0.9rem; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sp-gnote { margin-left: auto; font-size: 0.74rem; color: var(--_ink-3); white-space: nowrap; }
+.sp-group > .sp-field:last-child { margin-bottom: 14px; }
+
+/* one text */
+.sp-field { display: grid; gap: 5px; margin: 0 2px 12px 18px; padding: 2px; border-radius: 10px; transition: background .4s; }
+.sp-body > .sp-field { margin-left: 2px; }
+.sp-flash { background: color-mix(in srgb, var(--_accent) 14%, transparent); }
+.sp-flabel { display: flex; align-items: center; gap: 6px; min-height: 24px; }
+.sp-flabel label { min-width: 0; margin-right: auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.76rem; font-weight: 600; color: var(--_ink-3); }
+.sp-field textarea {
+  display: block; width: 100%; margin: 0; padding: 7px 9px; resize: none; overflow: hidden;
+  font: 0.86rem/1.5 var(--_mono); color: var(--_ink); background: var(--_sunk); border: 1px solid transparent; border-radius: 8px;
+}
+.sp-field textarea:hover { border-color: var(--_rule); }
+.sp-field textarea:focus { outline: none; border-color: var(--_accent); background: var(--_bg); box-shadow: 0 0 0 3px color-mix(in srgb, var(--_accent) 18%, transparent); }
+.sp-unseen { flex: none; padding: 1px 6px; border: 0; border-radius: 4px; background: var(--_sunk); font: 600 0.68rem var(--_font); color: var(--_ink-3) !important; cursor: help; }
+.sp-unseen:not(:disabled) { color: var(--_accent) !important; cursor: pointer; }
+.sp-unseen:not(:disabled):hover { background: color-mix(in srgb, var(--_accent) 12%, transparent); }
+.sp-hint { padding: 2px 2px 0; font-size: 0.76rem; color: var(--_ink-2); }
+
+/* a pie of what the text is made of, and its slop switch */
+.sp-ctl { flex: none; display: inline-flex; align-items: center; gap: 7px; }
+.sp-pie { flex: none; width: 16px; height: 16px; border-radius: 50%; background: var(--_rule); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--_ink) 14%, transparent); }
+.sp-toggle {
+  display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 9px 0 4px; border: 1px solid var(--_rule); border-radius: 99px;
+  background: var(--_bg); font-size: 0.74rem; font-weight: 600; color: var(--_ink-3); cursor: pointer;
+}
+.sp-switch { position: relative; flex: none; width: 24px; height: 14px; border-radius: 99px; background: var(--slop-c-ok, #17805a); transition: background .2s; }
+.sp-switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 10px; height: 10px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgb(0 0 0 / 0.3); transition: transform .2s; }
+.sp-toggle[aria-checked="true"] { color: var(--slop-c-ai, var(--_accent)); border-color: color-mix(in srgb, var(--slop-c-ai, var(--_accent)) 45%, var(--_rule)); }
+.sp-toggle[aria-checked="true"] .sp-switch { background: var(--slop-c-ai, var(--_accent)); }
+.sp-toggle[aria-checked="true"] .sp-switch::after { transform: translateX(10px); }
+.sp-toggle:hover:not(:disabled) { border-color: var(--_ink-3); }
+.sp-still .sp-switch, .sp-still .sp-switch::after { transition: none; }
+.sp-toggle:disabled { opacity: 0.45; cursor: default; }
+.sp-toggle:disabled .sp-switch { background: var(--_rule); }
+
+/* marking text: shown under the focused text */
+.sp-assign { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding-top: 2px; }
+.sp-assign-label { margin-right: 2px; font-size: 0.72rem; color: var(--_ink-3); }
+.sp-as { display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 8px 0 6px; border: 1px solid var(--_rule); border-radius: 99px; background: var(--_bg); font-size: 0.72rem; font-weight: 600; color: var(--_ink-2) !important; cursor: pointer; }
+.sp-as i { width: 8px; height: 8px; border-radius: 50%; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--_ink) 15%, transparent); }
+.sp-as:hover { border-color: var(--_ink-3); color: var(--_ink) !important; }
+
+/* the repeat badge: the same words are elsewhere too */
+.sp-rep {
+  flex: none; display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 7px 0 6px; border-radius: 6px;
+  border: 1px dashed color-mix(in srgb, var(--_accent) 55%, var(--_rule)); background: none; color: var(--_accent) !important;
+  font-size: 0.72rem; font-weight: 700; font-variant-numeric: tabular-nums; cursor: pointer;
+}
+.sp-rep::before { content: ""; width: 9px; height: 9px; border: 1.5px solid currentColor; border-radius: 2px; box-shadow: 2.5px -2.5px 0 -1px var(--_bg), 2.5px -2.5px 0 0.5px currentColor; margin-right: 2px; }
+.sp-rep:hover { background: color-mix(in srgb, var(--_accent) 10%, transparent); }
+
+/* Repeats: one card per repeated text */
+.sp-set { margin: 0 0 12px; padding: 10px; border: 1px solid var(--_rule); border-radius: 12px; }
+.sp-set .sp-flabel label { color: var(--_accent); }
+.sp-where { list-style: none; margin: 2px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px; }
+.sp-goto { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; padding: 3px 8px 3px 5px; border: 1px solid var(--_rule); border-radius: 6px; background: none; font-size: 0.74rem; color: var(--_ink-2) !important; cursor: pointer; }
+.sp-goto:hover { border-color: var(--_ink-3); color: var(--_ink) !important; }
+.sp-pie.sp-mini { width: 10px; height: 10px; }
+
+/* on the page, while the editor is open */
+.slop-editing [data-slop] { cursor: text; }
+.slop-editing [data-slop]:hover { outline: 1px dashed color-mix(in srgb, var(--_accent) 60%, transparent); outline-offset: 3px; border-radius: 2px; }
+.slop-focus { outline: 2px solid var(--_accent) !important; outline-offset: 3px; border-radius: 2px; }
+.slop-copy { outline: 2px dashed var(--_accent) !important; outline-offset: 3px; border-radius: 2px; }
+
 @media (max-width: 900px) {
-  .tx-panel { top: auto; left: 8px; right: 8px; bottom: 8px; width: auto; height: 56svh; }
+  .slop-panel { top: auto; left: 8px; right: 8px; bottom: 8px; width: auto; height: 60svh; }
+  .sp-head { cursor: ns-resize; }
+  .sp-edge:not([data-edge="n"]) { display: none; }
 }
 </style>
 
@@ -327,13 +460,13 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
           </svg>
         </div>
         <div class="layer panel-layer" id="L-chart">
-          <div class="lay-title" data-tx="term.stageTitle"></div>
+          <div class="lay-title" data-slop="term.stageTitle"></div>
           <div class="legend"><span><i class="sw" style="background: var(--c1)"></i>Ignoring flips</span><span class="t2"><i class="sw" style="background: var(--c2)"></i>Counting flips</span></div>
           <svg id="chart-svg" viewBox="0 0 640 330" role="img" aria-label="Bar chart of single-cycle probability by cycle length 6 to 12. Long cycles dominate."></svg>
           <div class="total"><div><b>24.94%</b><span>total, ignoring flips</span></div><div class="t2"><b>14.40%</b><span>total, counting flips</span></div></div>
         </div>
         <div class="layer panel-layer" id="L-cancel" data-b="0">
-          <div class="lay-title" data-tx="uniform.stageTitle"></div>
+          <div class="lay-title" data-slop="uniform.stageTitle"></div>
           <div class="fanrow"><svg id="fan-svg" viewBox="0 0 300 300" role="img" aria-label="The ring of slots, with the arrows out of UR so far and every home the next one could point to."></svg><div class="fan-note" id="fan-note"></div></div>
           <div class="tablebox">
             <table class="ctable">
@@ -360,18 +493,18 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
                   <td><span class="ev ret">back to UR</span><span class="fr"><span>1</span><span class="x xb">10</span></span></td>
                   <td class="res"><span class="fr"><span>1</span><span>12</span></span></td></tr>
                 <tr class="r4"><td>4…12</td>
-                  <td colspan="3" style="font-size: 0.9rem; color: var(--ink-2); white-space: normal" data-tx="uniform.tableRest"></td>
+                  <td colspan="3" style="font-size: 0.9rem; color: var(--ink-2); white-space: normal" data-slop="uniform.tableRest"></td>
                   <td class="res"><span class="fr"><span>1</span><span>12</span></span></td></tr>
               </tbody>
             </table>
           </div>
           <div class="histstrip">
-            <div class="hs-head"><span data-tx="uniform.histHead"></span><span class="lab-count" id="hist-count"></span><button class="mini" id="hist-more" hidden="">Run another million</button></div>
+            <div class="hs-head"><span data-slop="uniform.histHead"></span><span class="lab-count" id="hist-count"></span><button class="mini" id="hist-more" hidden="">Run another million</button></div>
             <svg id="hist-svg" viewBox="0 0 640 112" role="img" aria-label="Live histogram of the buffer's cycle length in random scrambles: flat at one twelfth."></svg>
           </div>
         </div>
         <div class="layer panel-layer" id="L-lab">
-          <div class="lay-title" data-tx="lab.stageTitle"></div>
+          <div class="lay-title" data-slop="lab.stageTitle"></div>
           <div class="runbar"><span class="lab-count" id="lab-count">0 scrambles</span><button class="mini" id="lab-more" hidden="">Run another million</button></div>
           <div class="lab-group">The answer · traced from UR, solved cube excluded</div>
           <div class="lab-row"><span class="name">No cycle break</span><span class="nums"><b id="sim2">–</b> · exact 22.65%</span><div class="track"><div class="fill" id="fill2"></div><div class="tick" style="left: 75.51%"></div></div></div>
@@ -379,7 +512,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
           <div class="lab-group">First attempt · one cycle anywhere, solved cube included</div>
           <div class="lab-row"><span class="name">Ignoring flips</span><span class="nums"><b id="sim0">–</b> · exact 24.94%</span><div class="track"><div class="fill" id="fill0"></div><div class="tick" style="left: 83.13%"></div></div></div>
           <div class="lab-row"><span class="name">Counting flips</span><span class="nums"><b id="sim1">–</b> · exact 14.40%</span><div class="track"><div class="fill" id="fill1"></div><div class="tick" style="left: 47.99%"></div></div></div>
-          <div class="hint" data-tx="lab.stageHint"></div>
+          <div class="hint" data-slop="lab.stageHint"></div>
         </div>
         <div class="nav" id="nav">
           <button class="key" id="k-prev" aria-label="Previous screen">←</button>
@@ -396,163 +529,163 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
 
   <div class="steps">
     <section class="step" data-scene="hero"><div class="card">
-      <div data-slopmeter="on"></div>
-      <div class="eyebrow" data-tx="hero.eyebrow"></div>
-      <h1 data-tx="hero.title"></h1>
-      <p class="dek" data-tx="hero.dek"></p>
+      <div data-slop-meter></div>
+      <div class="eyebrow" data-slop="hero.eyebrow"></div>
+      <h1 data-slop="hero.title"></h1>
+      <p class="dek" data-slop="hero.dek"></p>
       <div class="answers">
         <div class="answer"><span class="who">No cycle break</span><b>22.65%</b></div>
         <div class="answer"><span class="who">No break, no flips</span><b>13.74%</b></div>
       </div>
-      <p class="note" style="margin-top: 18px" data-tx="hero.note"></p>
-      <p class="hint" style="margin-top: 20px" data-tx="hero.hint"></p>
+      <p class="note" style="margin-top: 18px" data-slop="hero.note"></p>
+      <p class="hint" style="margin-top: 20px" data-slop="hero.hint"></p>
     </div></section>
 
     <section class="step" data-scene="pieces"><div class="card">
-      <h2 data-tx="pieces.title"></h2>
-      <p data-tx="pieces.p1"></p>
-      <p data-tx="pieces.p2"></p>
+      <h2 data-slop="pieces.title"></h2>
+      <p data-slop="pieces.p1"></p>
+      <p data-slop="pieces.p2"></p>
     </div></section>
 
     <section class="step" data-scene="homes"><div class="card">
-      <h2 data-tx="homes.title"></h2>
-      <p data-tx="homes.p1"></p>
-      <p data-tx="homes.p2"></p>
+      <h2 data-slop="homes.title"></h2>
+      <p data-slop="homes.p1"></p>
+      <p data-slop="homes.p2"></p>
     </div></section>
 
     <section class="step" data-scene="scramble"><div class="card">
-      <h2 data-tx="scramble.title"></h2>
-      <p data-tx="scramble.p1"></p>
-      <p data-tx="scramble.p2"></p>
+      <h2 data-slop="scramble.title"></h2>
+      <p data-slop="scramble.p1"></p>
+      <p data-slop="scramble.p2"></p>
     </div></section>
 
     <section class="step" data-scene="buffer"><div class="card">
-      <h2 data-tx="buffer.title"></h2>
-      <p data-tx="buffer.p1"></p>
-      <p data-tx="buffer.p2"></p>
+      <h2 data-slop="buffer.title"></h2>
+      <p data-slop="buffer.p1"></p>
+      <p data-slop="buffer.p2"></p>
     </div></section>
 
     <section class="step tall" data-scene="tperm"><div class="card">
-      <h2 data-tx="tperm.title"></h2>
-      <p data-tx="tperm.p1"></p>
-      <p data-tx="tperm.p2"></p>
-      <p data-tx="tperm.p3"></p>
-      <p class="hint scrub" data-tx="tperm.hint"></p>
+      <h2 data-slop="tperm.title"></h2>
+      <p data-slop="tperm.p1"></p>
+      <p data-slop="tperm.p2"></p>
+      <p data-slop="tperm.p3"></p>
+      <p class="hint scrub" data-slop="tperm.hint"></p>
     </div></section>
 
     <section class="step tall" data-scene="swaps"><div class="card">
-      <h2 data-tx="swaps.title"></h2>
-      <p data-tx="swaps.p1"></p>
-      <p data-tx="swaps.p2"></p>
-      <p class="hint scrub" data-tx="swaps.hint"></p>
+      <h2 data-slop="swaps.title"></h2>
+      <p data-slop="swaps.p1"></p>
+      <p data-slop="swaps.p2"></p>
+      <p class="hint scrub" data-slop="swaps.hint"></p>
     </div></section>
 
     <section class="step" data-scene="closed"><div class="card">
-      <h2 data-tx="closed.title"></h2>
-      <p data-tx="closed.p1"></p>
-      <p data-tx="closed.p2"></p>
+      <h2 data-slop="closed.title"></h2>
+      <p data-slop="closed.p1"></p>
+      <p data-slop="closed.p2"></p>
     </div></section>
 
     <section class="step tall" data-scene="break"><div class="card">
-      <h2 data-tx="break.title"></h2>
-      <p data-tx="break.p1"></p>
-      <p data-tx="break.p2"></p>
-      <p class="hint scrub" data-tx="break.hint"></p>
+      <h2 data-slop="break.title"></h2>
+      <p data-slop="break.p1"></p>
+      <p data-slop="break.p2"></p>
+      <p class="hint scrub" data-slop="break.hint"></p>
     </div></section>
 
     <section class="step" data-scene="rewind"><div class="card">
-      <h2 data-tx="rewind.title"></h2>
-      <p data-tx="rewind.p1"></p>
-      <p data-tx="rewind.p2"></p>
+      <h2 data-slop="rewind.title"></h2>
+      <p data-slop="rewind.p1"></p>
+      <p data-slop="rewind.p2"></p>
     </div></section>
 
     <section class="step tall" data-scene="ring"><div class="card">
-      <h2 data-tx="ring.title"></h2>
-      <p data-tx="ring.p1"></p>
+      <h2 data-slop="ring.title"></h2>
+      <p data-slop="ring.p1"></p>
       <div class="qbox">
-        <div class="eyebrow" data-tx="ring.question"></div>
-        <p data-tx="ring.p2"></p>
-        <p data-tx="ring.p3"></p>
+        <div class="eyebrow" data-slop="ring.question"></div>
+        <p data-slop="ring.p2"></p>
+        <p data-slop="ring.p3"></p>
       </div>
     </div></section>
 
     <section class="step tall" data-scene="flips"><div class="card">
-      <h2 data-tx="flips.title"></h2>
-      <p data-tx="flips.p1"></p>
-      <p data-tx="flips.p2"></p>
-      <p data-tx="flips.p3"></p>
-      <p class="hint scrub" data-tx="flips.hint"></p>
+      <h2 data-slop="flips.title"></h2>
+      <p data-slop="flips.p1"></p>
+      <p data-slop="flips.p2"></p>
+      <p data-slop="flips.p3"></p>
+      <p class="hint scrub" data-slop="flips.hint"></p>
     </div></section>
 
     <section class="step tall" data-scene="uniform"><div class="card">
-      <h2 data-tx="uniform.title"></h2>
-      <p data-tx="uniform.p1"></p>
-      <p data-tx="uniform.p2"></p>
-      <p data-tx="uniform.p3"></p>
-      <p data-tx="uniform.p4"></p>
-      <p class="hint scrub" data-tx="uniform.hint"></p>
+      <h2 data-slop="uniform.title"></h2>
+      <p data-slop="uniform.p1"></p>
+      <p data-slop="uniform.p2"></p>
+      <p data-slop="uniform.p3"></p>
+      <p data-slop="uniform.p4"></p>
+      <p class="hint scrub" data-slop="uniform.hint"></p>
     </div></section>
 
     <section class="step" data-scene="cuber"><div class="card">
-      <h2 data-tx="cuber.title"></h2>
-      <p data-tx="cuber.p1"></p>
+      <h2 data-slop="cuber.title"></h2>
+      <p data-slop="cuber.p1"></p>
       <math display="block"><mfrac><mn>1</mn><mn>12</mn></mfrac><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>0</mn></mrow><mn>10</mn></munderover><mfrac><mn>1</mn><mrow><mi>j</mi><mo>!</mo></mrow></mfrac><mo>≈</mo><mfrac><mi>e</mi><mn>12</mn></mfrac><mo>≈</mo><mn>22.65</mn><mo>%</mo></math>
-      <p data-tx="cuber.p2"></p>
-      <p data-tx="cuber.p3"></p>
+      <p data-slop="cuber.p2"></p>
+      <p data-slop="cuber.p3"></p>
       <math display="block"><mfrac><mn>1</mn><mn>12</mn></mfrac><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>0</mn></mrow><mn>10</mn></munderover><mfrac><mn>1</mn><mrow><mi>j</mi><mo>!</mo><mspace width="0.17em"/><msup><mn>2</mn><mi>j</mi></msup></mrow></mfrac><mo>≈</mo><mfrac><msqrt><mpadded height="0.7em" depth="0"><mi>e</mi></mpadded></msqrt><mn>12</mn></mfrac><mo>≈</mo><mn>13.74</mn><mo>%</mo></math>
-      <p data-tx="cuber.p4"></p>
+      <p data-slop="cuber.p4"></p>
     </div></section>
 
     <section class="step" data-scene="attempt"><div class="card">
-      <div class="eyebrow" data-tx="attempt.eyebrow"></div>
-      <h2 data-tx="attempt.title"></h2>
-      <p data-tx="attempt.p1"></p>
-      <p data-tx="attempt.p2"></p>
-      <p data-tx="attempt.p3"></p>
+      <div class="eyebrow" data-slop="attempt.eyebrow"></div>
+      <h2 data-slop="attempt.title"></h2>
+      <p data-slop="attempt.p1"></p>
+      <p data-slop="attempt.p2"></p>
+      <p data-slop="attempt.p3"></p>
     </div></section>
 
     <section class="step" data-scene="count"><div class="card">
-      <h2 data-tx="count.title"></h2>
-      <p data-tx="count.p1"></p>
-      <p data-tx="count.p2"></p>
-      <p data-tx="count.p3"></p>
-      <p data-tx="count.p4"></p>
+      <h2 data-slop="count.title"></h2>
+      <p data-slop="count.p1"></p>
+      <p data-slop="count.p2"></p>
+      <p data-slop="count.p3"></p>
+      <p data-slop="count.p4"></p>
     </div></section>
 
     <section class="step" data-scene="term"><div class="card">
-      <h2 data-tx="term.title"></h2>
-      <p data-tx="term.p1"></p>
+      <h2 data-slop="term.title"></h2>
+      <p data-slop="term.p1"></p>
       <math display="block"><mfrac><mrow><mrow><mo>(</mo><mfrac linethickness="0"><mn>12</mn><mi>k</mi></mfrac><mo>)</mo></mrow><mo>(</mo><mi>k</mi><mo>−</mo><mn>1</mn><mo>)</mo><mo>!</mo></mrow><mrow><mn>12</mn><mo>!</mo></mrow></mfrac><mo>=</mo><mfrac><mn>1</mn><mrow><mi>k</mi><mspace width="0.17em"/><mo>(</mo><mn>12</mn><mo>−</mo><mi>k</mi><mo>)</mo><mo>!</mo></mrow></mfrac></math>
-      <p data-tx="term.p2"></p>
+      <p data-slop="term.p2"></p>
       <math display="block"><mfrac><mn>1</mn><mrow><mn>12</mn><mo>!</mo></mrow></mfrac><mo>+</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>2</mn></mrow><mn>12</mn></munderover><mfrac><mn>1</mn><mrow><mi>k</mi><mspace width="0.17em"/><mo>(</mo><mn>12</mn><mo>−</mo><mi>k</mi><mo>)</mo><mo>!</mo></mrow></mfrac><mo>=</mo><mfrac><mn>103447</mn><mn>414720</mn></mfrac><mo>≈</mo><mn>24.94</mn><mo>%</mo></math>
     </div></section>
 
     <section class="step" data-scene="flipcount"><div class="card">
-      <h2 data-tx="flipcount.title"></h2>
-      <p data-tx="flipcount.p1"></p>
-      <p data-tx="flipcount.p2"></p>
+      <h2 data-slop="flipcount.title"></h2>
+      <p data-slop="flipcount.p1"></p>
+      <p data-slop="flipcount.p2"></p>
     </div></section>
 
     <section class="step" data-scene="full"><div class="card">
-      <h2 data-tx="full.title"></h2>
-      <p data-tx="full.p1"></p>
+      <h2 data-slop="full.title"></h2>
+      <p data-slop="full.p1"></p>
       <math display="block"><mfrac><mn>1</mn><mrow><mi>k</mi><mspace width="0.17em"/><mo>(</mo><mn>12</mn><mo>−</mo><mi>k</mi><mo>)</mo><mo>!</mo><mspace width="0.17em"/><msup><mn>2</mn><mrow><mn>12</mn><mo>−</mo><mi>k</mi></mrow></msup></mrow></mfrac></math>
-      <p data-tx="full.p2"></p>
+      <p data-slop="full.p2"></p>
       <math display="block"><mfrac><mn>1</mn><mrow><mn>12</mn><mo>!</mo><mspace width="0.17em"/><msup><mn>2</mn><mn>11</mn></msup></mrow></mfrac><mo>+</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>2</mn></mrow><mn>12</mn></munderover><mfrac><mn>1</mn><mrow><mi>k</mi><mspace width="0.17em"/><mo>(</mo><mn>12</mn><mo>−</mo><mi>k</mi><mo>)</mo><mo>!</mo><mspace width="0.17em"/><msup><mn>2</mn><mrow><mn>12</mn><mo>−</mo><mi>k</mi></mrow></msup></mrow></mfrac><mo>≈</mo><mn>14.40</mn><mo>%</mo></math>
-      <p data-tx="full.p3"></p>
+      <p data-slop="full.p3"></p>
     </div></section>
 
     <section class="step" data-scene="lab"><div class="card">
-      <h2 data-tx="lab.title"></h2>
-      <p data-tx="lab.p1"></p>
-      <p class="note" data-tx="lab.note"></p>
+      <h2 data-slop="lab.title"></h2>
+      <p data-slop="lab.p1"></p>
+      <p class="note" data-slop="lab.note"></p>
     </div></section>
   </div>
 </div>
 
 
 <section class="after" id="after">
-  <h2 data-tx="after.title"></h2>
+  <h2 data-slop="after.title"></h2>
   <div class="tablewrap">
     <table class="plain">
       <thead><tr><th>Question</th><th>Exact</th><th>Approx.</th></tr></thead>
@@ -566,20 +699,20 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       </tbody>
     </table>
   </div>
-  <h3 data-tx="after.countsTitle"></h3>
+  <h3 data-slop="after.countsTitle"></h3>
   <div class="tablewrap">
     <table class="plain">
       <thead><tr><th>k</th><th>Cycles, ignoring flips</th><th>Share</th><th>Cycles, counting flips</th><th>Share</th></tr></thead>
       <tbody id="ktable"></tbody>
     </table>
   </div>
-  <p class="note" data-tx="after.note"></p>
+  <p class="note" data-slop="after.note"></p>
 </section>
 
-<!-- Every word a reader sees, and who wrote it (see CLAUDE.md, "Text and authorship"). tools/edit.mjs saves the Edit text panel into it. -->
-<script type="application/json" id="article-text">
+<!-- Every word a reader sees, and who wrote it (see CLAUDE.md, "Text and authorship"). `slop-editor edit` (~/Desktop/Coding/slopometer/cli.mjs) saves the editor into it. -->
+<script type="application/json" id="slop-text">
 {
-  "version": 3,
+  "version": 4,
   "hero": {
     "eyebrow": "Combinatorics · blindfolded cubing",
     "title": "Single Cycles",
@@ -816,35 +949,49 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
     "title": "All four numbers",
     "countsTitle": "Counts by cycle length",
     "note": "Notation: {nChooseK} is “n choose k”, the number of ways to pick k items from n. Slots are named with the standard face letters U, D, F, B, L, R. Colors follow the common scheme with white on top and green in front."
-  }
+  },
+  "_show": "colors"
 }
 </script>
-<script id="article-text-js">
-/* Slop editor: every word a reader sees, and who wrote it. Canonical copy: ~/Desktop/Coding/slop-editor/article-text.js
-   (`node slop.mjs sync` inlines it into every page it's installed in). Ported from the Slop Zone on raphaelbajet.com.
+<script id="slop-js">
+/* Slop editor: who wrote every word on a page. MIT license.
 
-   The words live in the page's JSON block (a script element with id "article-text"): an object with a top-level
-   "version", and groups (objects) of texts in reading order. A text is a plain string (AI's words) or a list of
-   pieces: a string (AI's), {"me": "..."} (mine: typed in the Edit text panel, or dictated word for word) or
-   {"data": "..."} (nobody's: a fact, or someone else's words quoted). Lists are always one text, never a list of texts.
+   The words live in the page's text block, a JSON script element with the id "slop-text": an object with a
+   top-level "version" and groups (objects) of texts in reading order. A text is a plain string (the AI's words) or a
+   list of pieces: a string (the AI's), {"me": "..."} (mine: typed in the editor, or dictated word for word),
+   {"ok": "..."} (the AI's words, approved as they are), {"data": "..."} (a fact, or someone else's words quoted), or
+   {"<category>": "..."} for a category the page defines. A list is always one text.
+   Top-level keys that start with "_" aren't text: "_categories" holds the page's own categories and colors,
+   {"<id>": {"label": "...", "color": "#rrggbb"}}, for built-in ones too, and "_show" what readers see: "nothing" (the
+   default), "pie" (a pie of who wrote what, with a legend) or "colors" (the Slop-o-meter switch, which colors the words).
    Inside any text: [label](url) is a link, **bold**, *italic*, `code`, [[key]] a key cap, {name} a value the page
-   fills in (a computed number or a formula, from TX.vars), and \ makes the next character literal.
+   fills in (Slop.vars), and \ makes the next character literal.
 
-   Elements with data-tx="group.key" are filled from the block (TX.fill). Code renders the rest with TX.html(path).
-   The Slop-o-meter ([data-slopmeter]) switches the authorship colors on; data-slopmeter="on" makes on the default
-   until the reader picks. Served by tools/edit.mjs, the page also
-   gets the Edit text panel, which saves back into the file. */
-const TX = (() => {
+   Elements with data-slop="group.key" are filled from the block. Code renders the rest with Slop.html(path).
+   An element with data-slop-meter becomes the Slop-o-meter switch. Under `slop-editor edit`, the page also gets the
+   editor, which saves back into the file; with Slop.start({edit: 'local'}) it gets one that saves in the browser. */
+const Slop = (() => {
     'use strict';
-    // 'ai', 'mine' or 'data'
-    const authorOf = (piece) => (typeof piece === 'string' ? 'ai' : 'me' in piece ? 'mine' : 'data');
-    const textOf = (piece) => (typeof piece === 'string' ? piece : piece.me ?? piece.data);
-    const PIECE = { ai: (text) => text, mine: (text) => ({ me: text }), data: (text) => ({ data: text }) };
 
-    // the text with its markup, as the panel edits it
-    function plain(value) {
-        return typeof value === 'string' ? value : value.map(textOf).join('');
-    }
+    /* ---------- the format ---------- */
+
+    // the built-in categories. Slop is the AI's words; the slop switch approves them (ok) or takes that back.
+    // `me` has no color of its own: my words keep the page's
+    const BUILTIN = {
+        me: { label: 'My words', light: null, dark: null },
+        ok: { label: 'AI, approved', light: '#17805a', dark: '#5ccf9c' },
+        data: { label: 'Data & quotes', light: '#8a5600', dark: '#e6b45c' },
+        ai: { label: 'AI-generated', light: '#6d35d0', dark: '#b892ff' },
+    };
+    // colors for the page's own categories, in the order they're made
+    const PALETTE = ['#e0662b', '#2b9fc0', '#d4469a', '#3b7be0', '#b8860b', '#8b5cf6'];
+
+    const authorOf = (piece) => (typeof piece === 'string' ? 'ai' : Object.keys(piece)[0] ?? 'ai');
+    const textOf = (piece) => (typeof piece === 'string' ? piece : String(Object.values(piece)[0] ?? ''));
+    const pieceOf = (author, s) => (author === 'ai' ? s : { [author]: s });
+
+    // the text with its markup, as the editor shows it
+    const plain = (value) => (typeof value === 'string' ? value : value.map(textOf).join(''));
 
     // who wrote each character
     function authorsByChar(value) {
@@ -858,15 +1005,16 @@ const TX = (() => {
         for (let i = 0; i < text.length;) {
             let j = i;
             while (j < text.length && authors[j] === authors[i]) j++;
-            pieces.push(PIECE[authors[i]](text.slice(i, j)));
+            pieces.push(pieceOf(authors[i], text.slice(i, j)));
             i = j;
         }
         return pieces;
     }
 
-    // `value` after its plain text became `next` in the panel. An edit is one stretch replaced (typing, deleting,
-    // pasting): what both versions share at the start and the end keeps its author, and the new middle is mine
-    function applyEdit(value, next) {
+    // `value` after its plain text became `next` in the editor. An edit is one stretch replaced (typing, deleting,
+    // pasting): what both versions share at the start and the end keeps its author, and the new middle is mine.
+    // Unless it's an undo or a redo: then `was`, an earlier version whose plain text is `next`, says who wrote it
+    function applyEdit(value, next, was) {
         const prev = plain(value);
         if (prev === next) return value;
         let start = 0;
@@ -875,26 +1023,27 @@ const TX = (() => {
         while (end < prev.length - start && end < next.length - start
             && prev[prev.length - 1 - end] === next[next.length - 1 - end]) end++;
         const authors = authorsByChar(value);
-        return fromChars(next, [
-            ...authors.slice(0, start),
-            ...new Array(next.length - start - end).fill('mine'),
-            ...authors.slice(prev.length - end),
-        ]);
+        const middle = was != null && plain(was) === next
+            ? authorsByChar(was).slice(start, next.length - end)
+            : new Array(next.length - start - end).fill('me');
+        return fromChars(next, [...authors.slice(0, start), ...middle, ...authors.slice(prev.length - end)]);
     }
 
-    // `value` with one author's words handed to another, the text unchanged. Facts and quotes stay as they are
-    const reattribute = (value, from, to) => fromChars(plain(value), authorsByChar(value).map((author) => (author === from ? to : author)));
-    // re-slopify: my words become AI-generated
-    const reslop = (value) => reattribute(value, 'mine', 'ai');
-    // unslopify: the AI's words, approved as they are, become mine
-    const unslop = (value) => reattribute(value, 'ai', 'mine');
+    // `value` with one author's words handed to another, the text unchanged
+    const reattribute = (value, from, to) => fromChars(plain(value), authorsByChar(value).map((a) => (a === from ? to : a)));
+    // unslopify (the slop switch, off): the AI's words, approved as they are
+    const unslop = (value) => reattribute(value, 'ai', 'ok');
+    // re-slopify (the slop switch, on): approved words go back to being slop. What I typed stays mine
+    const reslop = (value) => reattribute(value, 'ok', 'ai');
+    // characters start to end (of the plain text) marked as one author's
+    const assign = (value, start, end, to) => fromChars(plain(value), authorsByChar(value).map((a, i) => (i >= start && i < end ? to : a)));
 
     const LINK = /\[([^\]]+)\]\(([^)\s]+)\)/y;
     const VAR = /\{(\w+)\}/y;
     const same = (a, b) => a.by === b.by && a.link === b.link && a.b === b.b && a.i === b.i && a.code === b.code && a.key === b.key;
 
-    // the text as it reads: runs of one author's words (`by`: 'ai', 'mine' or 'data') with their formatting (b, i,
-    // code, key) and the link they sit in, if any. A {name} is a run of its own with `v` set
+    // the text as it reads: runs of one author's words (`by`: the category) with their formatting (b, i, code, key)
+    // and the link they sit in, if any. A {name} is a run of its own with `v` set
     function runs(value) {
         const text = plain(value);
         const authors = authorsByChar(value);
@@ -936,22 +1085,23 @@ const TX = (() => {
     }
 
     // values the page fills in: {html, data} (data: a fact, shown in the data color; otherwise it takes the color of
-    // whoever wrote the {name}), or a plain string (a fact)
+    // whoever wrote the {name}), or a plain string or number (a fact)
     const vars = {};
+    const config = { code: 'code' };
     const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
-    const stripTags = (h) => h.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+    const stripTags = (h) => h.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+    // the class a category's words render with
+    const cls = (id) => `slop-${String(id).replace(/[^\w-]/g, '_')}`;
     function lookup(name, local) {
         const v = local?.[name] ?? vars[name];
-        if (v == null) { console.warn(`article text: no value for {${name}}`); return { html: esc(`{${name}}`), data: false }; }
+        if (v == null) { console.warn(`slop: no value for {${name}}`); return { html: esc(`{${name}}`), data: false }; }
         return typeof v === 'object' ? v : { html: esc(v), data: true };
     }
 
     // the text as it reads, in one string (for labels, titles and alt text)
-    function readable(value, local) {
-        return runs(value).map((run) => (run.v ? stripTags(lookup(run.v, local).html) : run.text)).join('');
-    }
+    const readable = (value, local) => runs(value).map((run) => (run.v ? stripTags(lookup(run.v, local).html) : run.text)).join('');
 
-    // the text as HTML: each author's words in a span (tx-ai, tx-mine, tx-data), links open in a new tab
+    // the text as HTML: each author's words in a span (slop-ai, slop-me, slop-ok, slop-data, …), links open in a new tab
     function render(value, local) {
         const one = (run) => {
             let h;
@@ -961,7 +1111,7 @@ const TX = (() => {
                 h = v.html;
                 if (v.data) by = 'data';
             } else h = esc(run.text).replace(/\n/g, '<br>');
-            h = `<span class="tx-${by}">${h}</span>`;
+            h = `<span class="${cls(by)}">${h}</span>`;
             if (run.key) h = `<kbd>${h}</kbd>`;
             if (run.code) h = `<span class="${config.code}">${h}</span>`;
             if (run.i) h = `<em>${h}</em>`;
@@ -980,23 +1130,38 @@ const TX = (() => {
             : one(part))).join('');
     }
 
-    // how much of these texts is mine, as they read: a share of the written letters (spaces, facts, quotes and
-    // filled-in values aside), and my word count
-    function share(values) {
-        let mine = 0;
-        let total = 0;
-        let words = 0;
+    // what these texts are made of, as they read: written letters (spaces and filled-in values aside) and words, by
+    // category. {counts: {ai: 120, me: 30, …}, letters, words: {…}, allWords}
+    function makeup(values) {
+        const counts = {};
+        const words = {};
+        let letters = 0;
+        let allWords = 0;
         values.forEach((value) => {
             runs(value).forEach((run) => {
-                if (run.by === 'data' || run.v) return;
-                const letters = run.text.replace(/\s/g, '').length;
-                total += letters;
-                if (run.by !== 'mine') return;
-                mine += letters;
-                words += run.text.split(/\s+/).filter(Boolean).length;
+                if (run.v) return;
+                const n = run.text.replace(/\s/g, '').length;
+                const w = run.text.split(/\s+/).filter(Boolean).length;
+                counts[run.by] = (counts[run.by] ?? 0) + n;
+                words[run.by] = (words[run.by] ?? 0) + w;
+                letters += n;
+                allWords += w;
             });
         });
-        return { fraction: total ? mine / total : 0, words, letters: total };
+        return { counts, letters, words, allWords };
+    }
+
+    // how much of these texts is mine (typed or approved), facts and quotes aside
+    function share(values) {
+        const m = makeup(values);
+        const letters = m.letters - (m.counts.data ?? 0);
+        const mine = (m.counts.me ?? 0) + (m.counts.ok ?? 0);
+        return {
+            fraction: letters ? mine / letters : 0,
+            letters,
+            words: (m.words.me ?? 0) + (m.words.ok ?? 0),
+            allWords: m.allWords - (m.words.data ?? 0),
+        };
     }
 
     function percent(fraction) {
@@ -1005,44 +1170,75 @@ const TX = (() => {
         return `${Math.round(fraction * 100)}%`;
     }
 
+    // repeated text: the same words in more than one place (a header that's also in the nav, a tagline in the hero
+    // and the footer). Each copy keeps its own authorship, so a copy is slop until it's approved, like any text.
+    // [[path, value]] → [{words, paths}], in reading order. Data-only and very short texts don't count
+    const wordsOf = (value) => plain(value).replace(/\s+/g, ' ').trim();
+    function repeats(list) {
+        const byWords = new Map();
+        list.forEach(([path, value]) => {
+            const w = wordsOf(value);
+            if (w.replace(/\W/g, '').length < 3 || !share([value]).letters) return;
+            if (!byWords.has(w)) byWords.set(w, []);
+            byWords.get(w).push(path);
+        });
+        return [...byWords].filter(([, paths]) => paths.length > 1).map(([words, paths]) => ({ words, paths }));
+    }
+
+    const core = { BUILTIN, plain, applyEdit, reslop, unslop, assign, reattribute, runs, readable, render, makeup, share, percent, repeats, wordsOf, vars };
+    if (typeof document === 'undefined') return core; // Node (the CLI and the tests) only needs the format
+
     /* ---------- the block ---------- */
-    const config = { code: 'code' };
+
     let text = { version: 0 };
     try {
-        text = JSON.parse(document.getElementById('article-text').textContent);
+        text = JSON.parse(document.getElementById('slop-text').textContent);
     } catch (e) {
-        console.error('article text: the article-text block is missing or not valid JSON', e);
+        console.error('slop: the slop-text block is missing or not valid JSON', e);
     }
+    const original = JSON.stringify(text);
     const isText = (v) => typeof v === 'string' || Array.isArray(v);
+    const isMeta = (key) => key === 'version' || key.startsWith('_');
     const keysOf = (path) => (Array.isArray(path) ? path : path.split('.'));
+    const dotted = (path) => keysOf(path).join('.');
     function get(path) {
         let node = text;
         for (const key of keysOf(path)) node = node?.[key];
-        if (!isText(node)) { console.warn(`article text: no text at ${keysOf(path).join('.')}`); return ''; }
+        if (!isText(node)) { console.warn(`slop: no text at ${dotted(path)}`); return ''; }
         return node;
     }
     function set(path, value) {
         const keys = keysOf(path);
         let node = text;
-        keys.slice(0, -1).forEach((key) => { node = node[key]; });
+        keys.slice(0, -1).forEach((key) => { node[key] ??= {}; node = node[key]; });
         node[keys[keys.length - 1]] = value;
     }
-    // every text in a group (or the whole block), in reading order: [[path, value]]
+    // every text in a group (or the whole block), in reading order: [[path, value]] with dotted paths
     function entries(node = text, at = []) {
         return Object.entries(node).flatMap(([key, v]) => {
-            if (key === 'version' && !at.length) return [];
-            if (isText(v)) return [[[...at, key], v]];
+            if (!at.length && isMeta(key)) return [];
+            if (isText(v)) return [[[...at, key].join('.'), v]];
             return v && typeof v === 'object' ? entries(v, [...at, key]) : [];
         });
     }
+    const groupKeys = () => Object.keys(text).filter((k) => !isMeta(k) && text[k] && (isText(text[k]) || typeof text[k] === 'object'));
+    const elementsOf = (path) => document.querySelectorAll(`[data-slop="${CSS.escape(dotted(path))}"]`);
 
-    const html = (path, local) => render(get(path), local);
-    const words = (path, local) => readable(get(path), local);
-    // fill every [data-tx] element (data-tx-vars: a JSON object of extra values)
+    // texts the page's code has rendered (Slop.html, Slop.words): with the [data-slop] elements, what's on the page
+    const rendered = new Set();
+    const html = (path, local) => { rendered.add(dotted(path)); return render(get(path), local); };
+    const words = (path, local) => { rendered.add(dotted(path)); return readable(get(path), local); };
+    const onPage = (path) => rendered.has(dotted(path)) || elementsOf(path).length > 0;
+    // how to show a text the page shows only some of the time: Slop.reveal(path, fn), where fn puts the page in a state
+    // that shows it and returns a function that undoes that. A group's key covers all its texts
+    const revealers = new Map();
+    const reveal = (path, fn) => { revealers.set(dotted(path), fn); };
+    const revealerOf = (path) => revealers.get(dotted(path)) ?? revealers.get(keysOf(path)[0]);
+    // fill every [data-slop] element (data-slop-vars: a JSON object of extra values)
     function fill(root = document) {
-        root.querySelectorAll('[data-tx]').forEach((el) => {
-            const local = el.dataset.txVars ? JSON.parse(el.dataset.txVars) : undefined;
-            const h = html(el.dataset.tx, local);
+        root.querySelectorAll('[data-slop]').forEach((el) => {
+            const local = el.dataset.slopVars ? JSON.parse(el.dataset.slopVars) : undefined;
+            const h = render(get(el.dataset.slop), local);
             if (el.innerHTML !== h) el.innerHTML = h;
         });
     }
@@ -1050,242 +1246,899 @@ const TX = (() => {
     const listeners = [];
     const onChange = (fn) => listeners.push(fn);
     let pending = false;
-    function changed() { // after an edit in the panel: refill the page, then let the article redo its layout
+    function changed() { // after an edit: refill the page, then let the page redo whatever it built from the text
         if (pending) return;
         pending = true;
         requestAnimationFrame(() => {
             pending = false;
             fill();
             listeners.forEach((fn) => { try { fn(); } catch (e) { console.error(e); } });
-            meterShare();
+            paintMeters();
         });
     }
 
-    /* ---------- Slop-o-meter: shows who wrote what ---------- */
-    const store = {
-        get: () => { try { return localStorage.getItem('slop-o-meter'); } catch { return null; } },
-        set: (v) => { try { localStorage.setItem('slop-o-meter', v); } catch { /* optional */ } },
+    /* ---------- categories and their colors ---------- */
+
+    let dark = false;
+    const ink = () => getComputedStyle(document.body).color;
+    // any CSS color as #rrggbb, for the color pickers
+    const hex = (color) => {
+        const x = document.createElement('canvas').getContext('2d');
+        x.fillStyle = '#000';
+        x.fillStyle = color;
+        const m = /rgba?\(([\d.]+)[ ,]+([\d.]+)[ ,]+([\d.]+)/.exec(x.fillStyle);
+        return m ? `#${m.slice(1, 4).map((v) => Math.round(+v).toString(16).padStart(2, '0')).join('')}` : x.fillStyle;
     };
-    const meters = [];
-    function setMeter(on) {
-        document.documentElement.classList.toggle('slop-on', on);
-        meters.forEach((m) => m.btn.setAttribute('aria-pressed', String(on)));
+    // a category's color: the page's choice (in the block, or --slop-<id> in its CSS), or the default for the theme.
+    // null for my words, unless picked: they keep the page's color
+    function colorOf(id, n) {
+        const own = text._categories?.[id]?.color;
+        if (own && CSS.supports('color', own)) return own;
+        const css = getComputedStyle(document.documentElement).getPropertyValue(`--slop-${id}`).trim();
+        if (css) return css;
+        if (BUILTIN[id]) return BUILTIN[id][dark ? 'dark' : 'light'];
+        return PALETTE[n % PALETTE.length];
     }
-    function meterShare() {
-        const { fraction } = share(entries().map(([, v]) => v));
-        meters.forEach((m) => { m.share.textContent = `${percent(fraction)} written by me, ${percent(1 - fraction)} by AI`; });
+    // every category, in the order they're shown: mine, approved, the page's own, data, slop
+    function categories() {
+        const own = text._categories ?? {};
+        const used = entries().flatMap(([, v]) => (typeof v === 'string' ? [] : v.map(authorOf)));
+        const custom = [...new Set([...Object.keys(own), ...used])].filter((id) => !(id in BUILTIN));
+        return ['me', 'ok', ...custom, 'data', 'ai'].map((id) => ({
+            id,
+            label: own[id]?.label || BUILTIN[id]?.label || id,
+            color: colorOf(id, custom.indexOf(id)),
+            builtin: id in BUILTIN,
+        }));
+    }
+    const swatch = (cat) => cat.color ?? ink();
+
+    // the colors go in a stylesheet of their own: each category's words while the Slop-o-meter is on, and
+    // --slop-c-<id> for anything else that wants them
+    let sheet = null;
+    function applyColors() {
+        sheet ??= document.head.appendChild(Object.assign(document.createElement('style'), { id: 'slop-colors' }));
+        const cats = categories().filter((c) => c.color);
+        sheet.textContent = `:root{${cats.map((c) => `--${cls(c.id).replace('slop-', 'slop-c-')}:${c.color}`).join(';')}}\n`
+            + cats.map((c) => `html.slop-on .${cls(c.id)}{color:${c.color}}`).join('\n');
+    }
+
+    // a pie of what these texts are made of, and the same in words for its tooltip
+    function gradient(m, cats) {
+        if (!m.letters) return '';
+        let at = 0;
+        const stops = cats.filter((c) => m.counts[c.id]).map((c) => {
+            const from = at;
+            at += (m.counts[c.id] / m.letters) * 100;
+            return `${swatch(c)} ${from.toFixed(2)}% ${at.toFixed(2)}%`;
+        });
+        return `conic-gradient(${stops.join(', ')})`;
+    }
+    const breakdown = (m, cats) => (m.letters ? cats.filter((c) => m.counts[c.id]).map((c) => `${c.label} ${percent(m.counts[c.id] / m.letters)}`).join(' · ') : 'No text');
+
+    /* ---------- colors follow the page: dark or light, whatever the system says ---------- */
+
+    function background(el) {
+        for (; el; el = el.parentElement) {
+            const m = /rgba?\(([\d.]+)[ ,]+([\d.]+)[ ,]+([\d.]+)(?:[ ,/]+([\d.]+%?))?/.exec(getComputedStyle(el).backgroundColor);
+            if (m && (m[4] === undefined || parseFloat(m[4]) > 0)) return m.slice(1, 4).map(Number);
+        }
+        return null;
+    }
+    let repaint = () => {};
+    function theme(force) {
+        const rgb = background(document.body);
+        const lin = (c) => { const s = c / 255; return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4; };
+        const now = rgb ? 0.2126 * lin(rgb[0]) + 0.7152 * lin(rgb[1]) + 0.0722 * lin(rgb[2]) < 0.2
+            : matchMedia('(prefers-color-scheme: dark)').matches;
+        if (now === dark && force !== true) return;
+        dark = now;
+        document.documentElement.classList.toggle('slop-dark', dark);
+        applyColors();
+        paintMeters();
+        repaint();
+    }
+
+    /* ---------- Slop-o-meter: a switch, a pie of what the page is made of, and what its colors mean ---------- */
+
+    const store = {
+        get: (k) => { try { return localStorage.getItem(k); } catch { return null; } },
+        set: (k, v) => { try { localStorage.setItem(k, v); } catch { /* optional */ } },
+        drop: (k) => { try { localStorage.removeItem(k); } catch { /* optional */ } },
+    };
+    // what readers see is the page's choice, "nothing" unless it says otherwise. While the editor is open, its
+    // author sees the colors whatever readers get
+    const SHOW = ['nothing', 'pie', 'colors'];
+    const shows = () => (SHOW.includes(text._show) ? text._show : 'nothing');
+    const meters = [];
+    let meterOn = false;
+    let editing = false;
+    function setMeter(on) {
+        meterOn = on;
+        paintShow();
+    }
+    function paintShow() {
+        const mode = shows();
+        document.documentElement.classList.toggle('slop-on', editing || (mode === 'colors' && meterOn));
+        meters.forEach((m) => {
+            m.el.dataset.show = mode;
+            m.btn.setAttribute('aria-pressed', String(meterOn));
+        });
+    }
+    function paintMeters() {
+        paintShow();
+        if (!meters.length) return;
+        const cats = categories();
+        const m = makeup(entries().map(([, v]) => v));
+        meters.forEach(({ pie, legend }) => {
+            pie.style.background = gradient(m, cats);
+            pie.title = breakdown(m, cats);
+            pie.setAttribute('aria-label', pie.title);
+            // each category in its own color, with its share of the page's text
+            legend.innerHTML = cats.filter((c) => m.counts[c.id])
+                .map((c) => `<span class="slop-key" style="color:${swatch(c)}"><i style="background:${swatch(c)}"></i>${esc(c.label)}<b class="slop-pct">${percent(m.counts[c.id] / m.letters)}</b></span>`).join('');
+        });
     }
     function buildMeter(el) {
-        el.classList.add('tx-meter');
-        el.innerHTML = '<button type="button" class="tx-meter-btn" aria-pressed="false"><span class="tx-switch" aria-hidden="true"></span>Slop-o-meter</button>'
-            + '<span class="tx-meter-key"><span class="tx-legend"><span class="tx-mine">My words</span> · <span class="tx-ai">AI-generated</span> · <span class="tx-data">Data &amp; quotes</span></span>'
-            + '<span class="tx-meter-share"></span></span>';
-        const m = { btn: el.querySelector('button'), share: el.querySelector('.tx-meter-share') };
+        el.classList.add('slop-meter');
+        el.innerHTML = '<button type="button" class="slop-meter-btn" aria-pressed="false"><span class="slop-switch" aria-hidden="true"></span>Slop-o-meter</button>'
+            + '<span class="slop-meter-key"><span class="slop-pie" role="img"></span><span class="slop-legend"></span></span>';
+        const m = { el, btn: el.querySelector('button'), pie: el.querySelector('.slop-pie'), legend: el.querySelector('.slop-legend') };
         m.btn.addEventListener('click', () => {
-            const on = !document.documentElement.classList.contains('slop-on');
+            const on = !meterOn;
             setMeter(on);
-            store.set(on ? 'on' : 'off');
+            store.set('slop-o-meter', on ? 'on' : 'off');
         });
         meters.push(m);
     }
 
-    /* ---------- the Edit text panel (only under tools/edit.mjs) ---------- */
+    /* ---------- the editor ---------- */
+
     const human = (key) => {
         const p = /^p(\d+)$/.exec(key);
         if (p) return `Paragraph ${p[1]}`;
         const s = key.replace(/([a-z])([A-Z0-9])/g, '$1 $2').replace(/[_-]/g, ' ').toLowerCase();
         return s.charAt(0).toUpperCase() + s.slice(1);
     };
-    const yours = (fraction) => (fraction === 1 ? 'yours' : `${percent(fraction)} yours`);
+    // a section is named after its title, if it has a short one, or its key
+    const groupTitle = (key) => {
+        const node = text[key];
+        const title = node && !isText(node) && isText(node.title) ? readable(node.title) : '';
+        return title && title.length <= 32 ? title : human(key);
+    };
+    // where a text is, for people: "Introduction · Paragraph 2"
+    const where = (path) => {
+        const [g, ...rest] = keysOf(path);
+        return [groupTitle(g), ...rest.map(human)].join(' · ');
+    };
+    const count = (n, one, many = `${one}s`) => `${n.toLocaleString()} ${n === 1 ? one : many}`;
+    const isLong = (path, value) => plain(value).length > 48 || /^p\d+$/.test(keysOf(path).at(-1));
+    const el = (tag, className, html = '') => Object.assign(document.createElement(tag), { className, innerHTML: html });
 
-    function panel() {
-        const btn = document.createElement('button');
+    // the editor opens on repeated text that still has slop, or on any text that does, or on everything
+    const slopIn = (path) => (makeup([get(path)]).counts.ai ?? 0) > 0;
+    const startTab = () => (repeats(entries()).some((s) => s.paths.some(slopIn)) ? 'repeats' : entries().some(([p]) => slopIn(p)) ? 'slop' : 'all');
+
+    function editor(mode) {
+        const LOCAL = `slop-text:${location.pathname}`;
+        // open: the first section, and any the page adds later (pasted text, say)
+        // it opens on Repeats, or on Slop left when nothing is repeated
+        const state = { tab: startTab(), open: new Set(groupKeys().slice(0, 1)), known: new Set(groupKeys()), focus: null };
+        let sets = repeats(entries());
+        let controls = []; // [{el, paths}] in the current view, repainted by numbers()
+        let undo = null;
+
+        const btn = el('button', 'slop-edit-btn', 'Edit text');
         btn.type = 'button';
-        btn.className = 'tx-edit-btn';
-        btn.textContent = 'Edit text';
-        const aside = document.createElement('aside');
-        aside.className = 'tx-panel';
+        const aside = el('aside', 'slop-panel', `
+          <header class="sp-head" title="Drag to move, or drag an edge to resize. Double-click to put it back">
+            <span class="sp-grip" aria-hidden="true"></span>
+            <div><h2>Edit text</h2><p class="sp-status" role="status" aria-live="polite"></p></div>
+            <button type="button" class="sp-save" title="Save (⌘S)" disabled>Saved</button>
+            <button type="button" class="sp-close" aria-label="Close the editor">×</button>
+          </header>
+          <div class="sp-cover">
+            <div class="sp-cover-row"><p class="sp-big"><b></b> slop</p><p class="sp-words"></p></div>
+            <div class="sp-cats"></div>
+            <div class="sp-show"><span>Readers see</span><div class="sp-seg" role="radiogroup" aria-label="What readers see">
+              <button type="button" role="radio" data-show="nothing" title="No sign of the slop editor on the published page">Nothing</button>
+              <button type="button" role="radio" data-show="pie" title="A pie of who wrote what, with a legend">Pie chart</button>
+              <button type="button" role="radio" data-show="colors" title="The Slop-o-meter: a switch that colors every word by who wrote it, and the pie">Colors</button>
+            </div></div>
+          </div>
+          <div class="sp-tabs" role="tablist">
+            <button type="button" role="tab" data-tab="repeats">Repeats <span></span></button>
+            <button type="button" role="tab" data-tab="slop">Slop left <span></span></button>
+            <button type="button" role="tab" data-tab="all">All <span></span></button>
+          </div>
+          <div class="sp-body" role="tabpanel"></div>
+          ${['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'].map((e) => `<div class="sp-edge" data-edge="${e}" aria-hidden="true"></div>`).join('')}`);
         aside.hidden = true;
         aside.setAttribute('aria-label', 'Edit text');
-        aside.innerHTML = `
-          <div class="tx-head">
-            <div><h2>Edit text</h2><p class="tx-status" role="status">Saved</p></div>
-            <button type="button" class="tx-close" aria-label="Close the panel">×</button>
-          </div>
-          <div class="tx-cover">
-            <div class="tx-cover-nums"><span><span class="tx-mine">Your words</span>: <b class="tx-cover-pct"></b> of the text</span><span class="tx-cover-words"></span></div>
-            <div class="tx-track" role="presentation"><span></span></div>
-            <div class="tx-actions"><button type="button" class="tx-reslop tx-unslop-all" disabled>Unslopify everything</button><button type="button" class="tx-reslop tx-reslop-all" disabled>Re-slopify everything</button></div>
-          </div>
-          <div class="tx-body"></div>`;
         document.body.append(btn, aside);
         const $ = (sel) => aside.querySelector(sel);
-        const statusEl = $('.tx-status');
-        const status = (msg, kind = '') => { statusEl.textContent = msg; statusEl.dataset.kind = kind; };
+        const body = $('.sp-body');
+        const statusEl = $('.sp-status');
+        const pageControl = control(() => entries().map(([p]) => p), 'the whole page');
+        $('.sp-cover-row').append(pageControl);
 
-        // one field per text, grouped by section
-        const groups = [];
-        const fields = [];
-        Object.entries(text).forEach(([key, node]) => {
-            if (key === 'version') return;
-            const list = isText(node) ? [[[key], node]] : entries(node, [key]);
-            const det = document.createElement('details');
-            det.className = 'tx-group';
-            const title = node && !isText(node) && isText(node.title) ? readable(node.title) : human(key);
-            det.innerHTML = `<summary><span>${esc(title)}</span><span class="tx-gshare"></span></summary>`
-                + `<div class="tx-actions tx-group-actions"><button type="button" class="tx-reslop tx-unslop-group" disabled>Unslopify ${esc(title)}</button>`
-                + `<button type="button" class="tx-reslop tx-reslop-group" disabled>Re-slopify ${esc(title)}</button></div>`;
-            const g = { det, list, title, shareEl: det.querySelector('.tx-gshare'), reslopEl: det.querySelector('.tx-reslop-group'), unslopEl: det.querySelector('.tx-unslop-group') };
-            list.forEach(([p]) => {
-                const value = get(p);
-                const long = plain(value).length > 48 || /^p\d+$/.test(p[p.length - 1]);
-                const label = document.createElement('label');
-                label.className = 'tx-field';
-                const name = p.slice(1).map(human).join(' · ') || human(key);
-                label.innerHTML = `<span class="tx-flabel"><span>${esc(name)}</span><span class="tx-fmine"></span>`
-                    + '<button type="button" class="tx-reslop tx-unslop" disabled title="Approve the AI\'s words here as mine">unslopify</button>'
-                    + '<button type="button" class="tx-reslop tx-reslop-one" disabled title="Mark my words here as AI-generated">re-slopify</button></span>';
-                const input = document.createElement(long ? 'textarea' : 'input');
-                input.value = plain(value);
-                input.spellcheck = true;
-                if (long) input.rows = 2;
-                label.append(input);
-                det.append(label);
-                const f = { path: p, input, mineEl: label.querySelector('.tx-fmine'), reslopEl: label.querySelector('.tx-reslop-one'), unslopEl: label.querySelector('.tx-unslop'), group: g };
-                fields.push(f);
-                input.addEventListener('input', () => edit(f));
-                f.reslopEl.addEventListener('click', (e) => { e.preventDefault(); reattributeAll([f], reslop); });
-                f.unslopEl.addEventListener('click', (e) => { e.preventDefault(); reattributeAll([f], unslop); });
-                input.addEventListener('focus', () => mark(p, true));
-                input.addEventListener('blur', () => mark(p, false));
-            });
-            groups.push(g);
-            const inGroup = () => fields.filter((f) => f.group === g);
-            g.reslopEl.addEventListener('click', () => {
-                if (confirm(`Mark all of your words in "${title}" as AI-generated?`)) reattributeAll(inGroup(), reslop);
-            });
-            g.unslopEl.addEventListener('click', () => {
-                if (confirm(`Approve all of the AI's words in "${title}" as yours?`)) reattributeAll(inGroup(), unslop);
-            });
-            $('.tx-body').append(det);
-        });
-        groups[0]?.det.setAttribute('open', '');
+        function status(msg, kind = '', action) {
+            statusEl.textContent = msg;
+            statusEl.dataset.kind = kind;
+            if (!action) return;
+            const b = el('button', 'sp-link', esc(action.label));
+            b.type = 'button';
+            b.addEventListener('click', action.run);
+            statusEl.append(' · ', b);
+        }
+        const savedStatus = () => (mode === 'local'
+            ? status('Saved in this browser', '', { label: 'Reset', run: reset })
+            : status(`Saved · version ${text.version}`));
 
-        const mark = (p, on) => document.querySelectorAll(`[data-tx="${p.join('.')}"]`).forEach((el) => el.classList.toggle('tx-focus', on));
-        const grow = (el) => { if (el.tagName === 'TEXTAREA') { el.style.height = 'auto'; el.style.height = `${el.scrollHeight + 2}px`; } };
-        function shares() {
-            fields.forEach((f) => {
-                const { fraction, letters } = share([get(f.path)]);
-                f.mineEl.textContent = fraction > 0 ? yours(fraction) : '';
-                f.reslopEl.disabled = fraction === 0;
-                f.unslopEl.disabled = !letters || fraction === 1;
+        // any change to who wrote what (the slop switch, marking text, deleting a category) can be undone
+        function withUndo(what, change) {
+            const before = JSON.stringify(text);
+            change();
+            if (JSON.stringify(text) === before) return false;
+            touched();
+            if (state.tab === 'slop') render(); else numbers();
+            undo = before;
+            status(what, '', {
+                label: 'Undo',
+                run: () => {
+                    if (!undo) return;
+                    const version = text.version;
+                    text = JSON.parse(undo);
+                    text.version = version;
+                    undo = null;
+                    applyColors();
+                    touched();
+                    render();
+                },
             });
-            groups.forEach((g) => {
-                const { fraction, letters } = share(g.list.map(([p]) => get(p)));
-                g.shareEl.textContent = `${percent(fraction)} yours`;
-                g.shareEl.classList.toggle('tx-some', fraction > 0);
-                g.reslopEl.disabled = fraction === 0;
-                g.unslopEl.disabled = !letters || fraction === 1;
-            });
-            const all = share(entries().map(([, v]) => v));
-            $('.tx-cover-pct').textContent = percent(all.fraction);
-            $('.tx-cover-words').textContent = all.words === 1 ? '1 word' : `${all.words.toLocaleString()} words`;
-            $('.tx-track span').style.width = `${all.fraction * 100}%`;
-            $('.tx-reslop-all').disabled = all.fraction === 0;
-            $('.tx-unslop-all').disabled = !all.letters || all.fraction === 1;
+            return true;
         }
 
-        // saving: debounced, one request at a time, each carrying the version it was based on
-        let timer = null;
-        let dirty = false;
+        /* the slop switch, next to a pie of what the texts are made of */
+        function control(paths, what, after) {
+            const c = el('span', 'sp-ctl', '<span class="sp-pie" role="img"></span>'
+                + '<button type="button" class="sp-toggle" role="switch"><span class="sp-switch" aria-hidden="true"></span>slop</button>');
+            const toggle = c.querySelector('.sp-toggle');
+            toggle.addEventListener('click', (e) => {
+                e.preventDefault(); // in a section's summary, don't open or close it
+                const on = toggle.getAttribute('aria-checked') === 'true';
+                const done = withUndo(on ? `Approved ${what}` : `Back to slop: ${what}`, () => paths().forEach((p) => set(p, on ? unslop(get(p)) : reslop(get(p)))));
+                if (done) after?.(on);
+            });
+            controls.push({ el: c, paths });
+            return c;
+        }
+        function paintControl({ el: c, paths }, cats) {
+            const m = makeup(paths().map(get));
+            const pie = c.querySelector('.sp-pie');
+            pie.style.background = gradient(m, cats);
+            pie.title = breakdown(m, cats);
+            pie.setAttribute('aria-label', pie.title);
+            const toggle = c.querySelector('.sp-toggle');
+            const on = (m.counts.ai ?? 0) > 0;
+            toggle.setAttribute('aria-checked', String(on));
+            toggle.disabled = !on && !m.counts.ok;
+            toggle.title = on ? 'Slop. Switch it off to approve the AI\'s words as they are'
+                : m.counts.ok ? 'Approved. Switch it on to make it slop again' : 'No AI-generated words here';
+        }
+
+        /* categories: a color picker and a name for each, and how much of the page is theirs */
+        const own = (id) => { text._categories ??= {}; return (text._categories[id] ??= {}); };
+        const slug = (label) => {
+            const base = label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'category';
+            let id = base;
+            for (let n = 2; id in BUILTIN || text._categories?.[id] || categories().some((c) => c.id === id); n++) id = `${base}-${n}`;
+            return id;
+        };
+        function renderCats() {
+            const box = $('.sp-cats');
+            box.innerHTML = '';
+            categories().forEach((cat) => {
+                const row = el('span', 'sp-cat', `<label class="sp-swatch" title="Pick a color for ${esc(cat.label)}"><input type="color"></label>`
+                    + `<input class="sp-cat-name" aria-label="Category name" spellcheck="false"><b class="sp-cat-pct"></b>`
+                    + (cat.builtin ? '' : `<button type="button" class="sp-cat-x" title="Delete ${esc(cat.label)}: its words become AI-generated">×</button>`));
+                row.dataset.id = cat.id;
+                const picker = row.querySelector('input[type="color"]');
+                picker.value = hex(swatch(cat));
+                row.querySelector('.sp-swatch').style.background = swatch(cat);
+                picker.addEventListener('input', () => {
+                    own(cat.id).color = picker.value;
+                    row.querySelector('.sp-swatch').style.background = picker.value;
+                    applyColors();
+                    touched();
+                });
+                const name = row.querySelector('.sp-cat-name');
+                name.value = cat.label;
+                name.size = Math.max(3, cat.label.length);
+                name.addEventListener('input', () => {
+                    name.size = Math.max(3, name.value.length);
+                    own(cat.id).label = name.value.trim();
+                    touched();
+                });
+                name.addEventListener('keydown', (e) => { if (e.key === 'Enter') name.blur(); });
+                row.querySelector('.sp-cat-x')?.addEventListener('click', () => {
+                    withUndo(`Deleted "${cat.label}"`, () => {
+                        entries().forEach(([p, v]) => set(p, reattribute(v, cat.id, 'ai')));
+                        delete text._categories?.[cat.id];
+                    });
+                    applyColors();
+                    render();
+                });
+                box.append(row);
+            });
+            const add = el('button', 'sp-cat-add', '+ Category');
+            add.type = 'button';
+            add.title = 'Another author or source: a co-author, an editor, a paper you quote';
+            add.addEventListener('click', () => {
+                const input = el('input', 'sp-cat-new');
+                input.placeholder = 'Name, then Enter';
+                add.replaceWith(input);
+                input.focus();
+                let finished = false;
+                const done = (keep) => {
+                    if (finished) return;
+                    finished = true;
+                    const label = input.value.trim();
+                    if (keep && label) {
+                        const id = slug(label);
+                        const color = PALETTE[categories().filter((c) => !c.builtin).length % PALETTE.length];
+                        Object.assign(own(id), { label, color });
+                        applyColors();
+                        touched();
+                    }
+                    render();
+                };
+                input.addEventListener('keydown', (e) => { if (e.key === 'Enter') done(true); if (e.key === 'Escape') done(false); });
+                input.addEventListener('blur', () => done(true), { once: true });
+            });
+            box.append(add);
+        }
+
+        /* marking text: the focused field gets a row of categories. A selection, or the whole text, becomes theirs */
+        const assignEl = el('div', 'sp-assign');
+        function showAssign(wrap, input, paths) {
+            assignEl.innerHTML = '<span class="sp-assign-label"></span>';
+            categories().forEach((cat) => {
+                const b = el('button', 'sp-as', `<i style="background:${swatch(cat)}"></i>${esc(cat.label)}`);
+                b.type = 'button';
+                b.addEventListener('pointerdown', (e) => e.preventDefault()); // keep the focus and the selection
+                b.addEventListener('click', () => {
+                    let [s, e] = [input.selectionStart, input.selectionEnd];
+                    const whole = s === e;
+                    if (whole) [s, e] = [0, input.value.length];
+                    withUndo(`Marked ${whole ? 'the text' : 'the selection'} as ${cat.label}`, () => paths.forEach((p) => set(p, assign(get(p), s, e, cat.id))));
+                });
+                assignEl.append(b);
+            });
+            assignLabel(input);
+            wrap.append(assignEl);
+        }
+        const assignLabel = (input) => {
+            if (assignEl.firstChild) assignEl.firstChild.textContent = input.selectionStart === input.selectionEnd ? 'Mark all as' : 'Mark selection as';
+        };
+
+        /* the views */
+        const setOf = (path) => sets.find((s) => s.paths.includes(path));
+        const hasSlop = (path) => (makeup([get(path)]).counts.ai ?? 0) > 0;
+        const hint = (wrap, message, action) => {
+            const h = wrap.querySelector('.sp-hint');
+            h.innerHTML = esc(message);
+            h.hidden = false;
+            h.dataset.at = performance.now();
+            if (!action) return;
+            const b = el('button', 'sp-link', esc(action.label));
+            b.type = 'button';
+            b.addEventListener('pointerdown', (e) => e.preventDefault()); // keep the focus in the field
+            b.addEventListener('click', () => { h.hidden = true; action.run(); });
+            h.append(' ', b);
+        };
+        let pressed = false;
+        addEventListener('pointerdown', () => { pressed = true; }, true);
+        addEventListener('pointerup', () => { setTimeout(() => { pressed = false; }); }, true);
+        const afterClick = (fn) => {
+            if (!pressed) { fn(); return; }
+            addEventListener('pointerup', () => setTimeout(fn), { once: true, capture: true });
+        };
+
+        function field(path, { all } = {}) {
+            const value = get(path);
+            const wrap = el('div', 'sp-field');
+            wrap.dataset.path = path;
+            const fid = `sp-${path.replace(/\W/g, '-')}${all ? '-all' : ''}`;
+            const name = all ? `${all.paths.length} copies` : keysOf(path).slice(1).map(human).join(' · ') || human(path);
+            wrap.innerHTML = `<div class="sp-flabel"><label for="${fid}">${esc(name)}</label>`
+                + '<button type="button" class="sp-unseen" hidden></button></div>'
+                + `<textarea id="${fid}" rows="1" spellcheck="true"></textarea><p class="sp-hint" hidden></p>`;
+            const row = wrap.querySelector('.sp-flabel');
+            const input = wrap.querySelector('textarea');
+            input.value = plain(value);
+            if (!isLong(path, value)) input.addEventListener('keydown', (e) => { if (e.key === 'Enter') e.preventDefault(); });
+            const paths = () => (all ? all.paths : [path]);
+            // back to how it was at the last save, words and authorship
+            const revert = el('button', 'sp-revert', 'Revert');
+            revert.type = 'button';
+            revert.title = 'Back to how this was at the last save';
+            revert.addEventListener('click', () => {
+                withUndo(`Reverted "${all ? all.words : where(path)}"`, () => paths().forEach((p) => { if (savedAt(p) !== undefined) set(p, savedAt(p)); }));
+                render();
+            });
+            row.append(revert);
+            if (!all) {
+                const rep = el('button', 'sp-rep');
+                rep.type = 'button';
+                rep.addEventListener('click', () => { const s = setOf(path); if (s) show('repeats', s.paths[0]); });
+                row.append(rep);
+            }
+            // a copy's switch changes that copy only, and says so. A Repeats card's switch changes every copy
+            row.append(control(paths, all ? count(all.paths.length, 'copy', 'copies') : `"${where(path)}"`, all ? null : (approved) => {
+                const others = (setOf(path)?.paths ?? []).filter((p) => p !== path);
+                if (!others.length) return;
+                const how = approved ? unslop : reslop;
+                hint(wrap, `Only this copy changed. ${count(others.length, 'other copy', 'other copies')} didn't.`, {
+                    label: others.length === 1 ? 'Change it too' : 'Change them too',
+                    run: () => withUndo(`${approved ? 'Approved' : 'Back to slop:'} ${count(others.length + 1, 'copy', 'copies')}`, () => others.forEach((p) => set(p, how(get(p))))),
+                });
+            }));
+            input.addEventListener('input', (e) => edit(paths(), input, /^history(Undo|Redo)$/.test(e.inputType)));
+            ['select', 'keyup', 'pointerup'].forEach((t) => input.addEventListener(t, () => assignLabel(input)));
+            input.addEventListener('focus', () => { focus(path, all, input, wrap); showAssign(wrap, input, paths()); });
+            input.addEventListener('blur', () => {
+                mark(false);
+                // after the click that moved the focus lands: removing these first would move what's being clicked
+                afterClick(() => {
+                    if (document.activeElement === input) return;
+                    wrap.querySelector('.sp-hint').hidden = true;
+                    if (assignEl.parentNode === wrap) assignEl.remove();
+                });
+            });
+            wrap.querySelector('.sp-unseen').addEventListener('click', () => input.focus());
+            wrap.input = input;
+            wrap.rep = wrap.querySelector('.sp-rep');
+            wrap.revert = revert;
+            wrap.paths = paths;
+            return wrap;
+        }
+
+        function groupView(key, paths) {
+            const det = el('details', 'sp-group', `<summary><span class="sp-gname">${esc(groupTitle(key))}</span><span class="sp-gnote"></span></summary>`);
+            det.dataset.group = key;
+            det.open = state.open.has(key);
+            const all = entries(text[key], [key]).map(([p]) => p);
+            det.querySelector('summary').append(control(() => all, `"${groupTitle(key)}"`));
+            det.addEventListener('toggle', () => {
+                if (det.open) { state.open.add(key); det.querySelectorAll('textarea').forEach(grow); } else state.open.delete(key);
+            });
+            paths.forEach((p) => det.append(field(p)));
+            return det;
+        }
+
+        function render() {
+            controls = [controls.find((c) => c.el === pageControl)];
+            sets = repeats(entries());
+            groupKeys().forEach((k) => { if (!state.known.has(k)) { state.known.add(k); state.open.add(k); } });
+            renderCats();
+            const top = body.scrollTop;
+            body.innerHTML = '';
+            aside.querySelectorAll('.sp-tabs button').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === state.tab)));
+            if (state.tab === 'repeats') {
+                body.insertAdjacentHTML('beforeend', '<p class="sp-intro">The same words in more than one place. Each copy is slop until it\'s approved. Here, editing or switching a card changes every copy.</p>');
+                if (!sets.length) body.insertAdjacentHTML('beforeend', '<p class="sp-empty">No repeated text on this page.</p>');
+                sets.forEach((s) => {
+                    const card = field(s.paths[0], { all: s });
+                    card.classList.add('sp-set');
+                    const list = el('ul', 'sp-where');
+                    s.paths.forEach((p) => {
+                        const li = document.createElement('li');
+                        const go = el('button', 'sp-goto', `<span class="sp-pie sp-mini"></span>${esc(where(p))}`);
+                        go.type = 'button';
+                        go.dataset.path = p;
+                        go.addEventListener('click', () => show('all', p));
+                        go.addEventListener('pointerenter', () => mark(true, [p]));
+                        go.addEventListener('pointerleave', () => mark(false));
+                        li.append(go);
+                        list.append(li);
+                    });
+                    card.append(list);
+                    body.append(card);
+                });
+            } else {
+                const only = state.tab === 'slop';
+                let shown = 0;
+                groupKeys().forEach((key) => {
+                    const paths = (isText(text[key]) ? [key] : entries(text[key], [key]).map(([p]) => p)).filter((p) => !only || hasSlop(p));
+                    if (!paths.length) return;
+                    shown += paths.length;
+                    body.append(isText(text[key]) ? field(key) : groupView(key, paths));
+                });
+                if (only && !shown) body.insertAdjacentHTML('beforeend', '<p class="sp-empty">No slop left. Every word here is yours, approved, or someone else\'s.</p>');
+            }
+            aside.classList.add('sp-still'); // new switches appear as they are, without sliding there
+            numbers();
+            body.querySelectorAll('textarea').forEach(grow);
+            body.scrollTop = top;
+            requestAnimationFrame(() => requestAnimationFrame(() => aside.classList.remove('sp-still')));
+        }
+
+        // every number, pie and switch in the editor, after any change
+        function numbers() {
+            const cats = categories();
+            const all = entries();
+            const page = makeup(all.map(([, v]) => v));
+            $('.sp-big b').textContent = percent(page.letters ? (page.counts.ai ?? 0) / page.letters : 0);
+            $('.sp-words').textContent = count(page.allWords, 'word');
+            aside.querySelectorAll('.sp-seg button').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.show === shows())));
+            aside.querySelectorAll('.sp-cat').forEach((row) => {
+                row.querySelector('.sp-cat-pct').textContent = percent(page.letters ? (page.counts[row.dataset.id] ?? 0) / page.letters : 0);
+            });
+            controls.forEach((c) => paintControl(c, cats));
+            body.querySelectorAll('.sp-goto').forEach((go) => {
+                const m = makeup([get(go.dataset.path)]);
+                go.querySelector('.sp-pie').style.background = gradient(m, cats);
+                go.title = breakdown(m, cats);
+            });
+            const live = repeats(all);
+            const tabs = { all: all.length, slop: all.filter(([p]) => hasSlop(p)).length, repeats: live.length };
+            aside.querySelectorAll('.sp-tabs button').forEach((b) => { b.querySelector('span').textContent = tabs[b.dataset.tab]; });
+            body.querySelectorAll('.sp-field').forEach((f) => {
+                f.revert.hidden = !f.paths().some((p) => differs(p) && savedAt(p) !== undefined);
+                const tag = f.querySelector('.sp-unseen');
+                const shown = revealed && f.paths().includes(revealed.path);
+                tag.hidden = !shown && f.paths().some(onPage);
+                tag.disabled = shown || !revealerOf(f.paths()[0]);
+                tag.textContent = shown ? 'shown while editing' : tag.disabled ? 'not on the page' : 'not on the page · show it';
+                tag.title = shown ? 'The page normally hides this. It\'s shown while you edit it'
+                    : tag.disabled ? 'Not on the page right now: the page shows it only some of the time, or not at all. A page can say how to show it with Slop.reveal'
+                        : 'Show the page the way it looks with this text';
+            });
+            paintSave();
+            body.querySelectorAll('.sp-field:not(.sp-set)').forEach((f) => {
+                const s = live.find((r) => r.paths.includes(f.dataset.path));
+                f.rep.hidden = !s;
+                if (!s) return;
+                f.rep.textContent = `${s.paths.length}×`;
+                f.rep.title = `Same words in ${count(s.paths.length - 1, 'other place')}: ${s.paths.filter((p) => p !== f.dataset.path).map(where).join(', ')}`;
+            });
+            body.querySelectorAll('.sp-group').forEach((det) => {
+                const paths = entries(text[det.dataset.group], [det.dataset.group]);
+                const left = paths.filter(([p]) => hasSlop(p)).length;
+                det.querySelector('.sp-gnote').textContent = left ? `${left} of ${paths.length} with slop` : 'no slop';
+            });
+            paintMeters();
+        }
+        repaint = () => { if (!aside.hidden) render(); };
+
+        // the page and the editor point at each other
+        function mark(on, paths = state.focus?.paths ?? [], scroll = false) {
+            document.querySelectorAll('.slop-focus, .slop-copy').forEach((x) => x.classList.remove('slop-focus', 'slop-copy'));
+            if (!on) return;
+            paths.forEach((p, i) => elementsOf(p).forEach((x) => x.classList.add(i ? 'slop-copy' : 'slop-focus')));
+            const target = paths.map((p) => elementsOf(p)[0]).find(Boolean);
+            if (!target || !scroll) return;
+            const r = target.getBoundingClientRect();
+            const bottom = innerWidth <= 900 ? aside.getBoundingClientRect().top : innerHeight;
+            if (r.top < 8 || r.bottom > bottom - 8) scrollBy({ top: r.top - (bottom - r.height) / 2, behavior: 'smooth' });
+        }
+        function focus(path, all, input, wrap) {
+            const s = all ?? setOf(path);
+            const paths = all ? all.paths : [path, ...(s ? s.paths.filter((p) => p !== path) : [])];
+            state.focus = { path, paths, copies: all || !s ? [] : s.paths.filter((p) => p !== path), was: wordsOf(get(path)), wrap, linked: null };
+            if (revealed && !paths.includes(revealed.path)) unreveal();
+            if (!paths.some(onPage)) showHidden(paths[0]);
+            mark(true, paths, true);
+        }
+        // a text the page hides: shown while it's being edited, if the page says how
+        let revealed = null; // {path, undo}
+        function showHidden(path) {
+            const fn = revealerOf(path);
+            if (!fn || revealed?.path === path) return;
+            try { revealed = { path, undo: fn() }; } catch (e) { console.error(e); return; }
+            fill();
+            numbers();
+        }
+        function unreveal() {
+            if (!revealed) return;
+            const { undo: hide } = revealed;
+            revealed = null;
+            try { hide?.(); } catch (e) { console.error(e); }
+            numbers();
+        }
+        // show one text: in this tab if it's there, otherwise in All
+        function show(tab, path) {
+            state.tab = tab;
+            if (tab !== 'repeats') state.open.add(keysOf(path)[0]);
+            render();
+            const f = [...body.querySelectorAll('.sp-field')].find((x) => x.dataset.path === path);
+            if (!f) return;
+            f.scrollIntoView({ block: 'center', behavior: 'smooth' });
+            f.input.focus({ preventScroll: true });
+            f.classList.add('sp-flash');
+            setTimeout(() => f.classList.remove('sp-flash'), 900);
+        }
+
+        const grow = (x) => { x.style.height = 'auto'; x.style.height = `${x.scrollHeight + 2}px`; };
+
+        // typing: what you type is yours, the rest keeps its author
+        // ⌘Z in a text: the words come back with whoever wrote them, from each text's recent versions
+        const past = new Map(); // path → [value, …], oldest first
+        function remember(p) {
+            const list = past.get(p) ?? [];
+            const v = get(p);
+            if (JSON.stringify(list.at(-1)) !== JSON.stringify(v)) list.push(v);
+            past.set(p, list.slice(-200));
+        }
+        const recall = (p, words) => past.get(p)?.findLast((v) => plain(v) === words);
+        function edit(paths, input, restoring) {
+            undo = null;
+            const f = state.focus;
+            [...paths, ...(f?.linked ?? [])].forEach((p) => {
+                remember(p);
+                set(p, applyEdit(get(p), input.value, restoring ? recall(p, input.value) : undefined));
+                remember(p);
+            });
+            grow(input);
+            if (f?.copies.length && !f.linked) {
+                // a copy changed on its own: offer to change the others the same way
+                const stale = f.copies.filter((p) => wordsOf(get(p)) === f.was);
+                if (!stale.length || wordsOf(input.value) === f.was) f.wrap.querySelector('.sp-hint').hidden = true;
+                else {
+                    hint(f.wrap, `Changed here only. ${count(stale.length, 'other copy', 'other copies')} still ${stale.length === 1 ? 'says' : 'say'} the old words.`, {
+                        label: stale.length === 1 ? 'Change it too' : 'Change them too',
+                        run: () => { // and keep them in step while this field has the focus
+                            stale.forEach((p) => set(p, applyEdit(get(p), input.value)));
+                            f.linked = stale;
+                            touched();
+                        },
+                    });
+                }
+            }
+            touched();
+        }
+
+        // saving: only with the Save button (or ⌘S), one request at a time, each carrying the version it was based on.
+        // `saved` is the text as of the last save, for the Save button's count and each text's Revert
+        let saved = JSON.parse(JSON.stringify(text));
         let busy = false;
         let stale = false;
-        let chain = Promise.resolve();
-        function save() {
-            chain = chain.then(async () => {
-                if (!dirty || stale) return;
-                dirty = false;
-                busy = true;
-                status('Saving…');
-                try {
-                    const res = await fetch('/__text', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(text) });
-                    const body = await res.text();
-                    if (res.status === 409) { stale = true; throw new Error(body); }
-                    if (!res.ok) throw new Error(body || res.statusText);
-                    text.version = Number(body);
-                    status(dirty ? 'Unsaved changes' : `Saved (version ${text.version})`, dirty ? 'dirty' : '');
-                } catch (e) {
-                    dirty = true;
-                    status(`Couldn't save: ${e.message}`, 'error');
-                } finally {
-                    busy = false;
-                }
+        function valueAt(root, p) {
+            let node = root;
+            for (const key of keysOf(p)) node = node?.[key];
+            return isText(node) ? node : undefined;
+        }
+        const savedAt = (p) => valueAt(saved, p);
+        const differs = (p) => JSON.stringify(valueAt(text, p)) !== JSON.stringify(savedAt(p));
+        // how many texts changed since the last save (and the categories, as one)
+        function unsaved() {
+            const paths = new Set([...entries(), ...entries(saved)].map(([p]) => p));
+            let n = [...paths].filter(differs).length;
+            const metaKeys = new Set([...Object.keys(text), ...Object.keys(saved)].filter((k) => k.startsWith('_')));
+            n += [...metaKeys].filter((k) => JSON.stringify(text[k] ?? null) !== JSON.stringify(saved[k] ?? null)).length;
+            return n;
+        }
+        const saveBtn = $('.sp-save');
+        function paintSave() {
+            const n = unsaved();
+            saveBtn.disabled = !n || busy;
+            saveBtn.textContent = busy ? 'Saving…' : n ? `Save ${n}` : 'Saved';
+            saveBtn.title = n ? `Save ${count(n, 'change')} (⌘S)` : 'Everything is saved';
+        }
+        async function save() {
+            if (busy || !unsaved()) return;
+            if (stale) { status('This page is out of date: reload it to save (copy any edits first)', 'error'); return; }
+            const body = JSON.stringify(text);
+            if (mode === 'local') {
+                store.set(LOCAL, JSON.stringify({ base: JSON.parse(original).version, text: JSON.parse(body) }));
+                saved = JSON.parse(body);
+                undo = null;
+                savedStatus();
+                numbers();
+                return;
+            }
+            busy = true;
+            paintSave();
+            try {
+                const res = await fetch('/__slop', { method: 'POST', headers: { 'content-type': 'application/json' }, body });
+                const out = await res.text();
+                if (res.status === 409) { stale = true; throw new Error(out); }
+                if (!res.ok) throw new Error(out || res.statusText);
+                text.version = Number(out);
+                saved = { ...JSON.parse(body), version: text.version };
+                undo = null;
+                savedStatus();
+            } catch (e) {
+                status(`Couldn't save: ${e.message}`, 'error');
+            } finally {
+                busy = false;
+                numbers();
+            }
+        }
+        saveBtn.addEventListener('click', save);
+        function touched() {
+            numbers();
+            changed();
+            if (!stale && !undo) status(unsaved() ? 'Not saved yet' : 'No changes since the last save', unsaved() ? 'dirty' : '');
+        }
+        function reset() {
+            store.drop(LOCAL);
+            text = JSON.parse(original);
+            saved = JSON.parse(original);
+            undo = null;
+            applyColors();
+            changed();
+            render();
+            savedStatus();
+        }
+        addEventListener('beforeunload', (e) => { if (busy || unsaved()) e.preventDefault(); });
+        addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 's' && !aside.hidden) { e.preventDefault(); save(); }
+            // ⌘Z outside a text undoes the last switch or mark (a text's own ⌘Z undoes its typing)
+            if ((e.metaKey || e.ctrlKey) && !e.shiftKey && e.key === 'z' && undo && !aside.hidden && !e.target.closest?.('textarea, input')) {
+                e.preventDefault();
+                statusEl.querySelector('.sp-link')?.click();
+            }
+        });
+        body.addEventListener('pointerdown', (e) => {
+            if (e.target.closest('.sp-hint')) return;
+            const at = performance.now(); // a hint this click makes stays
+            afterClick(() => body.querySelectorAll('.sp-hint').forEach((h) => { if (!(h.dataset.at > at)) h.hidden = true; }));
+        });
+
+        // while the editor is open, a click on a text opens it in the editor
+        document.addEventListener('click', (e) => {
+            if (aside.hidden || aside.contains(e.target) || btn.contains(e.target)) return;
+            const target = e.target.closest('[data-slop]');
+            if (!target) return;
+            e.preventDefault();
+            e.stopPropagation();
+            const path = target.dataset.slop;
+            const s = setOf(path);
+            if (state.tab === 'repeats' && s) show('repeats', s.paths[0]);
+            else show(state.tab === 'slop' && hasSlop(path) ? 'slop' : 'all', path);
+        }, true);
+
+        /* moving and resizing: drag the header to move the editor, or an edge to resize it. On a narrow screen it's a
+           sheet along the bottom, and dragging changes its height. Double-click the header to put it back */
+        const RECT = 'slop-editor-rect';
+        const MIN = { w: 300, h: 240 };
+        const narrow = () => innerWidth <= 900;
+        const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), Math.max(lo, hi));
+        let rect = {};
+        try { rect = JSON.parse(store.get(RECT)) ?? {}; } catch { /* docked */ }
+        function place() {
+            aside.removeAttribute('style');
+            if (narrow()) {
+                if (rect.sheet) aside.style.height = `${clamp(rect.sheet, 200, innerHeight - 16)}px`;
+                return;
+            }
+            if (!rect.box) return;
+            const w = clamp(rect.box.w, MIN.w, innerWidth - 16);
+            const h = clamp(rect.box.h, MIN.h, innerHeight - 16);
+            Object.assign(aside.style, {
+                left: `${clamp(rect.box.l, 8, innerWidth - w - 8)}px`, top: `${clamp(rect.box.t, 8, innerHeight - h - 8)}px`,
+                width: `${w}px`, height: `${h}px`, right: 'auto', bottom: 'auto',
             });
         }
-        function edit(f) {
-            set(f.path, applyEdit(get(f.path), f.input.value));
-            grow(f.input);
-            touched();
+        function drag(e, edge) {
+            if (e.button !== 0) return;
+            e.preventDefault();
+            const start = aside.getBoundingClientRect();
+            const x0 = e.clientX;
+            const y0 = e.clientY;
+            const target = e.currentTarget;
+            target.setPointerCapture(e.pointerId);
+            document.documentElement.classList.add('slop-dragging');
+            const move = (ev) => {
+                const dx = ev.clientX - x0;
+                const dy = ev.clientY - y0;
+                if (narrow()) { rect.sheet = Math.max(200, start.height - dy); place(); return; }
+                let { left: l, top: t, width: w, height: h } = start;
+                const sides = edge === 'move' ? '' : edge;
+                if (edge === 'move') { l += dx; t += dy; }
+                if (sides.includes('e')) w = Math.max(MIN.w, start.width + dx);
+                if (sides.includes('s')) h = Math.max(MIN.h, start.height + dy);
+                if (sides.includes('w')) { w = Math.max(MIN.w, start.width - dx); l = start.right - w; }
+                if (sides.includes('n')) { h = Math.max(MIN.h, start.height - dy); t = start.bottom - h; }
+                rect.box = { l, t, w, h };
+                place();
+            };
+            const up = () => {
+                target.removeEventListener('pointermove', move);
+                target.removeEventListener('pointerup', up);
+                target.removeEventListener('pointercancel', up);
+                document.documentElement.classList.remove('slop-dragging');
+                store.set(RECT, JSON.stringify(rect));
+            };
+            target.addEventListener('pointermove', move);
+            target.addEventListener('pointerup', up);
+            target.addEventListener('pointercancel', up);
         }
-        // re-slopify or unslopify these fields: their words change author, not wording
-        function reattributeAll(list, how) {
-            list.forEach((f) => set(f.path, how(get(f.path))));
-            touched();
-        }
-        function touched() {
-            shares();
-            changed();
-            dirty = true;
-            if (!stale) status('Unsaved changes', 'dirty');
-            clearTimeout(timer);
-            timer = setTimeout(save, 600);
-        }
-        addEventListener('beforeunload', (e) => { if (dirty || busy) e.preventDefault(); });
-        addEventListener('keydown', (e) => {
-            if ((e.metaKey || e.ctrlKey) && e.key === 's' && !aside.hidden) { e.preventDefault(); clearTimeout(timer); save(); }
+        const head = $('.sp-head');
+        head.addEventListener('pointerdown', (e) => { if (!e.target.closest('button')) drag(e, 'move'); });
+        head.addEventListener('dblclick', (e) => {
+            if (e.target.closest('button')) return;
+            rect = {};
+            store.drop(RECT);
+            place();
         });
+        aside.querySelectorAll('.sp-edge').forEach((x) => x.addEventListener('pointerdown', (e) => drag(e, x.dataset.edge)));
+        addEventListener('resize', () => { if (!aside.hidden) place(); });
 
         const open = (on) => {
             aside.hidden = !on;
             btn.hidden = on;
-            document.documentElement.classList.toggle('tx-editing', on);
-            if (on) { setMeter(true); fields.forEach((f) => grow(f.input)); }
+            document.documentElement.classList.toggle('slop-editing', on);
+            editing = on;
+            paintShow();
+            if (!on) { mark(false); unreveal(); return; }
+            place();
+            render();
         };
         btn.addEventListener('click', () => open(true));
-        $('.tx-close').addEventListener('click', () => open(false));
-        $('.tx-reslop-all').addEventListener('click', () => {
-            if (confirm('Mark all of your words on this page as AI-generated?')) reattributeAll(fields, reslop);
-        });
-        $('.tx-unslop-all').addEventListener('click', () => {
-            if (confirm('Approve all of the AI\'s words on this page as yours?')) reattributeAll(fields, unslop);
-        });
-        aside.addEventListener('toggle', (e) => { if (e.target.open) e.target.querySelectorAll('textarea').forEach(grow); }, true);
-        shares();
-        status(`Saved (version ${text.version})`);
+        $('.sp-close').addEventListener('click', () => open(false));
+        aside.querySelectorAll('.sp-seg button').forEach((b) => b.addEventListener('click', () => {
+            if (b.dataset.show === shows()) return;
+            withUndo(`Readers see: ${b.textContent.toLowerCase()}`, () => {
+                if (b.dataset.show === 'nothing') delete text._show; // the default, so the block needn't say it
+                else text._show = b.dataset.show;
+            });
+        }));
+        aside.querySelectorAll('.sp-tabs button').forEach((b) => b.addEventListener('click', () => { state.tab = b.dataset.tab; render(); }));
+        savedStatus();
+        return { render: () => { if (!aside.hidden) render(); }, touched, open };
     }
 
-    // set things up once the article has filled in TX.vars
+    // after the page changes the text itself (Slop.set, Slop.remove): refill the page, rebuild the editor and save
+    let ed = null;
+    function refresh() {
+        fill();
+        paintMeters();
+        ed?.render();
+        ed?.touched();
+    }
+    function remove(path) {
+        const keys = keysOf(path);
+        let node = text;
+        keys.slice(0, -1).forEach((key) => { node = node?.[key]; });
+        if (node) delete node[keys[keys.length - 1]];
+    }
+
+    // set things up once the page has filled in Slop.vars. Options: code (the class `code` renders with),
+    // edit: 'local' (an editor anyone can use, saving in their browser; under `slop-editor edit` it saves into the file)
     function start(options = {}) {
         Object.assign(config, options);
         fill();
-        document.querySelectorAll('[data-slopmeter]').forEach(buildMeter);
-        const saved = store.get();
-        setMeter(saved ? saved === 'on' : !!document.querySelector('[data-slopmeter="on"]'));
-        meterShare();
-        // edit mode only on this machine, under tools/edit.mjs (a GET there answers 405)
-        if (!/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)) return;
-        fetch('/__text').then((res) => { if (res.status === 405) panel(); }).catch(() => {});
+        document.querySelectorAll('[data-slop-meter]').forEach(buildMeter);
+        theme(true);
+        const watch = new MutationObserver(theme);
+        [document.documentElement, document.body].forEach((x) => watch.observe(x, { attributes: true, attributeFilter: ['class', 'data-theme', 'style'] }));
+        matchMedia('(prefers-color-scheme: dark)').addEventListener('change', theme);
+        setMeter(store.get('slop-o-meter') !== 'off'); // on unless this reader turned it off
+        // the browser editor: what this visitor changed last time, if the page hasn't changed since
+        const local = () => {
+            if (options.edit !== 'local') return;
+            try {
+                const saved = JSON.parse(store.get(`slop-text:${location.pathname}`));
+                if (saved?.base === text.version) { text = saved.text; applyColors(); changed(); }
+            } catch { /* nothing saved */ }
+            ed = editor('local');
+        };
+        // the file editor only on this machine, under `slop-editor edit` (a GET there answers "slop-editor")
+        if (!/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)) return local();
+        fetch('/__slop').then((res) => (res.ok ? res.text() : '')).then((s) => { if (s === 'slop-editor') ed = editor('file'); else local(); }).catch(local);
     }
 
-    return { plain, applyEdit, reslop, unslop, runs, readable, render, share, percent, vars, get, html, words, fill, onChange, start, entries,
-        get text() { return text; } };
+    return { ...core, get, set, remove, entries, categories, html, words, fill, refresh, onChange, reveal, start, get text() { return text; } };
 })();
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (() => {
   // ---------------- text ----------------
-  // The words come from the article-text block (TX). Inline formulas aren't words: they fill the {name}s in the text.
+  // The words come from the slop-text block (Slop). Inline formulas aren't words: they fill the {name}s in the text.
   const MATH = {
     eOver12: '<math><mi>e</mi><mo lspace="0" rspace="0">/</mo><mn>12</mn></math>',
     sqrtEOver12: '<math><msqrt><mpadded height="0.7em" depth="0"><mi>e</mi></mpadded></msqrt><mo lspace="0" rspace="0">/</mo><mn>12</mn></math>',
@@ -1310,8 +2163,8 @@ const TX = (() => {
     twoTo11: '<math><msup><mn>2</mn><mn>11</mn></msup></math>',
     nChooseK: '<math><mrow><mo>(</mo><mfrac linethickness="0"><mi>n</mi><mi>k</mi></mfrac><mo>)</mo></mrow></math>'
   };
-  for (const k in MATH) TX.vars[k] = {html: MATH[k]};
-  TX.start({code: 'pos'});
+  for (const k in MATH) Slop.vars[k] = {html: MATH[k]};
+  Slop.start({code: 'pos'});
 
   // ---------------- basics ----------------
   const POS = ['UR','UF','UL','UB','FR','FL','BL','BR','DR','DF','DL','DB']; // ring order; 0 = buffer
@@ -1508,12 +2361,12 @@ const TX = (() => {
     PATHS[key(first(back)) + '>' + key(last(back))] = back;
   }
   const rev = st => st.slice().reverse();
-  for (let i = 0; i < 3; i++) addPath([{st: [SWAPS[i], SWAPS[i + 1]], dur: 0.85, cap: () => TX.html('swaps.swapping', {slot: SOLVE_DEMO[i]})}], [{st: [SWAPS[i + 1], SWAPS[i]], dur: 0.5}]);
-  addPath([{st: BREAK.slice(0, 2), dur: 0.85, cap: () => TX.html('break.breaking')}], [{st: rev(BREAK.slice(0, 2)), dur: 0.5}]);
+  for (let i = 0; i < 3; i++) addPath([{st: [SWAPS[i], SWAPS[i + 1]], dur: 0.85, cap: () => Slop.html('swaps.swapping', {slot: SOLVE_DEMO[i]})}], [{st: [SWAPS[i + 1], SWAPS[i]], dur: 0.5}]);
+  addPath([{st: BREAK.slice(0, 2), dur: 0.85, cap: () => Slop.html('break.breaking')}], [{st: rev(BREAK.slice(0, 2)), dur: 0.5}]);
   // "A cycle break" b2 finishes the break; the next press rewinds the solve, a little faster in the middle.
-  addPath([{st: BREAK.slice(1), dur: 0.6, cap: () => TX.html('break.finishing')}], [{st: rev(BREAK.slice(1)), dur: 0.3}]);
+  addPath([{st: BREAK.slice(1), dur: 0.6, cap: () => Slop.html('break.finishing')}], [{st: rev(BREAK.slice(1)), dur: 0.3}]);
   const REWIND = seqFrom(SOLVED, SOLVE_DEMO.slice().reverse());
-  addPath(REWIND.slice(1).map((st, i) => ({st: [REWIND[i], st], dur: 0.5 - 0.14 * Math.sin(Math.PI * i / (REWIND.length - 2)), cap: () => TX.html('rewind.rewinding')})),
+  addPath(REWIND.slice(1).map((st, i) => ({st: [REWIND[i], st], dur: 0.5 - 0.14 * Math.sin(Math.PI * i / (REWIND.length - 2)), cap: () => Slop.html('rewind.rewinding')})),
           [{st: rev(REWIND), dur: 0.15}]);
 
   // ---------------- 3D cube ----------------
@@ -1770,49 +2623,49 @@ const TX = (() => {
     // Front page: starts solved (also when you come back to it), then scrambles with face turns every heroP() seconds.
     hero: {n: 1, f: (b, el) => {
       const base = {spin: true, split: true, buf: true, arrows: true};
-      if (el < HERO_DELAY) return Object.assign(base, {state: SOLVED, tally: {c: TALLY.c.slice(), n: TALLY.n, now: 0}, caption: TX.html('hero.caption')});
+      if (el < HERO_DELAY) return Object.assign(base, {state: SOLVED, tally: {c: TALLY.c.slice(), n: TALLY.n, now: 0}, caption: Slop.html('hero.caption')});
       const P = heroP(), idx = Math.floor((el - HERO_DELAY) / P), t = el - HERO_DELAY - idx * P, q = idx % HERO_SEQ.length;
       const settled = reduce || t > entryTotal(TURNS[key(q ? HERO_SEQ[q - 1] : SOLVED) + '>' + key(HERO_SEQ[q])]) + 2.8;
       return Object.assign(base, {state: HERO_SEQ[q], dimHome: settled ? HERO_SEQ[q] : null, heroDone: settled ? idx : null, tally: {c: TALLY.c.slice(), n: TALLY.n, now: settled ? HERO_INFO[q].n : 0},
         caption: settled ? `Scramble ${idx + 1}: ${HERO_INFO[q].text}` : `Scrambling: ${HERO_MOVES[q].length} face turns`});
     }},
-    pieces: {n: 1, f: () => ({view: V_HOME, slotMark: 'near3', caption: TX.html('pieces.caption'),
+    pieces: {n: 1, f: () => ({view: V_HOME, slotMark: 'near3', caption: Slop.html('pieces.caption'),
       tags: [{p3: [0, 0, 1.5], text: 'center'}, {p3: [1.5, 0, 1], text: 'edge'}, {p3: [1, 1.5, 1], text: 'corner', tone: '--ink-3'}]})},
-    homes: {n: 1, f: () => ({view: V_HOME, labels: 'all', caption: TX.html('homes.caption')})},
-    scramble: {n: 1, f: () => ({state: DEMO, cornerSet: opCorners(1), labels: 'all', caption: TX.html('scramble.caption')})},
+    homes: {n: 1, f: () => ({view: V_HOME, labels: 'all', caption: Slop.html('homes.caption')})},
+    scramble: {n: 1, f: () => ({state: DEMO, cornerSet: opCorners(1), labels: 'all', caption: Slop.html('scramble.caption')})},
     // Tilts slowly up and down (16 s) so the yellow bottom shows too.
     buffer: {n: 1, f: (b, el) => ({state: DEMO, cornerSet: opCorners(1), track: [PARTNER], buf: true, view: {rx: reduce ? V0.rx : 0.02 + 0.48 * Math.cos(2 * Math.PI * el / 16), ry: V0.ry}, labels: ['UR', 'DF'], focus: ['UR', 'DF'], arrows: [['UR', 'DF']],
-      tags: [{pos: 'UR', text: 'buffer'}], caption: TX.html('buffer.caption')})},
+      tags: [{pos: 'UR', text: 'buffer'}], caption: Slop.html('buffer.caption')})},
     // The first swap of the solve, UR ↔ DF, as real face turns (OP_PATH), with the two corners it swaps (TP_CORNERS) in color. Entering, they color in,
     // then the setup D' L2 brings DF's edge to UL; b1 plays the T-perm (faster, PRES_TP); b2 undoes the setup.
     tperm: {n: 3, f: b => ({state: [OP_SET, OP_TP, SWAPS[1]][b], cornerCol: TP_CORNERS, cornerSet: opCorners(b + 2), track: [PARTNER], buf: true,
       labels: b < 2 ? ['UR', 'UL', 'DF'] : ['UR', 'DF'], focus: b < 2 ? ['UR', 'UL'] : ['UR', 'DF'],
       tags: [[{pos: 'UL', text: 'from DF'}], [{pos: 'UL', text: 'swapped'}, {p3: [1.5, 1.5, 1.5], text: 'corner'}, {p3: [1.5, 1.5, -1.5], text: 'corner'}], [{pos: 'DF', text: 'home', tone: '--yes'}]][b],
-      caption: TX.html('tperm.caption' + (b + 1))})},
+      caption: Slop.html('tperm.caption' + (b + 1))})},
     // Picks up after the T-perm slide's swap UR ↔ DF.
     swaps: {n: 2, f: b => ({state: SWAPS[b + 1], via: 'swaps', cornerSet: opCorners(4), track: [PARTNER], buf: true, labels: SW_LAB, arrows: 'buffer', glow: [SOLVE_DEMO[b + 1]],
       tags: [{pos: 'UR', text: 'buffer'}],
-      caption: TX.html('swaps.caption' + (b + 1))})},
+      caption: Slop.html('swaps.caption' + (b + 1))})},
     closed: {n: 1, f: () => ({state: SWAPS[3], via: 'swaps', cornerSet: opCorners(4), buf: true, labels: BR_LAB, glow: ['UF', 'DR', 'BR'], arrows: true,
-      tags: [{pos: 'UR', text: 'home', tone: '--yes'}], caption: TX.html('closed.caption')})},
+      tags: [{pos: 'UR', text: 'home', tone: '--yes'}], caption: Slop.html('closed.caption')})},
     break: {n: 3, f: b => ({state: [BREAK[0], BREAK[1], BREAK[4]][b], via: 'swaps', cornerSet: opCorners(4), buf: true, labels: BR_LAB, arrows: true, glow: b ? [] : ['UF', 'DR', 'BR'],
-      caption: TX.html('break.caption' + (b + 1))})},
-    rewind: {n: 1, f: () => ({state: DEMO, via: 'swaps', cornerSet: opCorners(4), buf: true, labels: 'all', arrows: true, caption: TX.html('rewind.caption')})},
+      caption: Slop.html('break.caption' + (b + 1))})},
+    rewind: {n: 1, f: () => ({state: DEMO, via: 'swaps', cornerSet: opCorners(4), buf: true, labels: 'all', arrows: true, caption: Slop.html('rewind.caption')})},
     ring: {n: 2, f: b => ({state: b ? ONE8 : DEMO, buf: true, morph: 1, labels: 'all', arrows: true, glow: b ? [] : ['UF', 'DR', 'BR'],
-      caption: TX.html(b ? 'ring.caption2' : 'ring.caption1')})},
+      caption: Slop.html(b ? 'ring.caption2' : 'ring.caption1')})},
     // b0: a solved cube fades in, then UF flips (FLIP_AT) and the "impossible" tag appears once it lands.
     flips: {n: 2, f: (b, el) => {
       const k = b ? 2 : el < FLIP_AT ? 0 : 1;
       return {state: [SOLVED, F1, F2][k], fly: true, buf: true, view: {rx: 0.62, ry: -0.55}, labels: ['UF', 'UB'],
         glow: [[], ['UF'], ['UF', 'UB']][k], glowCol: '--c2',
         tags: [[], el > FLIP_AT + 0.9 || b ? [{pos: 'UF', text: 'impossible alone', tone: '--no'}] : [], [{pos: 'UB', text: 'a legal pair', tone: '--yes'}]][k],
-        caption: TX.html('flips.caption' + (k + 1))};
+        caption: Slop.html('flips.caption' + (k + 1))};
     }},
     count: {n: 1, f: (b, el) => {
       const P = 2.6, ph = el / P, i = Math.floor(ph) % 2, f = ph % 1;
       const rev = Math.floor(ph) === 0 ? 0 : (i === 1 ? ss(f / 0.28) : 1 - ss(f / 0.28));
       return {state: TRI, buf: true, morph: 1, labels: 'all', neutral: true, focus: ['UF', 'FL', 'DF'], tri: rev,
-        caption: TX.html(i ? 'count.caption2' : 'count.caption1')};
+        caption: Slop.html(i ? 'count.caption2' : 'count.caption1')};
     }},
     term: {n: 1, f: () => ({layer: 'chart', chartMode: 1})},
     flipcount: {n: 1, f: (b, el) => {
@@ -1826,9 +2679,9 @@ const TX = (() => {
     cuber: {n: 1, f: (b, el) => {
       const i = Math.floor(el / CUB_P) % CUB.length, k = CUB_K[i], j = 12 - k;
       return {state: CUB[i], buf: true, morph: 1, labels: 'all', arrows: true,
-        caption: j === 1 ? TX.html('cuber.caption1', {k: String(k)}) : TX.html('cuber.caption2', {k: String(k), j: String(j), jFact: fact(j).toLocaleString()})};
+        caption: j === 1 ? Slop.html('cuber.caption1', {k: String(k)}) : Slop.html('cuber.caption2', {k: String(k), j: String(j), jFact: fact(j).toLocaleString()})};
     }},
-    attempt: {n: 1, f: () => ({state: SKIP5, buf: true, morph: 1, labels: 'all', arrows: true, caption: TX.html('attempt.caption')})},
+    attempt: {n: 1, f: () => ({state: SKIP5, buf: true, morph: 1, labels: 'all', arrows: true, caption: Slop.html('attempt.caption')})},
     lab: {n: 1, f: () => ({layer: 'lab'})},
   };
 
@@ -2031,7 +2884,7 @@ const TX = (() => {
   }
   function ringCaption(R, t) {
     if (R.quiet) return null;
-    if (t < R.drawStart) return R.drawOnly ? null : TX.html('ring.moving');
+    if (t < R.drawStart) return R.drawOnly ? null : Slop.html('ring.moving');
     if (!R.solo) return null;
     const nodes = R.orders[0].nodes, done = clamp(Math.floor((t - R.drawStart) / R.per), 0, nodes.length - 1);
     return 'From UR: ' + nodes.slice(1, done + 1).map(i => POS[i]).join(' → ') + (done ? '' : '…');
@@ -2264,7 +3117,7 @@ const TX = (() => {
       s += `<text x="${f1(C + (R + 24) * Math.cos(a))}" y="${f1(C + (R + 24) * Math.sin(a) + 4)}" text-anchor="middle" font-size="11" font-weight="${i === 0 ? 700 : 400}" font-family="JetBrains Mono, monospace" style="fill: var(${i === 0 ? '--ink' : '--ink-3'})">${POS[i]}</text>`;
     }
     document.getElementById('fan-svg').innerHTML = s;
-    document.getElementById('fan-note').innerHTML = TX.html('uniform.fan' + (b + 1));
+    document.getElementById('fan-note').innerHTML = Slop.html('uniform.fan' + (b + 1));
   }
 
   // ---------------- histogram + lab sampling ----------------
@@ -2403,6 +3256,23 @@ const TX = (() => {
     else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); prev(); pressKey('k-prev'); }
   });
 
+  // The editor (slop-editor edit) shows a caption that's on screen only at one slide and build: it glides there, and
+  // back to where the reader was when it's done with it. Captions shown only mid-move (swaps.swapping,
+  // break.breaking, break.finishing, rewind.rewinding, ring.moving) or for a moment (flips.caption1) have none.
+  const showAt = (scene, b) => () => {
+    const from = curStop(), i = stepEls.findIndex(el => el.dataset.scene === scene);
+    goStop(stops.findIndex(x => x.i === i && x.b === b));
+    return () => goStop(from);
+  };
+  Object.entries({
+    'pieces.caption': 0, 'homes.caption': 0, 'scramble.caption': 0, 'buffer.caption': 0,
+    'tperm.caption1': 0, 'tperm.caption2': 1, 'tperm.caption3': 2, 'swaps.caption1': 0, 'swaps.caption2': 1,
+    'closed.caption': 0, 'break.caption1': 0, 'break.caption2': 1, 'break.caption3': 2, 'rewind.caption': 0,
+    'ring.caption1': 0, 'ring.caption2': 1, 'flips.caption2': 0, 'flips.caption3': 1,
+    'uniform.fan1': 0, 'uniform.fan2': 1, 'uniform.fan3': 2, 'uniform.fan4': 3,
+    'count.caption1': 0, 'count.caption2': 0, 'cuber.caption1': 0, 'cuber.caption2': 0, 'attempt.caption': 0,
+  }).forEach(([path, b]) => Slop.reveal(path, showAt(path.split('.')[0], b)));
+
   // ---------------- main loop ----------------
   const layers = {cube: 'L-cube', chart: 'L-chart', cancel: 'L-cancel', lab: 'L-lab'};
   for (const k in layers) layers[k] = document.getElementById(layers[k]);
@@ -2410,8 +3280,8 @@ const TX = (() => {
   let heroSession = null, heroCounted = null;
   let tallyKey = null, curFan = null; const cornerColA = new Array(8).fill(0);
   let active = 'hero', enterT = 0, lastT = 0, curLayer = 'cube', curCap = null, curMode = 0, curSlide = '';
-  // After an edit in the Edit text panel (tools/edit.mjs): segment titles come from the headings; the fan note and caption redraw.
-  TX.onChange(() => {
+  // After an edit in the editor (slop-editor edit): segment titles come from the headings; the fan note and caption redraw.
+  Slop.onChange(() => {
     stepEls.forEach((s, i) => { const h = s.querySelector('h1, h2'), t = h ? h.textContent : ''; segEls[i].setAttribute('aria-label', `Go to slide ${i + 1}: ${t}`); segEls[i].title = t; });
     curFan = null; curCap = null;
   });

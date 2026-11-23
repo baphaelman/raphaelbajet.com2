@@ -1,6 +1,6 @@
 // Copies the AI-rticles the Slop Zone opens into public/slop/play, so the site shows them as they are now: their
 // text as last saved in edit mode, and who wrote each word. The originals live in ~/Desktop/Coding/AIrticles and are
-// edited there (node tools/edit.mjs). This runs before `npm run dev`, `npm run edit` and `npm run build`, or on its
+// edited there (npx slop-editor edit <article>.html). This runs before `npm run dev`, `npm run edit` and `npm run build`, or on its
 // own with `npm run slop-play`. Where the originals aren't around (Vercel's build), the committed copies stay as they
 // are, so commit the copies after editing an article.
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
@@ -15,6 +15,7 @@ const PAGES = {
     'single-cycles.html': 'single-cycles/single-cycles.html',
 };
 
+const updated = [];
 for (const [name, source] of Object.entries(PAGES)) {
     const from = join(AIRTICLES, source);
     if (!existsSync(from)) {
@@ -25,5 +26,8 @@ for (const [name, source] of Object.entries(PAGES)) {
     const to = new URL(name, PLAY);
     if (existsSync(to) && readFileSync(to, 'utf8') === html) continue;
     writeFileSync(to, html);
+    updated.push(name);
     console.log(`slop-play: updated ${name}`);
 }
+// the live site only has what's committed
+if (updated.length) console.log(`slop-play: commit public/slop/play/{${updated.join(',')}} for the live site to get them`);
