@@ -1,0 +1,459 @@
+{
+    "version": 19,
+    "rupture": {
+        "title": [
+            {
+                "me": "The Slop Zone"
+            }
+        ],
+        "disclaimer": [
+            {
+                "me": "The projects in here were made largely with AI agents. So was the rupture you came through to get here, and this page."
+            }
+        ]
+    },
+    "intro": {
+        "title": [
+            {
+                "me": "The Slop Zone"
+            }
+        ],
+        "disclaimer": [
+            {
+                "me": "The code for these projects was written almost entirely by agents. I incepted, directed, linted, and reviewed it myself, (many of these for hours) and am proud enough of this stuff to show it off, or at least let everyone else play with. Some of this stuff I really do think is pretty cool, projects I've been thinking about for years but felt I haven't been able to put together until recently, with agents.\nOn this page, text written by me (like this) will be in white; purple is AI copy."
+            }
+        ],
+        "overviewTitle": "In the rupture",
+        "overviewNote": "Click to jump"
+    },
+    "headings": {
+        "what": [
+            {
+                "me": "What is it?"
+            }
+        ],
+        "how": [
+            {
+                "me": "How did it do it?"
+            }
+        ],
+        "role": [
+            {
+                "me": "What did I do?"
+            }
+        ]
+    },
+    "projects": [
+        {
+            "id": "algorhythms",
+            "title": [
+                {
+                    "me": "AlgoRhythms"
+                }
+            ],
+            "category": "Music",
+            "labels": [
+                "Music",
+                "Audio",
+                [
+                    {
+                        "me": "Animation"
+                    }
+                ]
+            ],
+            "when": [
+                {
+                    "me": "Nov 2026"
+                }
+            ],
+            "status": "Live, growing",
+            "tagline": [
+                {
+                    "me": "Pure music in the browser with a beautiful display"
+                }
+            ],
+            "color": "#d9773f",
+            "what": [
+                [
+                    {
+                        "me": "Animating simple melodies and progressions, so every line you see is a note you hear."
+                    }
+                ],
+                [
+                    {
+                        "me": "Design pieces in the editor from scratch. Drag moments into the "
+                    }
+                ],
+                [
+                    {
+                        "me": "Inspired by Bounce Gravity's [video](https://www.youtube.com/watch?v=TnSs5w5F5YA), completely independent."
+                    }
+                ]
+            ],
+            "how": [
+                "A plan first, then one Claude session as integrator: it assigned milestones and checked them, but wrote no code. Builder agents wrote all of it.",
+                "Strict TypeScript, tests in three browsers, and sound judged from offline renders by the numbers, never played aloud."
+            ],
+            "role": [
+                [
+                    {
+                        "me": "Opus 5.5 XHigh as orchestrator, long sessions that spawned 'builder' subagents. It would plan out a milestone at a time in detail, asking for my approval, and bring me version after version for me to try as it added features.\nOpus 5.5 Medium as the default subagent builder."
+                    }
+                ],
+                [
+                    {
+                        "me": "Opus 5.5 is an unambiguously good model when I'm writing this, November 2026. Maybe what has brought me so much amazement today will be an embarrassment in a few months."
+                    }
+                ]
+            ],
+            "links": [
+                {
+                    "label": "Play it",
+                    "href": "https://baphaelman.github.io/algorhythms/",
+                    "icon": "web"
+                },
+                {
+                    "label": "Code",
+                    "href": "https://github.com/baphaelman/algorhythms",
+                    "icon": "github"
+                },
+                {
+                    "label": [
+                        {
+                            "me": "Inspiration"
+                        }
+                    ],
+                    "href": "https://www.youtube.com/watch?v=TnSs5w5F5YA"
+                }
+            ],
+            "visual": "video",
+            "video": "/slop/kite-day.mp4",
+            "poster": "/slop/kite-day-poster.jpg",
+            "audio": "/slop/kite-day.flac",
+            "caption": [
+                {
+                    "me": "Bars from 'Kite Day', a piece designed in Algorhythms by a composer agent"
+                }
+            ],
+            "imageAlt": [
+                "Kite Day's pitch lines: chords and bass, then a glass line entering above",
+                {
+                    "me": " "
+                }
+            ],
+            "thumb": "pitchlines"
+        },
+        {
+            "id": "spotify-unwrapped",
+            "title": [
+                {
+                    "me": "Spotify (Un)Wrapped"
+                }
+            ],
+            "category": "Music",
+            "labels": [
+                "Music",
+                "Data viz"
+            ],
+            "when": [
+                {
+                    "me": "Oct – Nov 2026"
+                }
+            ],
+            "status": "Live",
+            "tagline": "Your whole Spotify history, charted",
+            "color": "#3aa64a",
+            "what": [
+                "Wrapped is shallow. This turns your full downloadable history into charts you can explore.",
+                "One time window drives the page: drag it, and every chart morphs to that period.",
+                "Nothing leaves your browser."
+            ],
+            "how": [
+                "Claude Code sessions, each in its own worktree, each change shown on a live link before merging.",
+                "Plain ES modules and ECharts, no build step. A color follows its artist, never its rank."
+            ],
+            "role": [
+                [
+                    {
+                        "me": "Started by trying my own visualizations in a Jupyter notebook (some graphs from the website have their inception there). Asked Claude to make one which was so fun I had it keep building. That graph became the  \"Top Artists' View\" tab.\nDidn't start as an agentic project, and it was my first when it did, so I didn't really know what I was doing and wasted a bunch of resources before setting up an environment and rules. Returning after working on a few other projects, a major redesign was done in a day of periodic exchanges, rather than a week."
+                    }
+                ]
+            ],
+            "links": [
+                {
+                    "label": "Try it",
+                    "href": "https://baphaelman.github.io/Spotify-Un-Wrapped/",
+                    "icon": "web"
+                },
+                {
+                    "label": "Code",
+                    "href": "https://github.com/baphaelman/Spotify-Un-Wrapped",
+                    "icon": "github"
+                }
+            ],
+            "visual": "image",
+            "caption": "The dashboard, on sample data.",
+            "image": "/slop/spotify-unwrapped.jpg",
+            "imageLight": "/slop/spotify-unwrapped-light.jpg",
+            "imageAlt": "The dashboard: a period timeline above a grid of charts",
+            "thumb": "streams"
+        },
+        {
+            "id": "rhyme-xray",
+            "title": [
+                {
+                    "me": "Rhyme X-ray"
+                }
+            ],
+            "category": "Music",
+            "labels": [
+                [
+                    {
+                        "me": "Linguistics"
+                    }
+                ],
+                [
+                    {
+                        "me": "Music"
+                    }
+                ]
+            ],
+            "when": [
+                {
+                    "me": "Nov 2026"
+                }
+            ],
+            "status": "Live",
+            "tagline": [
+                {
+                    "me": "Analyze rhymes syllable-by-syllable"
+                }
+            ],
+            "color": "#4a7fc1",
+            "what": [
+                [
+                    {
+                        "me": "A website that automatically analyzed the rhyme scheme of any song, verse, or snippet from the text. You can also search for any song in the navbar.\nInspired by the [Rhymes Highlighted](https://www.youtube.com/watch?v=LnJs0TdVWLQ&list=RDLnJs0TdVWLQ&start_radio=1) youtube videos; and had the idea to create a model that would correctly extract rhymes from purely text for a while, but didn't get far until Claude."
+                    }
+                ]
+            ],
+            "how": [
+                [
+                    {
+                        "me": "It used a pronunciation dictionary instead of naively guessing from the letters directly, and is much better about guessing pronunciations it doesn't know, also. Handles multiple kinds of syllables, intelligently handles sections of the song/adlibs, and gives you probably more information than you want."
+                    }
+                ]
+            ],
+            "role": [
+                [
+                    {
+                        "me": "I had another agent come in later and criticize the UI/UX (it was even worse before, somehow). Still overbearing but much better, and I'm going for an almost sci-fi tech panel with a million dials kind of thing for these projects."
+                    }
+                ]
+            ],
+            "links": [
+                {
+                    "label": "Try it",
+                    "href": "https://baphaelman.github.io/rhyme-xray/",
+                    "icon": "web"
+                },
+                {
+                    "label": "Code",
+                    "href": "https://github.com/baphaelman/rhyme-xray",
+                    "icon": "github"
+                }
+            ],
+            "visual": "image",
+            "caption": [
+                {
+                    "me": "A preview: the page opens on the lines which incepted this project months ago. "
+                }
+            ],
+            "image": "/slop/rhyme-xray.jpg",
+            "imageLight": "/slop/rhyme-xray-light.jpg",
+            "imageAlt": "Rhyme X-ray coloring the rhymes in two lines by MF DOOM",
+            "thumb": "rhymes"
+        },
+        {
+            "id": "games",
+            "title": "Games",
+            "tagline": "Playable right here",
+            "color": "#c9a227",
+            "thumb": "board",
+            "items": [
+                {
+                    "id": "paper-othello",
+                    "title": [
+                        {
+                            "me": "Paper Othello"
+                        }
+                    ],
+                    "labels": [
+                        "Board game",
+                        "Game theory"
+                    ],
+                    "when": [
+                        {
+                            "me": "Nov 2026"
+                        }
+                    ],
+                    "tagline": "My pen-and-paper game, solved and simulated",
+                    "what": [
+                        "Othello for pencil and paper, where nothing is erased: place a mark next to your opponent's, and fill any gap between it and one of yours.",
+                        "4×4 is a draw; 5×5 is a first-player win by three. Bigger boards were studied in thousands of self-play games.",
+                        "A playable board, puzzles, a bot lab, an Elo ladder, a paper and a players' guide."
+                    ],
+                    "how": [
+                        "One experiment script per question, and every rule a toggle in one engine, so variants need no new code.",
+                        "An exact alpha-beta solver for small boards, and a Rust port, compiled to WebAssembly, for the long runs."
+                    ],
+                    "role": [],
+                    "links": [],
+                    "href": "/slop/play/othello/index.html",
+                    "open": "Play",
+                    "image": "/slop/othello.jpg",
+                    "imageLight": "/slop/othello-light.jpg",
+                    "imageAlt": "The Paper Othello board, with the rules and bot panels"
+                }
+            ]
+        },
+        {
+            "id": "airticles",
+            "title": [
+                {
+                    "me": "AIrticles"
+                }
+            ],
+            "tagline": "Interactive explainers you step through",
+            "color": "#2f9e6b",
+            "thumb": "comma",
+            "items": [
+                {
+                    "id": "comma-pump",
+                    "title": [
+                        {
+                            "me": "The Comma Pump"
+                        }
+                    ],
+                    "labels": [
+                        "Music",
+                        "Math"
+                    ],
+                    "when": [
+                        {
+                            "me": "Nov 2026"
+                        }
+                    ],
+                    "tagline": "Why every keyboard is slightly out of tune, on purpose",
+                    "what": [
+                        "Pure intervals don't fit together. Tune I–vi–ii–V–I purely, chord to chord, and it sinks 81/80 every loop. Hear it, then try five tunings that hide the error."
+                    ],
+                    "how": [
+                        "Every number is computed from exact fractions and rechecked by an independent Python script. Every note is synthesized, with no samples.",
+                        "Scripts checked every step for errors; the sound was checked by ear."
+                    ],
+                    "role": [],
+                    "links": [],
+                    "href": "/slop/play/comma-pump.html",
+                    "open": "Read",
+                    "image": "/slop/comma-pump.jpg",
+                    "imageLight": "/slop/comma-pump-light.jpg",
+                    "imageAlt": "Twelve pure fifths spiraling past C, missing it by 23.5 cents"
+                },
+                {
+                    "id": "single-cycles",
+                    "title": [
+                        {
+                            "me": "Single Cycles"
+                        }
+                    ],
+                    "labels": [
+                        "Puzzles",
+                        "Math"
+                    ],
+                    "when": [
+                        {
+                            "me": "Nov 2026"
+                        }
+                    ],
+                    "tagline": "How often one chain of swaps fixes every edge",
+                    "what": [
+                        "My blindfolded-cubing article, rebuilt around a 3D cube, with a corrected answer."
+                    ],
+                    "how": [
+                        "One HTML file with three.js. Slides move by real face turns, reversible mid-turn, and a Python script checks the math."
+                    ],
+                    "role": [],
+                    "links": [
+                        {
+                            "label": "Original article",
+                            "href": "/single-cycles",
+                            "internal": true
+                        }
+                    ],
+                    "href": "/slop/play/single-cycles.html",
+                    "open": "Read",
+                    "image": "/slop/single-cycles.jpg",
+                    "imageLight": "/slop/single-cycles-light.jpg",
+                    "imageAlt": "A 3D cube above a ring of its twelve edges"
+                }
+            ]
+        },
+        {
+            "id": "craft-prs",
+            "title": [
+                {
+                    "me": "Craft Libraries PRs"
+                }
+            ],
+            "category": "Open source",
+            "labels": [
+                "Rust",
+                "Testing"
+            ],
+            "when": [
+                {
+                    "me": "Nov 2026"
+                }
+            ],
+            "status": "4 PRs in review",
+            "tagline": "An agent fixing issues in an open-source Rust repo",
+            "color": "#a78bfa",
+            "what": [
+                "craft-libs: the Rust monorepo behind the Craft apps.",
+                "So far, cheaper tests: hostile-input sweeps that scale down, and a .docx test that no longer builds 100 MB of XML."
+            ],
+            "how": [
+                "An agent picks an issue, fixes it on my fork and drafts the PR, within time and attempt limits. Nothing is posted without my yes or no."
+            ],
+            "role": [],
+            "links": [
+                {
+                    "label": "craft-libs",
+                    "href": "https://github.com/storytold/craft-libs"
+                }
+            ],
+            "visual": "prs",
+            "caption": "All waiting on review.",
+            "prs": [
+                {
+                    "title": "audio: hostile sweeps honour CRAFT_HOSTILE_DIVISOR",
+                    "href": "https://github.com/storytold/craft-libs/pull/3008"
+                },
+                {
+                    "title": "tests: the remaining hostile sweeps honour CRAFT_HOSTILE_DIVISOR",
+                    "href": "https://github.com/storytold/craft-libs/pull/3012"
+                },
+                {
+                    "title": "docx: the mutated Standard-encryption sweep encrypts its seed once",
+                    "href": "https://github.com/storytold/craft-libs/pull/3014"
+                },
+                {
+                    "title": "docx: the radar caps case uses just over each cap instead of 100 MB of XML",
+                    "href": "https://github.com/storytold/craft-libs/pull/3016"
+                }
+            ],
+            "thumb": "pr"
+        }
+    ]
+}

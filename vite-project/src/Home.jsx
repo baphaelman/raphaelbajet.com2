@@ -1,6 +1,7 @@
 import { React, useState, useEffect } from 'react';
 
 import SimplePortfolioCard from '../components/SimplePortfolioCard.jsx';
+import SlopRupture from '../components/SlopRupture.jsx';
 import portfolioText from '/public/portfolioText.js';
 
 function Home() {
@@ -101,6 +102,13 @@ function Home() {
         alignItems: 'center',
     };
 
+    // holds the projects page and the rupture, which stays put while the projects scroll
+    const projectsWrapperStyle = {
+        position: 'relative',
+        width: '100vw',
+        height: '100vh',
+    };
+
     const projectsStyle = {
         width: '100vw',
         height: '100vh',
@@ -164,6 +172,7 @@ function Home() {
         flexDirection: 'column',
         margin: '2vw',
         marginTop: '22vh',
+        marginRight: 'max(22vw, 180px)', // room for the rupture
     }
 
     const portfolioTitleStyle = {
@@ -309,6 +318,7 @@ function Home() {
                     </button>
                 </div>
             </div>
+            <div style={projectsWrapperStyle}>
             <div style={projectsStyle} className="page projects"> {/* hererererererererererererere PROJECTSPROJECTSPROJECTS */}
                 <div style={portfolioTitleStyle}>
                     <h2 style={projectsTitleStyle}>Projects</h2>
@@ -333,6 +343,8 @@ function Home() {
                     ))}
                 </div>
                 
+            </div>
+            <SlopRupture />
             </div>
             <div className="page" style={meStyle}> {/* hererererererererererererere MEMEMEMEMEMEMEMEMEMEMEMEME */}
                 <div className="img-triple">

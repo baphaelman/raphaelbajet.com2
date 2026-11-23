@@ -1,12 +1,5 @@
 const portfolioText = [
     {
-        id: 0,
-        header: "Spotify (Un)Wrapped",
-        description: "Beautiful visualizations of your streaming data",
-        href: "https://baphaelman.github.io/Spotify-Un-Wrapped/",
-        target: '_blank',
-    },
-    {
         id: 1,
         header: "Single Cycles",
         description: "Using combinatorics and coding to answer a question about solving a rubik's cube blindfolded",
