@@ -5,60 +5,9 @@ import SlopEditor from '/components/SlopEditor.jsx';
 import Words from '/components/SlopWords.jsx';
 import { plain, readable, share, unslop, allTexts, percent } from '/components/slopText.js';
 import slopStats from '/src/slopStats.json';
-import { CATCHPHRASES } from '/components/slopCatchphrases.js';
 
 // `npm run edit` (vite --mode edit): the Edit text panel, how much of the text is mine, and the parts still to write
 const EDITING = import.meta.env.MODE === 'edit';
-
-// Behind everything, like the static in the rupture: the classics in dim rows, each in its own order, drifting
-// sideways at its own pace and its own way, picked fresh on every visit. Plain random clumps (two rows in step read
-// as one band), so this is random that looks it: speeds spread evenly by ratio, never close to a nearby row's, and
-// no direction more than two rows running
-const BACKDROP_SLOWEST = 0.6; // characters a second
-const BACKDROP_FASTEST = 4;
-
-function shuffled(list) {
-    const copy = [...list];
-    for (let i = copy.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [copy[i], copy[j]] = [copy[j], copy[i]];
-    }
-    return copy;
-}
-
-// how different two speeds look: by ratio, so 1 to 2 is as far as 2 to 4
-const apart = (a, b) => Math.max(a / b, b / a);
-
-function backdropRows(count) {
-    const rows = [];
-    while (rows.length < count) {
-        const near = rows.slice(-2);
-        const reverse = near.length === 2 && near[0].reverse === near[1].reverse ? !near[1].reverse : Math.random() < 0.5;
-        // a row going the same way as one just above needs a clearly different speed; one going the other way, less so
-        let speed;
-        do speed = BACKDROP_SLOWEST * (BACKDROP_FASTEST / BACKDROP_SLOWEST) ** Math.random();
-        while (near.some((row) => apart(speed, row.speed) < (row.reverse === reverse ? 1.5 : 1.2)));
-        const text = shuffled(CATCHPHRASES).join('   ·   ');
-        const seconds = text.length / speed;
-        rows.push({ text, speed, reverse, seconds, delay: -Math.random() * seconds }); // starting anywhere in its loop
-    }
-    return rows;
-}
-
-const BACKDROP_ROWS = backdropRows(40);
-
-function Backdrop() {
-    return (
-        <div className="slop-backdrop" aria-hidden="true">
-            {BACKDROP_ROWS.map((row, i) => (
-                <div className={`slop-backdrop-row${row.reverse ? ' slop-backdrop-reverse' : ''}`} key={i} style={{ animationDuration: `${row.seconds}s`, animationDelay: `${row.delay}s` }}>
-                    <span>{row.text}</span>
-                    <span>{row.text}</span>
-                </div>
-            ))}
-        </div>
-    );
-}
 
 // the clip's controls, drawn in currentColor
 const CLIP_ICONS = {
@@ -612,7 +561,6 @@ function SlopZone({ text, savedText, onEdit, onLeave, leaveRef }) {
 
     return (
         <div className={`slop-inner${editing ? ' slop-inner-editing' : ''}${picked.size ? ' slop-picking' : ''}`} ref={innerRef}>
-            <Backdrop />
             <div className={`slop-topbar${pastBar ? ' slop-topbar-edge' : ''}`} ref={topbarRef}>
                 <div className="slop-topbar-row">
                     <span className="slop-wordmark"><Words value={intro.title} /></span>

@@ -22,11 +22,11 @@ function reattributed(text, paths, how) {
     return next;
 }
 
-// Re-slopify (your words become an agent's) and unslopify (an agent's words, approved as they are, become yours)
-// for some texts. Facts and quotes stay as they are. A button with nothing to change is faded. For more than one
-// field (`what` names them), each asks first
+// Unslopify (an agent's words, approved as they are) and re-slopify (approved words go back to being an agent's)
+// for some texts. What you typed, facts and quotes stay as they are. A button with nothing to change is faded. For
+// more than one field (`what` names them), each asks first
 function Reattribute({ values, onChange, what, small }) {
-    const { fraction, letters } = share(values);
+    const { slop, approved } = share(values);
     const run = (how, question) => () => {
         if (!what || window.confirm(question)) onChange(how);
     };
@@ -35,7 +35,7 @@ function Reattribute({ values, onChange, what, small }) {
             <button
                 type="button"
                 className="slop-reslop"
-                disabled={!letters || fraction === 1}
+                disabled={!slop}
                 onClick={run(unslop, `Approve all of the AI's words in ${what} as yours?`)}
                 title="Approve the AI's words here as yours"
             >
@@ -44,9 +44,9 @@ function Reattribute({ values, onChange, what, small }) {
             <button
                 type="button"
                 className="slop-reslop"
-                disabled={fraction === 0}
-                onClick={run(reslop, `Mark all of your words in ${what} as AI-generated?`)}
-                title="Mark your words here as AI-generated"
+                disabled={!approved}
+                onClick={run(reslop, `Take back your approval of the AI's words in ${what}?`)}
+                title="Take back your approval of the AI's words here"
             >
                 {what ? `Re-slopify ${what}` : 're-slopify'}
             </button>

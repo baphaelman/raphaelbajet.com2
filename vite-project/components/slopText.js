@@ -1,16 +1,21 @@
 // Who wrote what in the Slop Zone. Text in slopProjects.json is either a plain string (an agent's words), or a
 // list of pieces where each piece is a string (an agent's), {"me": "..."} (yours: typed in the Edit text panel,
-// or dictated word for word) or {"data": "..."} (nobody's: a fact, or someone else's words quoted),
-// e.g. ["Paste a verse and ", {"me": "watch every rhyme light up"}].
+// or dictated word for word), {"ok": "..."} (an agent's, approved by you as they are) or {"data": "..."} (nobody's:
+// a fact, or someone else's words quoted), e.g. ["Paste a verse and ", {"me": "watch every rhyme light up"}].
+// It's the slop editor's format (~/Desktop/Coding/slopometer): approved words count as yours, and re-slopifying
+// takes an approval back without touching what you typed. Before 2026-11-23, unslopify wrote {"me": ...}, so older
+// "me" pieces are typed or approved.
 // Any text can hold a link, written [label](address): only the label shows on the page.
 
-// 'ai', 'mine' or 'data'
+// 'ai', 'mine', 'ok', 'data', or the key of a category of the slop editor's own
 const authorOf = (piece) => {
     if (typeof piece === 'string') return 'ai';
-    return 'me' in piece ? 'mine' : 'data';
+    const key = Object.keys(piece)[0] ?? 'data';
+    return key === 'me' ? 'mine' : key;
 };
-const textOf = (piece) => (typeof piece === 'string' ? piece : piece.me ?? piece.data);
-const PIECE = { ai: (text) => text, mine: (text) => ({ me: text }), data: (text) => ({ data: text }) };
+const textOf = (piece) => (typeof piece === 'string' ? piece : String(Object.values(piece)[0] ?? ''));
+const pieceOf = (author, text) => (author === 'ai' ? text : { [author === 'mine' ? 'me' : author]: text });
+const yours = (author) => author === 'mine' || author === 'ok';
 
 // the text with its link markup, as the panel edits it
 export function plain(value) {
@@ -29,7 +34,7 @@ function fromChars(text, authors) {
     for (let i = 0; i < text.length;) {
         let j = i;
         while (j < text.length && authors[j] === authors[i]) j++;
-        pieces.push(PIECE[authors[i]](text.slice(i, j)));
+        pieces.push(pieceOf(authors[i], text.slice(i, j)));
         i = j;
     }
     return pieces;
@@ -55,14 +60,14 @@ export function applyEdit(value, next) {
 
 // `value` with one author's words handed to another, the text unchanged. Facts and quotes stay as they are
 const reattribute = (value, from, to) => fromChars(plain(value), authorsByChar(value).map((author) => (author === from ? to : author)));
-// re-slopify: your words become an agent's, for when you want them associated with the slop
-export const reslop = (value) => reattribute(value, 'mine', 'ai');
-// unslopify: an agent's words, approved as they are, become yours, so you don't have to retype them
-export const unslop = (value) => reattribute(value, 'ai', 'mine');
+// re-slopify: approved words go back to being an agent's. What you typed stays yours
+export const reslop = (value) => reattribute(value, 'ok', 'ai');
+// unslopify: an agent's words, approved as they are, so you don't have to retype them
+export const unslop = (value) => reattribute(value, 'ai', 'ok');
 
 const LINK = /\[([^\]]+)\]\(([^)\s]+)\)/g;
 
-// the text as it reads: runs of one author's words (`by`: 'ai', 'mine' or 'data'), each with the link it sits
+// the text as it reads: runs of one author's words (`by`: 'ai', 'mine', 'ok' or 'data'), each with the link it sits
 // in, if any
 export function runs(value) {
     const text = plain(value);
@@ -124,23 +129,27 @@ export const textPaths = (text) => [
 export const entryTexts = (entry) => entryTextPaths(entry).map((path) => getAt(entry, path));
 export const allTexts = (text) => textPaths(text).map((path) => getAt(text, path));
 
-// how much of these texts is yours, as they read: a share of the written letters (spaces, facts and quotes
-// aside), and your word count
+// how much of these texts is yours (typed or approved), as they read: a share of the written letters (spaces,
+// facts and quotes aside), your word count, and how many letters are the AI's (`slop`) and approved (`approved`)
 export function share(values) {
     let mine = 0;
     let total = 0;
     let words = 0;
+    let slop = 0;
+    let approved = 0;
     values.forEach((value) => {
         runs(value).forEach((run) => {
             if (run.by === 'data') return;
             const letters = run.text.replace(/\s/g, '').length;
             total += letters;
-            if (run.by !== 'mine') return;
+            if (run.by === 'ai') slop += letters;
+            if (run.by === 'ok') approved += letters;
+            if (!yours(run.by)) return;
             mine += letters;
             words += run.text.split(/\s+/).filter(Boolean).length;
         });
     });
-    return { fraction: total ? mine / total : 0, words, letters: total };
+    return { fraction: total ? mine / total : 0, words, letters: total, slop, approved };
 }
 
 export function percent(fraction) {
