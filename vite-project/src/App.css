@@ -354,7 +354,6 @@ button > .image-text {
 
 /* Slop Zone: the rupture in Projects, and what's inside it */
 :root {
-  --void: #000000;
   --slop: #BA89FF;
   --slop-glow: rgba(186, 137, 255, 0.55);
   --void-ink: #F0EBD8;
@@ -377,6 +376,10 @@ button > .image-text {
   --mine: var(--zone-text);
   --ai: var(--slop);
   --data: var(--mine);
+
+  /* the phrases drifting behind the zone, and the same phrases seen through the crack, a little brighter */
+  --backdrop-ink: color-mix(in srgb, var(--slop) 13%, transparent);
+  --crack-ink: color-mix(in srgb, var(--slop) 44%, transparent);
 }
 
 .slop-mine,
@@ -431,7 +434,7 @@ button > .image-text {
 
 .rupture {
   position: absolute;
-  top: calc(20vh - 12px);
+  top: calc(20vh - 50px);
   bottom: 3vh;
   right: 4vw;
   width: max(16vw, 150px);
@@ -459,61 +462,44 @@ button > .image-text {
   width: 100%;
 }
 
-.rupture-glow {
-  position: absolute;
-  inset: 0;
-  display: block;
-  filter: drop-shadow(0 0 1px #e3d1ff) drop-shadow(0 0 8px var(--slop-glow)) drop-shadow(0 0 22px rgba(186, 137, 255, 0.22));
-  animation: rupture-flicker 6s infinite;
-}
-
-.rupture-hovered .rupture-glow,
-.rupture:focus-visible .rupture-glow {
-  filter: drop-shadow(0 0 1px #f1e7ff) drop-shadow(0 0 12px var(--slop)) drop-shadow(0 0 34px rgba(186, 137, 255, 0.4));
-}
-
+/* the zone, seen through the split (its outline set from script, hidden until then): its page color, and its backdrop
+   lined up with the screen */
 .rupture-void {
   position: absolute;
   inset: 0;
   display: block;
   overflow: hidden;
-  background: radial-gradient(ellipse at 48% 45%, #120a1f 0%, var(--void) 55%);
-  transition: clip-path 0.6s cubic-bezier(0.3, 0, 0.2, 1);
+  background: var(--zone-page);
+  clip-path: inset(50%);
 }
 
 .rupture-static {
   position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2.2em;
-  padding-top: 2em;
-  font-family: var(--mono);
-  font-size: 10px;
-  white-space: nowrap;
-  color: rgba(186, 137, 255, 0.5);
-  animation: rupture-drift 40s linear infinite;
+  width: 100vw;
+  height: 100vh;
+  -webkit-font-smoothing: antialiased;
 }
 
-.rupture-fractures {
+.rupture-static .slop-backdrop {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  pointer-events: none;
+  z-index: auto;
+  color: var(--crack-ink);
 }
 
-.rupture-fractures path {
-  fill: none;
-  stroke: #04050a;
-  stroke-width: 1.4;
-  stroke-linejoin: bevel;
-  vector-effect: non-scaling-stroke;
-  opacity: 0.85;
+/* the ink brimming in it (drawn by slopGooGL.js), reaching past the crack's box on every side */
+.rupture-goo {
+  position: absolute;
+  top: calc(-1 * var(--pad));
+  left: calc(-1 * var(--pad));
+  width: calc(100% + 2 * var(--pad));
+  height: calc(100% + 2 * var(--pad));
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.rupture-painted .rupture-goo {
+  opacity: 1;
 }
 
 .rupture-label {
@@ -544,20 +530,6 @@ button > .image-text {
   text-shadow: 0 0 12px var(--slop-glow);
 }
 
-@keyframes rupture-flicker {
-  0%, 100% { opacity: 1; }
-  46% { opacity: 1; }
-  47% { opacity: 0.7; }
-  48% { opacity: 1; }
-  49% { opacity: 0.82; }
-  50% { opacity: 1; }
-}
-
-@keyframes rupture-drift {
-  from { transform: translateY(0); }
-  to { transform: translateY(-50%); }
-}
-
 /* behind the zone's cards: the classics, dim, drifting sideways. Just above the zone's own background (z-index -1
    in the zone's stacking context), so everything else covers it */
 .slop-backdrop {
@@ -573,7 +545,7 @@ button > .image-text {
   font-size: 13px;
   line-height: 1;
   white-space: nowrap;
-  color: color-mix(in srgb, var(--slop) 13%, transparent);
+  color: var(--backdrop-ink);
 }
 
 .slop-backdrop-row {
@@ -609,24 +581,49 @@ button > .image-text {
   -webkit-font-smoothing: antialiased;
 }
 
-.slop-zone-opening,
-.slop-zone-closing {
-  transition: clip-path 1s cubic-bezier(0.75, 0, 0.15, 1);
-}
-
-.slop-inner {
-  opacity: 0;
-}
-
-.slop-zone-opening .slop-inner,
-.slop-zone-open .slop-inner {
-  opacity: 1;
-  transition: opacity 0.6s ease 0.5s;
+/* as the crack's torn wide open, the phrases dim from how they looked through it and the zone comes up behind them;
+   sealing, the other way round. The tear itself (SlopRupture.jsx) is drawn from script */
+.slop-zone-opening .slop-inner {
+  animation: slop-fade 0.5s ease 1.15s backwards;
 }
 
 .slop-zone-closing .slop-inner {
-  opacity: 0;
-  transition: opacity 0.25s ease;
+  animation: slop-fade 0.25s ease reverse forwards;
+}
+
+.slop-zone-opening .slop-backdrop {
+  animation: slop-backdrop-settle 0.5s ease 1s backwards;
+}
+
+.slop-zone-closing .slop-backdrop {
+  animation: slop-backdrop-settle 0.4s ease reverse forwards;
+}
+
+@keyframes slop-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slop-backdrop-settle {
+  from { color: var(--crack-ink); }
+  to { color: var(--backdrop-ink); }
+}
+
+/* the tear, over the zone it's opening onto */
+.slop-tear {
+  position: fixed;
+  inset: 0;
+  z-index: 1001;
+  pointer-events: none;
+}
+
+.slop-tear .rupture-goo {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  transition: none;
 }
 
 .slop-zone h2,
@@ -2037,11 +2034,6 @@ button > .image-text {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .rupture-glow,
-  .rupture-static {
-    animation: none;
-  }
-
   .slop-backdrop-row {
     animation: none;
   }

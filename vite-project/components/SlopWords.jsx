@@ -1,11 +1,11 @@
 import { Fragment } from 'react';
 import { runs } from '/components/slopText.js';
 
-// one author's words: an agent's in the zone's purple, anything else (yours, facts and quotes) in the text color. Line breaks
-// are kept
+// one author's words: an agent's in the zone's purple, anything else (yours, facts and quotes) in the text color.
+// Approved words look like yours (slop-mine), with slop-ok as well. Line breaks are kept
 function Run({ run }) {
     return (
-        <span className={`slop-${run.by}`}>
+        <span className={run.by === 'ok' ? 'slop-mine slop-ok' : `slop-${run.by}`}>
             {run.text.split('\n').map((line, i) => <Fragment key={i}>{i > 0 && <br />}{line}</Fragment>)}
         </span>
     );
