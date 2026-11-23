@@ -238,6 +238,84 @@ a { color: var(--accent-ink); text-underline-offset: 3px; }
   .layer, .step .card, .card [data-b] { transition: none !important; animation: none !important; }
 }
 </style>
+<style id="article-text-css">
+/* Slop editor: who wrote what (see the article-text script). Canonical copy: ~/Desktop/Coding/slop-editor/article-text.css.
+   Uses the article's tokens: --bg, --panel, --ink, --ink-2, --ink-3, --rule, --accent, --f-display, --f-mono. */
+:root {
+  /* my words in the body ink, anything AI-generated in purple, facts and quotes in amber */
+  --mine: var(--ink); --ai: #6e36d0; --data: #8f5a00;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --ai: #ba89ff; --data: #e8b65a; }
+}
+:root[data-theme="dark"] { --ai: #ba89ff; --data: #e8b65a; }
+
+/* the colors show while the Slop-o-meter is on */
+.slop-on .tx-mine { color: var(--tx-mine, var(--mine)); }
+.slop-on .tx-ai { color: var(--tx-ai, var(--ai)); }
+.slop-on .tx-data { color: var(--tx-data, var(--data)); }
+.tx-data { font-variant-numeric: tabular-nums; }
+/* quieter text keeps the three colors, a step down */
+.note, .lede, .dek, .hint, .eyebrow, .lay-sub, .cta-sub, .fan-note {
+  --tx-mine: var(--ink-2);
+  --tx-ai: color-mix(in srgb, var(--ai) 74%, var(--ink-3));
+  --tx-data: color-mix(in srgb, var(--data) 74%, var(--ink-3));
+}
+
+/* Slop-o-meter: a switch at the top of the article */
+.tx-meter { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 0 0 14px; font-family: var(--f-mono); font-size: 0.74rem; color: var(--ink-3); }
+.tx-meter-btn { display: inline-flex; align-items: center; gap: 8px; padding: 4px 10px 4px 5px; border-radius: 99px; border: 1px solid var(--rule); background: var(--panel); color: var(--ink-2); font: 600 0.74rem var(--f-mono); letter-spacing: 0.04em; cursor: pointer; }
+.tx-meter-btn:hover { border-color: var(--ai); }
+.tx-switch { position: relative; width: 26px; height: 15px; border-radius: 99px; background: var(--rule); transition: background .2s; }
+.tx-switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 11px; height: 11px; border-radius: 50%; background: var(--panel); box-shadow: 0 1px 2px rgb(0 0 0 / 0.3); transition: transform .2s; }
+.tx-meter-btn[aria-pressed="true"] { border-color: var(--ai); color: var(--ink); }
+.tx-meter-btn[aria-pressed="true"] .tx-switch { background: var(--ai); }
+.tx-meter-btn[aria-pressed="true"] .tx-switch::after { transform: translateX(11px); }
+.tx-meter-key { display: none; flex-wrap: wrap; gap: 2px 12px; }
+.slop-on .tx-meter-key { display: inline-flex; }
+.tx-legend .tx-mine { color: var(--mine); } .tx-legend .tx-ai { color: var(--ai); } .tx-legend .tx-data { color: var(--data); }
+.tx-legend { font-weight: 600; }
+
+/* Edit text: only under tools/edit.mjs */
+.tx-edit-btn { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: max(14px, env(safe-area-inset-bottom, 0px)); z-index: 60; font: 600 0.86rem var(--f-display); padding: 9px 15px; border-radius: 99px; border: 1px solid var(--ai); background: var(--panel); color: var(--ai); cursor: pointer; box-shadow: 0 6px 24px rgb(0 0 0 / 0.14); }
+.tx-edit-btn[hidden], .tx-panel[hidden] { display: none; }
+.tx-panel { position: fixed; top: 12px; right: 12px; bottom: 12px; z-index: 60; width: min(400px, calc(100vw - 24px)); display: flex; flex-direction: column; background: var(--panel); color: var(--ink); border: 1px solid var(--rule); border-radius: 16px; box-shadow: 0 16px 48px rgb(0 0 0 / 0.28); font-family: var(--f-display); }
+.tx-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; padding: 14px 16px 10px; border-bottom: 1px solid var(--rule); }
+.tx-head h2 { font-size: 1.1rem; margin: 0; }
+.tx-status { margin: 2px 0 0; font: 0.74rem var(--f-mono); color: var(--ink-3); }
+.tx-status[data-kind="dirty"] { color: var(--ink-2); }
+.tx-status[data-kind="error"] { color: #d0453a; }
+.tx-close { font-size: 1.3rem; line-height: 1; width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--rule); background: none; color: var(--ink); cursor: pointer; }
+.tx-cover { padding: 10px 16px; border-bottom: 1px solid var(--rule); display: grid; gap: 6px; font: 0.78rem var(--f-mono); color: var(--ink-2); }
+.tx-cover-nums { display: flex; justify-content: space-between; gap: 8px; }
+.tx-cover-nums .tx-mine { color: var(--mine); font-weight: 600; }
+.tx-track { height: 6px; border-radius: 3px; background: color-mix(in srgb, var(--ai) 35%, var(--rule)); overflow: hidden; }
+.tx-track span { display: block; height: 100%; background: var(--mine); transition: width .3s; }
+.tx-body { overflow-y: auto; padding: 6px 12px 16px; overscroll-behavior: contain; }
+.tx-group { border-bottom: 1px solid var(--rule); }
+.tx-group summary { display: flex; justify-content: space-between; gap: 10px; padding: 10px 4px; cursor: pointer; font-weight: 700; font-size: 0.92rem; }
+.tx-gshare { font: 0.72rem var(--f-mono); color: var(--ink-3); white-space: nowrap; padding-top: 2px; }
+.tx-gshare.tx-some { color: var(--ink); }
+.tx-field { display: grid; gap: 4px; margin: 0 4px 12px; }
+.tx-flabel { display: flex; justify-content: space-between; gap: 8px; font: 0.72rem var(--f-mono); color: var(--ink-3); }
+.tx-fmine { color: var(--ink); }
+.tx-field input, .tx-field textarea { width: 100%; font: 0.88rem/1.45 var(--f-mono); color: var(--ink); background: var(--bg); border: 1px solid var(--rule); border-radius: 8px; padding: 6px 8px; resize: vertical; }
+.tx-field input:focus, .tx-field textarea:focus { outline: 2px solid var(--ai); outline-offset: 0; border-color: transparent; }
+.tx-reslop { font: 600 0.7rem var(--f-mono); padding: 3px 9px; border-radius: 99px; border: 1px solid color-mix(in srgb, var(--ai) 55%, var(--rule)); background: none; color: var(--ai); cursor: pointer; white-space: nowrap; }
+.tx-reslop:hover:not(:disabled) { background: color-mix(in srgb, var(--ai) 12%, transparent); }
+.tx-unslop, .tx-unslop-all, .tx-unslop-group { border-color: var(--rule); color: var(--mine); }
+.tx-unslop:hover:not(:disabled), .tx-unslop-all:hover:not(:disabled), .tx-unslop-group:hover:not(:disabled) { background: color-mix(in srgb, var(--mine) 8%, transparent); }
+.tx-reslop:disabled { opacity: 0.35; cursor: default; background: none; }
+.tx-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.tx-group-actions { margin: 0 4px 12px; }
+.tx-flabel { align-items: center; }
+.tx-fmine { margin-left: auto; }
+.tx-flabel .tx-reslop { padding: 0 7px; font-size: 0.66rem; }
+.tx-focus { outline: 2px dashed var(--ai); outline-offset: 3px; border-radius: 3px; }
+@media (max-width: 900px) {
+  .tx-panel { top: auto; left: 8px; right: 8px; bottom: 8px; width: auto; height: 56svh; }
+}
+</style>
 </head>
 <body>
 
@@ -246,65 +324,66 @@ a { color: var(--accent-ink); text-underline-offset: 3px; }
 
     <section class="step" data-scene="hero">
       <div class="card">
-        <div class="eyebrow">An interactive explainer</div>
-        <h1>The Comma Pump</h1>
-        <p>Why every keyboard you have ever played is slightly out of tune, on purpose.</p>
-        <p>The intervals that sound purest are simple frequency ratios. The trouble is that simple ratios refuse to fit together, and the clearest way to hear it is to sing four chords in perfect tune and arrive somewhere you didn't start.</p>
-        <p class="note">Every note here is synthesized live from exact ratios. Turn the sound on, then scroll or press <kbd>→</kbd> / <kbd>Space</kbd> to step through and <kbd>←</kbd> to go back. <kbd>P</kbd> plays the example on screen and <kbd>S</kbd> stops everything. Headphones help with the beating.</p>
+        <div data-slopmeter="on"></div>
+        <div class="eyebrow" data-tx="hero.eyebrow"></div>
+        <h1 data-tx="hero.title"></h1>
+        <p data-tx="hero.p1"></p>
+        <p data-tx="hero.p2"></p>
+        <p class="note" data-tx="hero.note"></p>
       </div>
     </section>
 
     <section class="step tall" data-scene="pure" data-n="4" style="--n:4">
       <div class="card">
-        <div class="eyebrow">1 · Pure intervals</div>
-        <h2>Simple ratios sound smooth</h2>
-        <p data-b="0">Two notes blend when their frequencies form a simple ratio. An <b>octave</b> is <span class="r">2:1</span>: the <span class="hi">upper note</span> vibrates exactly twice for every vibration of the <span class="lo">lower</span> one. Add the two waves and the sum repeats after every cycle of the lower note.</p>
-        <p data-b="1">A <b>perfect fifth</b> is <span class="r">3:2</span>. The sum is more intricate but still repeats, every two cycles. Below the waves, each note's overtones form a ladder: real instruments sound a whole series of harmonics, and with <span class="r">3:2</span> the lower note's 3rd harmonic lands exactly on the upper note's 2nd. Musicians measure intervals in <i>cents</i>, 1/1200 of an octave; this fifth is <b class="n" data-k="fifthC"></b>&nbsp;¢.</p>
-        <p data-b="2">A <b>major third</b> is <span class="r">5:4</span>, <b class="n" data-k="thirdC"></b>&nbsp;¢. The pattern takes four cycles to repeat, and the 5th harmonic of one note meets the 4th of the other. The simpler the ratio, the more overtones coincide, which is roughly why the octave sounds smoothest and the third most colorful.</p>
-        <p data-b="3">Nudge a ratio and the overtones stop meeting. They sit a few hertz apart and the sound pulses, or <b>beats</b>, at the difference. This is the major third on a piano, <b class="n" data-k="etThirdC"></b>&nbsp;¢ instead of <b class="n" data-k="thirdC"></b>: listen for a shimmer of about <b class="n" data-k="etThirdBeat"></b> beats a second, and watch the summed wave keep changing shape.</p>
+        <div class="eyebrow" data-tx="pure.eyebrow"></div>
+        <h2 data-tx="pure.title"></h2>
+        <p data-b="0" data-tx="pure.p1"></p>
+        <p data-b="1" data-tx="pure.p2"></p>
+        <p data-b="2" data-tx="pure.p3"></p>
+        <p data-b="3" data-tx="pure.p4"></p>
       </div>
     </section>
 
     <section class="step tall" data-scene="stack" data-n="3" style="--n:3">
       <div class="card">
-        <div class="eyebrow">2 · They don't fit</div>
-        <h2>Stack them and the circle won't close</h2>
-        <p data-b="0">Stack twelve pure fifths, C, G, D, A and on, and you visit every note of the chromatic scale. On the spiral one full turn is an octave, so every note sits at its pitch class and the stack climbs outward. Twelve fifths span about seven octaves, so the last note ought to land back on C.</p>
-        <p data-b="1">It misses. <span class="r">(3/2)<sup>12</sup> = <span data-k="f12"></span></span>, while seven octaves are <span class="r">2<sup>7</sup> = 128</span>. The stack overshoots by <span class="r" data-k="pythFrac"></span>, the <b>Pythagorean comma</b>: <b class="n" data-k="pythC"></b>&nbsp;cents. Press <i>Compare</i> to hear the starting C against the B♯ that should have been C.</p>
-        <p data-b="2">Pure major thirds fail the other way. Three of them, C–E–G♯–B♯, make <span class="r">(5/4)<sup>3</sup> = <span data-k="t3"></span></span>, short of the octave <span class="r">2/1</span> by <span class="r" data-k="diesisFrac"></span>: <b class="n" data-k="diesisC"></b>&nbsp;cents, nearly half a semitone.</p>
+        <div class="eyebrow" data-tx="stack.eyebrow"></div>
+        <h2 data-tx="stack.title"></h2>
+        <p data-b="0" data-tx="stack.p1"></p>
+        <p data-b="1" data-tx="stack.p2"></p>
+        <p data-b="2" data-tx="stack.p3"></p>
       </div>
     </section>
 
     <section class="step tall" data-scene="pump" data-n="5" style="--n:5">
       <div class="card">
-        <div class="eyebrow">3 · The comma pump</div>
-        <h2>Four perfect chords, and the floor gives way</h2>
-        <p data-b="0">Take a common progression: C major, A minor, D minor, G major and back to C, or <b>I–vi–ii–V–I</b>. Tune each chord purely, and keep any note it shares with the chord before exactly where it was, the way a choir or string quartet tunes by ear. The chain follows the roots: each one is fixed by the note it keeps.</p>
-        <p data-b="1">Play it. Each chord is perfectly in tune and every shared note holds still, yet the C that comes back sits at <span class="r ju" data-k="pumpFrac"></span> of where it started: <b class="n ju" data-k="pumpC"></b>&nbsp;cents flat. Let it loop and the whole progression sinks by the same step each time; after <b class="n" data-k="semiLoops"></b> loops it has dropped more than a semitone. Leave <i>Reference C</i> on to hear the gap open against the original pitch.</p>
-        <p data-b="2">A choir that refuses to sink has to put the comma somewhere else. Keep C where it is and tune every chord purely on its home note, and the shared notes can no longer all hold still: when D minor arrives, its <span data-k="jumpNote"></span> must be <span class="r" data-k="jumpFrac"></span> higher than the <span data-k="jumpNote"></span> just sung. Press <i>Pure, fixed C</i> and listen for the held note sliding up <b class="n" data-k="jumpC"></b>&nbsp;cents.</p>
-        <p data-b="3">Or tune nothing purely. In <b>equal temperament</b> every semitone is exactly <span class="r">2<sup>1/12</sup></span>, so the loop comes home every time and nothing jumps. The comma is spread out instead: every major third is <b class="n" data-k="etThirdOff"></b>&nbsp;¢ wide and every fifth <b class="n" data-k="etFifthOff"></b>&nbsp;¢ narrow, in every chord, all the time.</p>
-        <p data-b="4">Where does <span class="r" data-k="pumpFrac"></span> come from? Follow the roots: C→A is down a fifth and up a pure third, then A→D, D→G and G→C are three more fifths down. Four pure fifths are <span class="r" data-k="f4"></span>, but two octaves and a pure third are <span class="r" data-k="o2t"></span>. The difference, the <b>syntonic comma</b>, has to go somewhere: into the pitch, into a held note, or into every chord.</p>
+        <div class="eyebrow" data-tx="pump.eyebrow"></div>
+        <h2 data-tx="pump.title"></h2>
+        <p data-b="0" data-tx="pump.p1"></p>
+        <p data-b="1" data-tx="pump.p2"></p>
+        <p data-b="2" data-tx="pump.p3"></p>
+        <p data-b="3" data-tx="pump.p4"></p>
+        <p data-b="4" data-tx="pump.p5"></p>
       </div>
     </section>
 
     <section class="step tall" data-scene="temper" data-n="5" style="--n:5">
       <div class="card">
-        <div class="eyebrow">4 · Temperaments</div>
-        <h2>Every tuning is a compromise</h2>
-        <p data-b="0">A temperament bends the ratios so they fit, and chooses where the error goes. Here is one C major triad in <b>just intonation</b>: every interval pure and nothing beats. Lovely, but as the pump showed, you can't keep it up as the harmony moves.</p>
-        <p data-b="1"><b>Quarter-comma meantone</b>, the Renaissance favorite, narrows every fifth by a quarter of the syntonic comma so that four fifths make a pure major third. Thirds are perfect; each fifth is <b class="n" data-k="mtFifthOff"></b>&nbsp;¢ narrow and beats slowly.</p>
-        <p data-b="2"><b>Equal temperament</b> shares the Pythagorean comma out across all twelve fifths. Fifths are only <b class="n" data-k="etFifthOff"></b>&nbsp;¢ narrow, but major thirds are <b class="n" data-k="etThirdOff"></b>&nbsp;¢ wide and beat fast. Every key is equally good and equally impure.</p>
-        <p data-b="3">Meantone's narrow fifths can't close the circle either. Eleven good fifths leave one leftover, from <span data-k="wolfName"></span>, that is <b class="n" data-k="wolfC"></b>&nbsp;¢, <b class="n" data-k="wolfOff"></b>&nbsp;¢ wider than pure: the <b>wolf fifth</b>, named for how it howls. Play it, then the triad's own fifth for contrast.</p>
-        <p data-b="4">Here is every major triad at once, around the circle of fifths, colored by how far it is from pure; click one to hear it. Meantone has <b class="n" data-k="mtGood"></b> sweet keys and <b class="n" data-k="mtBad"></b> unusable ones. Just intonation, tuned to C, is perfect in <b class="n" data-k="jiGood"></b> keys and unusable in the other <b class="n" data-k="jiBad"></b>, <span data-k="jiD"></span>. Equal temperament is mildly off everywhere. Two historical in-betweens are here too: <b>Pythagorean</b> tuning, with pure fifths and thirds <b class="n" data-k="pythThirdOff"></b>&nbsp;¢ wide (except <b class="n" data-k="pythSchis"></b> distant triads whose thirds come out almost pure by accident), and <b>Werckmeister III</b>, a well temperament in which every key is usable and each has its own color.</p>
+        <div class="eyebrow" data-tx="temper.eyebrow"></div>
+        <h2 data-tx="temper.title"></h2>
+        <p data-b="0" data-tx="temper.p1"></p>
+        <p data-b="1" data-tx="temper.p2"></p>
+        <p data-b="2" data-tx="temper.p3"></p>
+        <p data-b="3" data-tx="temper.p4"></p>
+        <p data-b="4" data-tx="temper.p5"></p>
       </div>
     </section>
 
     <section class="step tall" data-scene="lattice" data-n="2" style="--n:2">
       <div class="card">
-        <div class="eyebrow">5 · Playground</div>
-        <h2>A map of pure pitches</h2>
-        <p data-b="0">Every pure pitch is a product of 3s and 5s (with 2s to move by octaves). Put fifths across and major thirds up, and every major triad becomes an upward triangle and every minor triad a downward one. Click a node to hear it and see its ratio; click a triangle to hear its chord, and <i>Same in ET</i> to hear it tempered. A ↓ marks a note a syntonic comma lower than the same name reached by fifths alone. <i>Just scale</i> rings the twelve notes section 4 used for just intonation.</p>
-        <p data-b="1">The comma pump is a walk on this map. Each chord shares an edge or a corner with the last, but four steps later you are one row up and four columns left: a different C, <span class="r" data-k="pumpFrac"></span> of the first. Press <i>Walk the pump</i>. Equal temperament's trick is to pretend those two Cs are the same point, and with them every pair of notes a comma apart.</p>
+        <div class="eyebrow" data-tx="lattice.eyebrow"></div>
+        <h2 data-tx="lattice.title"></h2>
+        <p data-b="0" data-tx="lattice.p1"></p>
+        <p data-b="1" data-tx="lattice.p2"></p>
       </div>
     </section>
 
@@ -327,7 +406,7 @@ a { color: var(--accent-ink); text-underline-offset: 3px; }
         <div class="layer" id="L-hero">
           <div class="viz"><svg id="hero-svg" viewBox="-108 -108 216 216" role="img" aria-label="Twelve pure fifths drawn on a spiral, one turn per octave; the last one overshoots C"></svg></div>
           <button class="btn primary cta" id="hero-snd">🔊 Enable sound</button>
-          <div class="cta-sub">Twelve pure fifths, one turn per octave. They almost come back to C.</div>
+          <div class="cta-sub" data-tx="hero.stage.caption"></div>
         </div>
 
         <!-- 1 Pure intervals -->
@@ -394,7 +473,7 @@ a { color: var(--accent-ink); text-underline-offset: 3px; }
 
         <!-- 5 Lattice -->
         <div class="layer" id="L-lattice">
-          <div class="lay-head"><div class="lay-title">Fifths across, major thirds up</div><div class="lay-sub">Click nodes and triangles, or Tab to a node and press Enter.</div></div>
+          <div class="lay-head"><div class="lay-title" data-tx="lattice.stage.title"></div><div class="lay-sub" data-tx="lattice.stage.sub"></div></div>
           <div class="viz"><svg id="lat-svg" preserveAspectRatio="xMidYMid meet" aria-label="Lattice of pure pitches: fifths across, major thirds up"></svg></div>
           <div id="lat-read" aria-live="polite"></div>
           <div class="ctrls">
@@ -411,22 +490,22 @@ a { color: var(--accent-ink); text-underline-offset: 3px; }
 </div>
 
 <section class="after" id="after">
-  <div class="eyebrow">Appendix</div>
-  <h2>The numbers</h2>
-  <p class="lede">Every figure on this page is computed in your browser from exact fractions; nothing is typed in. These are the ratios it starts from and what they come to.</p>
-  <h3>Pure intervals</h3>
+  <div class="eyebrow" data-tx="after.eyebrow"></div>
+  <h2 data-tx="after.title"></h2>
+  <p class="lede" data-tx="after.lede"></p>
+  <h3 data-tx="after.intervals"></h3>
   <div class="tablewrap"><table class="ntab" id="tab-ivs"></table></div>
-  <h3>Commas: where the ratios fail to meet</h3>
+  <h3 data-tx="after.commas"></h3>
   <div class="tablewrap"><table class="ntab" id="tab-commas"></table></div>
-  <h3>The five tunings, note by note (cents above C)</h3>
+  <h3 data-tx="after.tunings"></h3>
   <div class="tablewrap"><table class="ntab" id="tab-tunings"></table></div>
-  <h3>How the sound is made</h3>
-  <p id="snd-notes"></p>
-  <h3>Further reading</h3>
+  <h3 data-tx="after.sound"></h3>
+  <p data-tx="after.soundNotes"></p>
+  <h3 data-tx="after.reading"></h3>
   <ul>
-    <li>Hermann von Helmholtz, <i>On the Sensations of Tone</i> (1863). The classic account of overtones and beating as the physics of consonance.</li>
-    <li>Harry Partch, <i>Genesis of a Music</i> (1949). A composer's case for just intonation, lattice diagrams included.</li>
-    <li>Ross W. Duffin, <i>How Equal Temperament Ruined Harmony (and Why You Should Care)</i> (2007). A lively history of meantone, well temperaments and the victory of 12-TET.</li>
+    <li data-tx="after.reading1"></li>
+    <li data-tx="after.reading2"></li>
+    <li data-tx="after.reading3"></li>
   </ul>
 </section>
 
@@ -437,6 +516,560 @@ a { color: var(--accent-ink); text-underline-offset: 3px; }
   <button class="btn" id="theme" title="Switch light / dark" aria-label="Switch light or dark theme">◐</button>
 </div>
 
+<script type="application/json" id="article-text">
+{
+  "version": 4,
+  "hero": {
+    "eyebrow": "An interactive explainer",
+    "title": "The Comma Pump",
+    "p1": "Why every keyboard you have ever played is slightly out of tune, on purpose.",
+    "p2": "The intervals that sound purest are simple frequency ratios. The trouble is that simple ratios refuse to fit together, and the clearest way to hear it is to sing four chords in perfect tune and arrive somewhere you didn't start.",
+    "note": "Every note here is synthesized live from exact ratios. Turn the sound on, then scroll or press [[→]] / [[Space]] to step through and [[←]] to go back. [[P]] plays the example on screen and [[S]] stops everything. Headphones help with the beating.",
+    "stage": {
+      "caption": "Twelve pure fifths, one turn per octave. They almost come back to C."
+    }
+  },
+  "pure": {
+    "eyebrow": "1 · Pure intervals",
+    "title": "Simple ratios sound smooth",
+    "p1": "Two notes blend when their frequencies form a simple ratio. An **octave** is `2:1`: the upper note vibrates exactly twice for every vibration of the lower one. Add the two waves and the sum repeats after every cycle of the lower note.",
+    "p2": "A **perfect fifth** is `3:2`. The sum is more intricate but still repeats, every two cycles. Below the waves, each note's overtones form a ladder: real instruments sound a whole series of harmonics, and with `3:2` the lower note's 3rd harmonic lands exactly on the upper note's 2nd. Musicians measure intervals in *cents*, 1/1200 of an octave; this fifth is **{fifthC}** ¢.",
+    "p3": "A **major third** is `5:4`, **{thirdC}** ¢. The pattern takes four cycles to repeat, and the 5th harmonic of one note meets the 4th of the other. The simpler the ratio, the more overtones coincide, which is roughly why the octave sounds smoothest and the third most colorful.",
+    "p4": "Nudge a ratio and the overtones stop meeting. They sit a few hertz apart and the sound pulses, or **beats**, at the difference. This is the major third on a piano, **{etThirdC}** ¢ instead of **{thirdC}**: listen for a shimmer of about **{etThirdBeat}** beats a second, and watch the summed wave keep changing shape.",
+    "stage": {
+      "subOne": "{cents} cents. {f1} Hz and {f2} Hz. The sum repeats every cycle of the lower note.",
+      "subMany": "{cents} cents. {f1} Hz and {f2} Hz. The sum repeats every {n} cycles of the lower note.",
+      "subPiano": "{cents} cents, {off} ¢ from pure 5:4. The sum never quite repeats (its drift is slowed down here)."
+    }
+  },
+  "stack": {
+    "eyebrow": "2 · They don't fit",
+    "title": "Stack them and the circle won't close",
+    "p1": "Stack twelve pure fifths, C, G, D, A and on, and you visit every note of the chromatic scale. On the spiral one full turn is an octave, so every note sits at its pitch class and the stack climbs outward. Twelve fifths span about seven octaves, so the last note ought to land back on C.",
+    "p2": "It misses. `(3/2)¹² = {f12}`, while seven octaves are `2⁷ = 128`. The stack overshoots by `{pythFrac}`, the **Pythagorean comma**: **{pythC}** cents. Press *Compare* to hear the starting C against the B♯ that should have been C.",
+    "p3": "Pure major thirds fail the other way. Three of them, C–E–G♯–B♯, make `(5/4)³ = {t3}`, short of the octave `2/1` by `{diesisFrac}`: **{diesisC}** cents, nearly half a semitone.",
+    "stage": {
+      "titleFifths": "Twelve pure fifths vs. seven octaves",
+      "titleThirds": "Three pure major thirds vs. one octave",
+      "sub": "Each step ×{step} ({stepC} ¢). One turn of the spiral = one octave."
+    }
+  },
+  "pump": {
+    "eyebrow": "3 · The comma pump",
+    "title": "Four perfect chords, and the floor gives way",
+    "p1": "Take a common progression: C major, A minor, D minor, G major and back to C, or **I–vi–ii–V–I**. Tune each chord purely, and keep any note it shares with the chord before exactly where it was, the way a choir or string quartet tunes by ear. The chain follows the roots: each one is fixed by the note it keeps.",
+    "p2": "Play it. Each chord is perfectly in tune and every shared note holds still, yet the C that comes back sits at `{pumpFrac}` of where it started: **{pumpC}** cents flat. Let it loop and the whole progression sinks by the same step each time; after **{semiLoops}** loops it has dropped more than a semitone. Leave *Reference C* on to hear the gap open against the original pitch.",
+    "p3": "A choir that refuses to sink has to put the comma somewhere else. Keep C where it is and tune every chord purely on its home note, and the shared notes can no longer all hold still: when D minor arrives, its {jumpNote} must be `{jumpFrac}` higher than the {jumpNote} just sung. Press *Pure, fixed C* and listen for the held note sliding up **{jumpC}** cents.",
+    "p4": "Or tune nothing purely. In **equal temperament** every semitone is exactly `{etSemi}`, so the loop comes home every time and nothing jumps. The comma is spread out instead: every major third is **{etThirdOff}** ¢ wide and every fifth **{etFifthOff}** ¢ narrow, in every chord, all the time.",
+    "p5": "Where does `{pumpFrac}` come from? Follow the roots: C→A is down a fifth and up a pure third, then A→D, D→G and G→C are three more fifths down. Four pure fifths are `{f4}`, but two octaves and a pure third are `{o2t}`. The difference, the **syntonic comma**, has to go somewhere: into the pitch, into a held note, or into every chord.",
+    "stage": {
+      "goesJust": "into the pitch, which sinks",
+      "goesFixed": "into the held {jumpNote}, which jumps",
+      "goesEt": "into every chord, a little",
+      "eqbox": "`(3/2)⁴ = {eqF4}`  vs  `2² · 5/4 = {eqO2t}`\nratio `{synt}` = **{syntC}**, the syntonic comma"
+    }
+  },
+  "temper": {
+    "eyebrow": "4 · Temperaments",
+    "title": "Every tuning is a compromise",
+    "p1": "A temperament bends the ratios so they fit, and chooses where the error goes. Here is one C major triad in **just intonation**: every interval pure and nothing beats. Lovely, but as the pump showed, you can't keep it up as the harmony moves.",
+    "p2": "**Quarter-comma meantone**, the Renaissance favorite, narrows every fifth by a quarter of the syntonic comma so that four fifths make a pure major third. Thirds are perfect; each fifth is **{mtFifthOff}** ¢ narrow and beats slowly.",
+    "p3": "**Equal temperament** shares the Pythagorean comma out across all twelve fifths. Fifths are only **{etFifthOff}** ¢ narrow, but major thirds are **{etThirdOff}** ¢ wide and beat fast. Every key is equally good and equally impure.",
+    "p4": "Meantone's narrow fifths can't close the circle either. Eleven good fifths leave one leftover, from {wolfName}, that is **{wolfC}** ¢, **{wolfOff}** ¢ wider than pure: the **wolf fifth**, named for how it howls. Play it, then the triad's own fifth for contrast.",
+    "p5": "Here is every major triad at once, around the circle of fifths, colored by how far it is from pure; click one to hear it. Meantone has **{mtGood}** sweet keys and **{mtBad}** unusable ones. Just intonation, tuned to C, is perfect in **{jiGood}** keys and unusable in the other **{jiBad}**, {jiD}. Equal temperament is mildly off everywhere. Two historical in-betweens are here too: **Pythagorean** tuning, with pure fifths and thirds **{pythThirdOff}** ¢ wide (except **{pythSchis}** distant triads whose thirds come out almost pure by accident), and **Werckmeister III**, a well temperament in which every key is usable and each has its own color.",
+    "stage": {
+      "sub": "{root} major triad. Off = cents from the pure ratio; beats = gap between the nearest coinciding harmonics."
+    }
+  },
+  "lattice": {
+    "eyebrow": "5 · Playground",
+    "title": "A map of pure pitches",
+    "p1": "Every pure pitch is a product of 3s and 5s (with 2s to move by octaves). Put fifths across and major thirds up, and every major triad becomes an upward triangle and every minor triad a downward one. Click a node to hear it and see its ratio; click a triangle to hear its chord, and *Same in ET* to hear it tempered. A ↓ marks a note a syntonic comma lower than the same name reached by fifths alone. *Just scale* rings the twelve notes section 4 used for just intonation.",
+    "p2": "The comma pump is a walk on this map. Each chord shares an edge or a corner with the last, but four steps later you are one row up and four columns left: a different C, `{pumpFrac}` of the first. Press *Walk the pump*. Equal temperament's trick is to pretend those two Cs are the same point, and with them every pair of notes a comma apart.",
+    "stage": {
+      "title": "Fifths across, major thirds up",
+      "sub": "Click nodes and triangles, or Tab to a node and press Enter.",
+      "empty": "Click a node or a triangle."
+    }
+  },
+  "after": {
+    "eyebrow": "Appendix",
+    "title": "The numbers",
+    "lede": "Every figure on this page is computed in your browser from exact fractions; nothing is typed in. These are the ratios it starts from and what they come to.",
+    "intervals": "Pure intervals",
+    "commas": "Commas: where the ratios fail to meet",
+    "tunings": "The five tunings, note by note (cents above C)",
+    "sound": "How the sound is made",
+    "soundNotes": "Nothing is sampled. Each note is a Web Audio oscillator playing a custom waveform of {harmonics} harmonics, the *n*th at amplitude 1/*n*{rolloff}, because beating lives in the overtones and pure sine waves would hide it. Frequencies are computed from the ratios above, relative to an equal-tempered C (C4 = {c4} Hz, from A4 = 440 Hz). Notes fade in over 30 ms, settle to a steady level so beats stay audible, and fade out over about 0.3 s, so nothing clicks. In the comma pump the four voices are continuous oscillators: shared notes are literally held, and a note forced to move slides instead of restarting.",
+    "reading": "Further reading",
+    "reading1": "Hermann von Helmholtz, *On the Sensations of Tone* (1863). The classic account of overtones and beating as the physics of consonance.",
+    "reading2": "Harry Partch, *Genesis of a Music* (1949). A composer's case for just intonation, lattice diagrams included.",
+    "reading3": "Ross W. Duffin, *How Equal Temperament Ruined Harmony (and Why You Should Care)* (2007). A lively history of meantone, well temperaments and the victory of 12-TET."
+  }
+}
+</script>
+<script id="article-text-js">
+/* Slop editor: every word a reader sees, and who wrote it. Canonical copy: ~/Desktop/Coding/slop-editor/article-text.js
+   (`node slop.mjs sync` inlines it into every page it's installed in). Ported from the Slop Zone on raphaelbajet.com.
+
+   The words live in the page's JSON block (a script element with id "article-text"): an object with a top-level
+   "version", and groups (objects) of texts in reading order. A text is a plain string (AI's words) or a list of
+   pieces: a string (AI's), {"me": "..."} (mine: typed in the Edit text panel, or dictated word for word) or
+   {"data": "..."} (nobody's: a fact, or someone else's words quoted). Lists are always one text, never a list of texts.
+   Inside any text: [label](url) is a link, **bold**, *italic*, `code`, [[key]] a key cap, {name} a value the page
+   fills in (a computed number or a formula, from TX.vars), and \ makes the next character literal.
+
+   Elements with data-tx="group.key" are filled from the block (TX.fill). Code renders the rest with TX.html(path).
+   The Slop-o-meter ([data-slopmeter]) switches the authorship colors on; data-slopmeter="on" makes on the default
+   until the reader picks. Served by tools/edit.mjs, the page also
+   gets the Edit text panel, which saves back into the file. */
+const TX = (() => {
+    'use strict';
+    // 'ai', 'mine' or 'data'
+    const authorOf = (piece) => (typeof piece === 'string' ? 'ai' : 'me' in piece ? 'mine' : 'data');
+    const textOf = (piece) => (typeof piece === 'string' ? piece : piece.me ?? piece.data);
+    const PIECE = { ai: (text) => text, mine: (text) => ({ me: text }), data: (text) => ({ data: text }) };
+
+    // the text with its markup, as the panel edits it
+    function plain(value) {
+        return typeof value === 'string' ? value : value.map(textOf).join('');
+    }
+
+    // who wrote each character
+    function authorsByChar(value) {
+        if (typeof value === 'string') return new Array(value.length).fill('ai');
+        return value.flatMap((piece) => new Array(textOf(piece).length).fill(authorOf(piece)));
+    }
+
+    function fromChars(text, authors) {
+        if (authors.every((author) => author === 'ai')) return text;
+        const pieces = [];
+        for (let i = 0; i < text.length;) {
+            let j = i;
+            while (j < text.length && authors[j] === authors[i]) j++;
+            pieces.push(PIECE[authors[i]](text.slice(i, j)));
+            i = j;
+        }
+        return pieces;
+    }
+
+    // `value` after its plain text became `next` in the panel. An edit is one stretch replaced (typing, deleting,
+    // pasting): what both versions share at the start and the end keeps its author, and the new middle is mine
+    function applyEdit(value, next) {
+        const prev = plain(value);
+        if (prev === next) return value;
+        let start = 0;
+        while (start < prev.length && start < next.length && prev[start] === next[start]) start++;
+        let end = 0;
+        while (end < prev.length - start && end < next.length - start
+            && prev[prev.length - 1 - end] === next[next.length - 1 - end]) end++;
+        const authors = authorsByChar(value);
+        return fromChars(next, [
+            ...authors.slice(0, start),
+            ...new Array(next.length - start - end).fill('mine'),
+            ...authors.slice(prev.length - end),
+        ]);
+    }
+
+    // `value` with one author's words handed to another, the text unchanged. Facts and quotes stay as they are
+    const reattribute = (value, from, to) => fromChars(plain(value), authorsByChar(value).map((author) => (author === from ? to : author)));
+    // re-slopify: my words become AI-generated
+    const reslop = (value) => reattribute(value, 'mine', 'ai');
+    // unslopify: the AI's words, approved as they are, become mine
+    const unslop = (value) => reattribute(value, 'ai', 'mine');
+
+    const LINK = /\[([^\]]+)\]\(([^)\s]+)\)/y;
+    const VAR = /\{(\w+)\}/y;
+    const same = (a, b) => a.by === b.by && a.link === b.link && a.b === b.b && a.i === b.i && a.code === b.code && a.key === b.key;
+
+    // the text as it reads: runs of one author's words (`by`: 'ai', 'mine' or 'data') with their formatting (b, i,
+    // code, key) and the link they sit in, if any. A {name} is a run of its own with `v` set
+    function runs(value) {
+        const text = plain(value);
+        const authors = authorsByChar(value);
+        const out = [];
+        const st = { b: false, i: false, code: false, key: false, link: null };
+        let linkEnd = -1;
+        let linkTail = 0;
+        const push = (s, by, v) => {
+            const run = { text: s, by, link: st.link, b: st.b, i: st.i, code: st.code, key: st.key, v };
+            const last = out[out.length - 1];
+            if (last && !last.v && !v && same(last, run)) last.text += s;
+            else out.push(run);
+        };
+        for (let i = 0; i < text.length;) {
+            const c = text[i];
+            if (i === linkEnd) { st.link = null; i += linkTail; linkEnd = -1; continue; }
+            if (c === '\\' && i + 1 < text.length) { push(text[i + 1], authors[i + 1]); i += 2; continue; }
+            if (c === '[' && text[i + 1] === '[' && !st.key) { st.key = true; i += 2; continue; }
+            if (c === ']' && text[i + 1] === ']' && st.key) { st.key = false; i += 2; continue; }
+            if (c === '[' && !st.link) {
+                LINK.lastIndex = i;
+                const m = LINK.exec(text);
+                if (m) { st.link = { href: m[2] }; linkEnd = i + 1 + m[1].length; linkTail = m[0].length - m[1].length - 1; i++; continue; }
+            }
+            if (c === '`') { st.code = !st.code; i++; continue; }
+            if (c === '*' && !st.code) {
+                if (text[i + 1] === '*') { st.b = !st.b; i += 2; } else { st.i = !st.i; i++; }
+                continue;
+            }
+            if (c === '{') {
+                VAR.lastIndex = i;
+                const m = VAR.exec(text);
+                if (m) { push('', authors[i], m[1]); i += m[0].length; continue; }
+            }
+            push(c, authors[i]);
+            i++;
+        }
+        return out;
+    }
+
+    // values the page fills in: {html, data} (data: a fact, shown in the data color; otherwise it takes the color of
+    // whoever wrote the {name}), or a plain string (a fact)
+    const vars = {};
+    const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+    const stripTags = (h) => h.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+    function lookup(name, local) {
+        const v = local?.[name] ?? vars[name];
+        if (v == null) { console.warn(`article text: no value for {${name}}`); return { html: esc(`{${name}}`), data: false }; }
+        return typeof v === 'object' ? v : { html: esc(v), data: true };
+    }
+
+    // the text as it reads, in one string (for labels, titles and alt text)
+    function readable(value, local) {
+        return runs(value).map((run) => (run.v ? stripTags(lookup(run.v, local).html) : run.text)).join('');
+    }
+
+    // the text as HTML: each author's words in a span (tx-ai, tx-mine, tx-data), links open in a new tab
+    function render(value, local) {
+        const one = (run) => {
+            let h;
+            let by = run.by;
+            if (run.v) {
+                const v = lookup(run.v, local);
+                h = v.html;
+                if (v.data) by = 'data';
+            } else h = esc(run.text).replace(/\n/g, '<br>');
+            h = `<span class="tx-${by}">${h}</span>`;
+            if (run.key) h = `<kbd>${h}</kbd>`;
+            if (run.code) h = `<span class="${config.code}">${h}</span>`;
+            if (run.i) h = `<em>${h}</em>`;
+            if (run.b) h = `<strong>${h}</strong>`;
+            return h;
+        };
+        const parts = [];
+        runs(value).forEach((run) => {
+            const last = parts[parts.length - 1];
+            if (!run.link) parts.push(run);
+            else if (last?.link === run.link) last.runs.push(run);
+            else parts.push({ link: run.link, runs: [run] });
+        });
+        return parts.map((part) => (part.runs
+            ? `<a href="${esc(part.link.href)}" target="_blank" rel="noopener">${part.runs.map(one).join('')}</a>`
+            : one(part))).join('');
+    }
+
+    // how much of these texts is mine, as they read: a share of the written letters (spaces, facts, quotes and
+    // filled-in values aside), and my word count
+    function share(values) {
+        let mine = 0;
+        let total = 0;
+        let words = 0;
+        values.forEach((value) => {
+            runs(value).forEach((run) => {
+                if (run.by === 'data' || run.v) return;
+                const letters = run.text.replace(/\s/g, '').length;
+                total += letters;
+                if (run.by !== 'mine') return;
+                mine += letters;
+                words += run.text.split(/\s+/).filter(Boolean).length;
+            });
+        });
+        return { fraction: total ? mine / total : 0, words, letters: total };
+    }
+
+    function percent(fraction) {
+        if (fraction > 0 && fraction < 0.01) return '<1%';
+        if (fraction < 1 && fraction > 0.99) return '>99%';
+        return `${Math.round(fraction * 100)}%`;
+    }
+
+    /* ---------- the block ---------- */
+    const config = { code: 'code' };
+    let text = { version: 0 };
+    try {
+        text = JSON.parse(document.getElementById('article-text').textContent);
+    } catch (e) {
+        console.error('article text: the article-text block is missing or not valid JSON', e);
+    }
+    const isText = (v) => typeof v === 'string' || Array.isArray(v);
+    const keysOf = (path) => (Array.isArray(path) ? path : path.split('.'));
+    function get(path) {
+        let node = text;
+        for (const key of keysOf(path)) node = node?.[key];
+        if (!isText(node)) { console.warn(`article text: no text at ${keysOf(path).join('.')}`); return ''; }
+        return node;
+    }
+    function set(path, value) {
+        const keys = keysOf(path);
+        let node = text;
+        keys.slice(0, -1).forEach((key) => { node = node[key]; });
+        node[keys[keys.length - 1]] = value;
+    }
+    // every text in a group (or the whole block), in reading order: [[path, value]]
+    function entries(node = text, at = []) {
+        return Object.entries(node).flatMap(([key, v]) => {
+            if (key === 'version' && !at.length) return [];
+            if (isText(v)) return [[[...at, key], v]];
+            return v && typeof v === 'object' ? entries(v, [...at, key]) : [];
+        });
+    }
+
+    const html = (path, local) => render(get(path), local);
+    const words = (path, local) => readable(get(path), local);
+    // fill every [data-tx] element (data-tx-vars: a JSON object of extra values)
+    function fill(root = document) {
+        root.querySelectorAll('[data-tx]').forEach((el) => {
+            const local = el.dataset.txVars ? JSON.parse(el.dataset.txVars) : undefined;
+            const h = html(el.dataset.tx, local);
+            if (el.innerHTML !== h) el.innerHTML = h;
+        });
+    }
+
+    const listeners = [];
+    const onChange = (fn) => listeners.push(fn);
+    let pending = false;
+    function changed() { // after an edit in the panel: refill the page, then let the article redo its layout
+        if (pending) return;
+        pending = true;
+        requestAnimationFrame(() => {
+            pending = false;
+            fill();
+            listeners.forEach((fn) => { try { fn(); } catch (e) { console.error(e); } });
+            meterShare();
+        });
+    }
+
+    /* ---------- Slop-o-meter: shows who wrote what ---------- */
+    const store = {
+        get: () => { try { return localStorage.getItem('slop-o-meter'); } catch { return null; } },
+        set: (v) => { try { localStorage.setItem('slop-o-meter', v); } catch { /* optional */ } },
+    };
+    const meters = [];
+    function setMeter(on) {
+        document.documentElement.classList.toggle('slop-on', on);
+        meters.forEach((m) => m.btn.setAttribute('aria-pressed', String(on)));
+    }
+    function meterShare() {
+        const { fraction } = share(entries().map(([, v]) => v));
+        meters.forEach((m) => { m.share.textContent = `${percent(fraction)} written by me, ${percent(1 - fraction)} by AI`; });
+    }
+    function buildMeter(el) {
+        el.classList.add('tx-meter');
+        el.innerHTML = '<button type="button" class="tx-meter-btn" aria-pressed="false"><span class="tx-switch" aria-hidden="true"></span>Slop-o-meter</button>'
+            + '<span class="tx-meter-key"><span class="tx-legend"><span class="tx-mine">My words</span> · <span class="tx-ai">AI-generated</span> · <span class="tx-data">Data &amp; quotes</span></span>'
+            + '<span class="tx-meter-share"></span></span>';
+        const m = { btn: el.querySelector('button'), share: el.querySelector('.tx-meter-share') };
+        m.btn.addEventListener('click', () => {
+            const on = !document.documentElement.classList.contains('slop-on');
+            setMeter(on);
+            store.set(on ? 'on' : 'off');
+        });
+        meters.push(m);
+    }
+
+    /* ---------- the Edit text panel (only under tools/edit.mjs) ---------- */
+    const human = (key) => {
+        const p = /^p(\d+)$/.exec(key);
+        if (p) return `Paragraph ${p[1]}`;
+        const s = key.replace(/([a-z])([A-Z0-9])/g, '$1 $2').replace(/[_-]/g, ' ').toLowerCase();
+        return s.charAt(0).toUpperCase() + s.slice(1);
+    };
+    const yours = (fraction) => (fraction === 1 ? 'yours' : `${percent(fraction)} yours`);
+
+    function panel() {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'tx-edit-btn';
+        btn.textContent = 'Edit text';
+        const aside = document.createElement('aside');
+        aside.className = 'tx-panel';
+        aside.hidden = true;
+        aside.setAttribute('aria-label', 'Edit text');
+        aside.innerHTML = `
+          <div class="tx-head">
+            <div><h2>Edit text</h2><p class="tx-status" role="status">Saved</p></div>
+            <button type="button" class="tx-close" aria-label="Close the panel">×</button>
+          </div>
+          <div class="tx-cover">
+            <div class="tx-cover-nums"><span><span class="tx-mine">Your words</span>: <b class="tx-cover-pct"></b> of the text</span><span class="tx-cover-words"></span></div>
+            <div class="tx-track" role="presentation"><span></span></div>
+            <div class="tx-actions"><button type="button" class="tx-reslop tx-unslop-all" disabled>Unslopify everything</button><button type="button" class="tx-reslop tx-reslop-all" disabled>Re-slopify everything</button></div>
+          </div>
+          <div class="tx-body"></div>`;
+        document.body.append(btn, aside);
+        const $ = (sel) => aside.querySelector(sel);
+        const statusEl = $('.tx-status');
+        const status = (msg, kind = '') => { statusEl.textContent = msg; statusEl.dataset.kind = kind; };
+
+        // one field per text, grouped by section
+        const groups = [];
+        const fields = [];
+        Object.entries(text).forEach(([key, node]) => {
+            if (key === 'version') return;
+            const list = isText(node) ? [[[key], node]] : entries(node, [key]);
+            const det = document.createElement('details');
+            det.className = 'tx-group';
+            const title = node && !isText(node) && isText(node.title) ? readable(node.title) : human(key);
+            det.innerHTML = `<summary><span>${esc(title)}</span><span class="tx-gshare"></span></summary>`
+                + `<div class="tx-actions tx-group-actions"><button type="button" class="tx-reslop tx-unslop-group" disabled>Unslopify ${esc(title)}</button>`
+                + `<button type="button" class="tx-reslop tx-reslop-group" disabled>Re-slopify ${esc(title)}</button></div>`;
+            const g = { det, list, title, shareEl: det.querySelector('.tx-gshare'), reslopEl: det.querySelector('.tx-reslop-group'), unslopEl: det.querySelector('.tx-unslop-group') };
+            list.forEach(([p]) => {
+                const value = get(p);
+                const long = plain(value).length > 48 || /^p\d+$/.test(p[p.length - 1]);
+                const label = document.createElement('label');
+                label.className = 'tx-field';
+                const name = p.slice(1).map(human).join(' · ') || human(key);
+                label.innerHTML = `<span class="tx-flabel"><span>${esc(name)}</span><span class="tx-fmine"></span>`
+                    + '<button type="button" class="tx-reslop tx-unslop" disabled title="Approve the AI\'s words here as mine">unslopify</button>'
+                    + '<button type="button" class="tx-reslop tx-reslop-one" disabled title="Mark my words here as AI-generated">re-slopify</button></span>';
+                const input = document.createElement(long ? 'textarea' : 'input');
+                input.value = plain(value);
+                input.spellcheck = true;
+                if (long) input.rows = 2;
+                label.append(input);
+                det.append(label);
+                const f = { path: p, input, mineEl: label.querySelector('.tx-fmine'), reslopEl: label.querySelector('.tx-reslop-one'), unslopEl: label.querySelector('.tx-unslop'), group: g };
+                fields.push(f);
+                input.addEventListener('input', () => edit(f));
+                f.reslopEl.addEventListener('click', (e) => { e.preventDefault(); reattributeAll([f], reslop); });
+                f.unslopEl.addEventListener('click', (e) => { e.preventDefault(); reattributeAll([f], unslop); });
+                input.addEventListener('focus', () => mark(p, true));
+                input.addEventListener('blur', () => mark(p, false));
+            });
+            groups.push(g);
+            const inGroup = () => fields.filter((f) => f.group === g);
+            g.reslopEl.addEventListener('click', () => {
+                if (confirm(`Mark all of your words in "${title}" as AI-generated?`)) reattributeAll(inGroup(), reslop);
+            });
+            g.unslopEl.addEventListener('click', () => {
+                if (confirm(`Approve all of the AI's words in "${title}" as yours?`)) reattributeAll(inGroup(), unslop);
+            });
+            $('.tx-body').append(det);
+        });
+        groups[0]?.det.setAttribute('open', '');
+
+        const mark = (p, on) => document.querySelectorAll(`[data-tx="${p.join('.')}"]`).forEach((el) => el.classList.toggle('tx-focus', on));
+        const grow = (el) => { if (el.tagName === 'TEXTAREA') { el.style.height = 'auto'; el.style.height = `${el.scrollHeight + 2}px`; } };
+        function shares() {
+            fields.forEach((f) => {
+                const { fraction, letters } = share([get(f.path)]);
+                f.mineEl.textContent = fraction > 0 ? yours(fraction) : '';
+                f.reslopEl.disabled = fraction === 0;
+                f.unslopEl.disabled = !letters || fraction === 1;
+            });
+            groups.forEach((g) => {
+                const { fraction, letters } = share(g.list.map(([p]) => get(p)));
+                g.shareEl.textContent = `${percent(fraction)} yours`;
+                g.shareEl.classList.toggle('tx-some', fraction > 0);
+                g.reslopEl.disabled = fraction === 0;
+                g.unslopEl.disabled = !letters || fraction === 1;
+            });
+            const all = share(entries().map(([, v]) => v));
+            $('.tx-cover-pct').textContent = percent(all.fraction);
+            $('.tx-cover-words').textContent = all.words === 1 ? '1 word' : `${all.words.toLocaleString()} words`;
+            $('.tx-track span').style.width = `${all.fraction * 100}%`;
+            $('.tx-reslop-all').disabled = all.fraction === 0;
+            $('.tx-unslop-all').disabled = !all.letters || all.fraction === 1;
+        }
+
+        // saving: debounced, one request at a time, each carrying the version it was based on
+        let timer = null;
+        let dirty = false;
+        let busy = false;
+        let stale = false;
+        let chain = Promise.resolve();
+        function save() {
+            chain = chain.then(async () => {
+                if (!dirty || stale) return;
+                dirty = false;
+                busy = true;
+                status('Saving…');
+                try {
+                    const res = await fetch('/__text', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(text) });
+                    const body = await res.text();
+                    if (res.status === 409) { stale = true; throw new Error(body); }
+                    if (!res.ok) throw new Error(body || res.statusText);
+                    text.version = Number(body);
+                    status(dirty ? 'Unsaved changes' : `Saved (version ${text.version})`, dirty ? 'dirty' : '');
+                } catch (e) {
+                    dirty = true;
+                    status(`Couldn't save: ${e.message}`, 'error');
+                } finally {
+                    busy = false;
+                }
+            });
+        }
+        function edit(f) {
+            set(f.path, applyEdit(get(f.path), f.input.value));
+            grow(f.input);
+            touched();
+        }
+        // re-slopify or unslopify these fields: their words change author, not wording
+        function reattributeAll(list, how) {
+            list.forEach((f) => set(f.path, how(get(f.path))));
+            touched();
+        }
+        function touched() {
+            shares();
+            changed();
+            dirty = true;
+            if (!stale) status('Unsaved changes', 'dirty');
+            clearTimeout(timer);
+            timer = setTimeout(save, 600);
+        }
+        addEventListener('beforeunload', (e) => { if (dirty || busy) e.preventDefault(); });
+        addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 's' && !aside.hidden) { e.preventDefault(); clearTimeout(timer); save(); }
+        });
+
+        const open = (on) => {
+            aside.hidden = !on;
+            btn.hidden = on;
+            document.documentElement.classList.toggle('tx-editing', on);
+            if (on) { setMeter(true); fields.forEach((f) => grow(f.input)); }
+        };
+        btn.addEventListener('click', () => open(true));
+        $('.tx-close').addEventListener('click', () => open(false));
+        $('.tx-reslop-all').addEventListener('click', () => {
+            if (confirm('Mark all of your words on this page as AI-generated?')) reattributeAll(fields, reslop);
+        });
+        $('.tx-unslop-all').addEventListener('click', () => {
+            if (confirm('Approve all of the AI\'s words on this page as yours?')) reattributeAll(fields, unslop);
+        });
+        aside.addEventListener('toggle', (e) => { if (e.target.open) e.target.querySelectorAll('textarea').forEach(grow); }, true);
+        shares();
+        status(`Saved (version ${text.version})`);
+    }
+
+    // set things up once the article has filled in TX.vars
+    function start(options = {}) {
+        Object.assign(config, options);
+        fill();
+        document.querySelectorAll('[data-slopmeter]').forEach(buildMeter);
+        const saved = store.get();
+        setMeter(saved ? saved === 'on' : !!document.querySelector('[data-slopmeter="on"]'));
+        meterShare();
+        // edit mode only on this machine, under tools/edit.mjs (a GET there answers 405)
+        if (!/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)) return;
+        fetch('/__text').then((res) => { if (res.status === 405) panel(); }).catch(() => {});
+    }
+
+    return { plain, applyEdit, reslop, unslop, runs, readable, render, share, percent, vars, get, html, words, fill, onChange, start, entries,
+        get text() { return text; } };
+})();
+</script>
 <script>
 'use strict';
 /* =====================================================================
@@ -608,7 +1241,12 @@ const NUM = {
   mtGood: String(12 - mtBad), mtBad: String(mtBad), jiGood: String(12 - jiBad), jiBad: String(jiBad),
   jiD: badness(triadInfo('just', 2)) >= 0.5 ? 'D major among them' : 'D major not among them', pythSchis: String(countKeys('pyth', ti => Math.abs(ti.M3off) < 3)), pythThirdOff: fmt(FIFTH.pow(4).fold().c - THIRD.c),
 };
-document.querySelectorAll('[data-k]').forEach(el => { if (NUM[el.dataset.k] != null) el.textContent = NUM[el.dataset.k]; else console.warn('missing number', el.dataset.k); });
+// Numbers and formulas the text fills in as {name} (TX, the article-text script). Numbers keep their data-k span for tools/check_numbers.py.
+for (const [k, v] of Object.entries(NUM)) TX.vars[k] = {html: `<span data-k="${k}">${v}</span>`, data: true};
+Object.assign(TX.vars, {
+  etSemi: {html: '2<sup>1/12</sup>'},
+  eqF4: String(FIFTH.pow(4)), eqO2t: `${OCT.pow(2).mul(THIRD).n * 16n}/16`, synt: String(SYNT), syntC: `${fmt(SYNT.c, 2)} ¢`,
+});
 
 /* =====================================================================
    Audio. One context, created on the first gesture. A harmonic-rich
@@ -799,11 +1437,14 @@ SC.pure = {
   pick(i) {
     this.iv = i; this.t0 = performance.now() / 1000;
     document.querySelectorAll('#pu-ints .btn').forEach((b, j) => b.classList.toggle('on', j === i));
-    const iv = INTS[i];
+    this.text();
+  },
+  text() {
+    const iv = INTS[this.iv];
     $('pu-title').textContent = `${iv.long || iv.name} ${iv.q ? iv.tag : '2^(4/12) ≈ ' + iv.r.toFixed(4)}`;
-    $('pu-sub').textContent = iv.q
-      ? `${fmt(iv.q.c)} cents. ${F1} Hz and ${fmt(F1 * iv.r, 1)} Hz. The sum repeats every ${iv.q.d} cycle${iv.q.d > 1n ? 's' : ''} of the lower note.`
-      : `${fmt(centsOf(iv.r))} cents, ${fmtS(centsOf(iv.r) - iv.ref.c)} ¢ from pure 5:4. The sum never quite repeats (its drift is slowed down here).`;
+    $('pu-sub').innerHTML = iv.q
+      ? TX.html(iv.q.d > 1n ? 'pure.stage.subMany' : 'pure.stage.subOne', {cents: fmt(iv.q.c), f1: String(F1), f2: fmt(F1 * iv.r, 1), n: String(iv.q.d)})
+      : TX.html('pure.stage.subPiano', {cents: fmt(centsOf(iv.r)), off: fmtS(centsOf(iv.r) - iv.ref.c)});
   },
   frame(now) {
     const {c, W, H} = fitCanvas($('pu-cv')), iv = INTS[this.iv], t = now - this.t0;
@@ -880,8 +1521,8 @@ SC.stack = {
   ui() {
     document.querySelectorAll('[data-act=st-mode]').forEach(b => b.classList.toggle('on', b.dataset.v === this.mode));
     const S = SPIRAL[this.mode];
-    $('st-title').textContent = this.mode === 'fifths' ? 'Twelve pure fifths vs. seven octaves' : 'Three pure major thirds vs. one octave';
-    $('st-sub').textContent = `Each step ×${S.step} (${fmt(S.step.c)} ¢). One turn of the spiral = one octave.`;
+    $('st-title').innerHTML = TX.html(this.mode === 'fifths' ? 'stack.stage.titleFifths' : 'stack.stage.titleThirds');
+    $('st-sub').innerHTML = TX.html('stack.stage.sub', {step: String(S.step), stepC: fmt(S.step.c)});
   },
   dur() { return this.mode === 'fifths' ? 0.42 : 0.7; },
   frame(now) {
@@ -911,9 +1552,9 @@ function playCompare(mode) {
 
 /* ---------- 3 · The comma pump ---------- */
 const PMODE = {
-  just:  {col: 'just',   goes: 'into the pitch, which sinks', name: 'root, held notes'},
-  fixed: {col: 'accent', goes: `into the held ${JUMP.name}, which jumps`, name: 'root, fixed C'},
-  et:    {col: 'et',     goes: 'into every chord, a little', name: 'equal temperament'},
+  just:  {col: 'just',   goes: 'pump.stage.goesJust', name: 'root, held notes'},     // goes: where the comma goes, in the text block
+  fixed: {col: 'accent', goes: 'pump.stage.goesFixed', name: 'root, fixed C'},
+  et:    {col: 'et',     goes: 'pump.stage.goesEt', name: 'equal temperament'},
 };
 const BUILD_MODE = ['just', 'just', 'fixed', 'et', 'just'];
 const SHOWN = [['just'], ['just'], ['just', 'fixed'], ['just', 'et'], ['just', 'et']];
@@ -978,8 +1619,7 @@ function rootLabel(q, tonic) { const x = tonic ? q.foldNear() : q.fold(); const 
 function ratioPow(L) { const q = PUMP.pow(L); const s = q.toString(); return s.length <= 17 ? s : `(${PUMP})^${L}`; }
 const FULL = {x: MAXK + 0.8, yt: 24, yb: LOOPS * PUMP_C - 18};
 const PVIEW = [{x: 4.6, yt: 10, yb: -40}, FULL, {x: 8.6, yt: 28, yb: -26}, FULL, FULL];
-$('eqbox').innerHTML = `<span class="r">(3/2)⁴ = ${FIFTH.pow(4)}</span> &nbsp;vs&nbsp; <span class="r">2² · 5/4 = ${OCT.pow(2).mul(THIRD).n * 16n}/16</span><br>
-  ratio <span class="r ju">${SYNT}</span> = <b class="ju">${fmt(SYNT.c, 2)} ¢</b>, the syntonic comma`;
+const eqbox = () => { $('eqbox').innerHTML = TX.html('pump.stage.eqbox'); };
 SC.pump = {
   layer: 'L-pump', b: 0, v: {...PVIEW[0]},
   set(b) { this.b = b; $('eqbox').classList.toggle('on', b === 4); if (!pump.mode) { pump.viewMode = null; pump.viewK = -1; } },
@@ -1009,7 +1649,8 @@ SC.pump = {
     const pc = $('pr-c'); pc.textContent = fmtS(tc) + ' ¢'; pc.classList.toggle('flat', tc < -0.05);
     $('pr-r').textContent = mode === 'just' ? ratioPow(tl) : '1/1';
     $('pr-l').textContent = P >= 0 ? `${Math.min(tl + 1, LOOPS)} of ${LOOPS}` : '–';
-    $('pr-g').textContent = PMODE[mode].goes;
+    const goes = TX.html(PMODE[mode].goes, {jumpNote: JUMP.name});
+    if (goes !== this.goes) { this.goes = goes; $('pr-g').innerHTML = goes; }
     this.draw(P, mode, playing);
   },
   draw(P, mode, playing) {
@@ -1103,7 +1744,7 @@ SC.temper = {
     document.querySelectorAll('[data-act=te-view]').forEach(b => b.classList.toggle('on', b.dataset.v === this.view));
     $('L-temper').classList.toggle('keys', this.view === 'keys');
     $('te-title').textContent = T.long;
-    $('te-sub').textContent = `${n[r]} major triad. Off = cents from the pure ratio; beats = gap between the nearest coinciding harmonics.`;
+    $('te-sub').innerHTML = TX.html('temper.stage.sub', {root: n[r]});
     this.rows = [
       {name: `${n[r]}–${n[(r + 4) % 12]} major third`, c: ti.M3, pure: THIRD.c, off: ti.M3off, beat: ti.bM3},
       {name: `${n[(r + 4) % 12]}–${n[(r + 7) % 12]} minor third`, c: ti.m3, pure: MIN3.c, off: ti.m3off, beat: ti.bm3},
@@ -1249,7 +1890,7 @@ SC.lattice = {
     let r;
     if (this.chordPts) r = `<b>${triName(this.chordPts)}</b>: ` + this.chordPts.map(desc).join(' · ');
     else if (this.sel.length) r = this.sel.map(desc).join(' · ');
-    else r = this.path ? `C <b>1/1</b> → … → C↓ <b>${latQ(-4, 1).fold()}</b>: an octave of <b>${PUMP}</b>, ${fmt(PUMP_C)} ¢` : 'Click a node or a triangle.';
+    else r = this.path ? `C <b>1/1</b> → … → C↓ <b>${latQ(-4, 1).fold()}</b>: an octave of <b>${PUMP}</b>, ${fmt(PUMP_C)} ¢` : TX.html('lattice.stage.empty');
     const names = {}; this.sel.forEach(([a, b]) => { (names[nameOf(a + 4 * b)] ||= []).push(latQ(a, b)); });
     for (const [nm, qs] of Object.entries(names)) if (qs.length > 1) { const d = qs[1].div(qs[0]).foldNear(); r += `<br>two ${nm}s, ${d} apart (${fmtS(d.c)} ¢)`; }
     $('lat-read').innerHTML = r;
@@ -1334,7 +1975,7 @@ document.addEventListener('click', e => {
   let h = '<tr><th>Note</th>' + TUNE_ORDER.map(k => `<th>${TUNINGS[k].name}</th>`).join('') + '</tr>';
   for (let pc = 0; pc < 12; pc++) h += `<tr><td>${[...new Set(TUNE_ORDER.map(k => TUNINGS[k].names[pc]))].join(' / ')}</td>` + TUNE_ORDER.map(k => `<td class="mono">${fmt(TUNINGS[k].cents[pc])}</td>`).join('') + '</tr>';
   $('tab-tunings').innerHTML = h;
-  $('snd-notes').innerHTML = `Nothing is sampled. Each note is a Web Audio oscillator playing a custom waveform of ${HARMONICS} harmonics, the <i>n</i>th at amplitude 1/<i>n</i><sup>${ROLLOFF}</sup>, because beating lives in the overtones and pure sine waves would hide it. Frequencies are computed from the ratios above, relative to an equal-tempered C (C4 = ${fmt(C4, 2)} Hz, from A4 = 440 Hz). Notes fade in over 30 ms, settle to a steady level so beats stay audible, and fade out over about 0.3 s, so nothing clicks. In the comma pump the four voices are continuous oscillators: shared notes are literally held, and a note forced to move slides instead of restarting.`;
+  Object.assign(TX.vars, {harmonics: String(HARMONICS), rolloff: {html: `<sup>${ROLLOFF}</sup>`, data: true}, c4: fmt(C4, 2)});
 })();
 
 /* =====================================================================
@@ -1390,13 +2031,21 @@ addEventListener('keydown', e => {
   else if (k === 'p') { e.preventDefault(); SC[curScene]?.primary?.(); }
   else if (k === 's' || k === 'escape') { stopAll(); }
 });
+// The words, from the text block (TX). After an edit in the Edit text panel (tools/edit.mjs) the page refills
+// itself; redo everything built from the text. Positions (stopY, detect) are measured live, so they follow.
+TX.start({code: 'r'});
+eqbox();
 const segsEl = $('segs');
 stepEls.forEach((s, i) => {
-  const b = document.createElement('button'); b.className = 'seg'; const h = s.querySelector('h1, h2');
-  b.setAttribute('aria-label', `Go to ${h ? h.textContent : 'slide ' + (i + 1)}`); b.title = h ? h.textContent : '';
+  const b = document.createElement('button'); b.className = 'seg';
   b.addEventListener('click', () => { backRun = false; goStop(stops.findIndex(x => x.i === i)); }); segsEl.appendChild(b);
 });
 const segEls = [...segsEl.children];
+function segTitles() {
+  segEls.forEach((b, i) => { const h = stepEls[i].querySelector('h1, h2'), t = h ? h.textContent : ''; b.setAttribute('aria-label', `Go to ${t || 'slide ' + (i + 1)}`); b.title = t; });
+}
+segTitles();
+TX.onChange(() => { segTitles(); eqbox(); SC.pure.text(); SC.stack.ui(); SC.temper.update(); SC.lattice.readout(); });
 const CHAPTERS = [['Ratios', 'pure'], ['Stacking', 'stack'], ['The pump', 'pump'], ['Temperaments', 'temper'], ['Playground', 'lattice']];
 const chapStart = CHAPTERS.map(([, sc]) => stepEls.findIndex(el => el.dataset.scene === sc));
 const chapBtns = CHAPTERS.map(([name], c) => {
