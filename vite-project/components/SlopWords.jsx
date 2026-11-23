@@ -1,7 +1,7 @@
 import { Fragment } from 'react';
 import { runs } from '/components/slopText.js';
 
-// one author's words: yours in white, an agent's in the zone's purple, facts and quotes in amber. Line breaks
+// one author's words: an agent's in the zone's purple, anything else (yours, facts and quotes) in the text color. Line breaks
 // are kept
 function Run({ run }) {
     return (

@@ -1,7 +1,3 @@
-<!doctype html>
-<html lang="en">
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Single Cycles</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -121,8 +117,8 @@ kbd { font-family: var(--f-mono); font-size: 0.78rem; font-weight: 600; color: v
 .pipbar { position: absolute; left: 0; right: 0; bottom: 12px; display: flex; justify-content: center; z-index: 5; pointer-events: none; }
 .pipbar:empty { display: none; }
 .cap { position: absolute; left: 16px; right: 16px; bottom: 30px; display: flex; justify-content: center; pointer-events: none; }
-.cap span { font-family: var(--f-mono); font-size: 0.8rem; line-height: 1.35; color: var(--ink); background: color-mix(in srgb, var(--panel) 88%, transparent); border: 1px solid var(--rule); border-radius: 99px; padding: 6px 14px; max-width: 100%; text-align: center; transition: opacity .25s; }
-.cap span:empty { display: none; }
+.cap > span { font-family: var(--f-mono); font-size: 0.8rem; line-height: 1.35; color: var(--ink); background: color-mix(in srgb, var(--panel) 88%, transparent); border: 1px solid var(--rule); border-radius: 99px; padding: 6px 14px; max-width: 100%; text-align: center; transition: opacity .25s; }
+.cap > span:empty { display: none; }
 /* Front-page tally of how many cycles each scramble had */
 /* Front-page running tally: one bar split by how many cycles each scramble had */
 .tally { position: absolute; left: 50%; transform: translateX(-50%); width: min(460px, calc(100% - 32px)); bottom: 72px; display: grid; gap: 4px; pointer-events: none; transition: opacity .4s; font-family: var(--f-mono); font-size: 0.72rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
@@ -238,23 +234,85 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
   #L-cancel .fanrow svg { width: 34%; }
   .fan-note { font-size: 0.8rem; }
 }
-/* Text editing (owner only) */
-.editbar { position: fixed; right: 16px; bottom: 16px; z-index: 40; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
-.editbar[hidden], .edpanel[hidden], .ed-tools[hidden] { display: none; }
-.editbar .mini { background: var(--panel); }
-.editbar .ed-save { background: var(--accent); color: #fff; }
-.ed-tools { display: inline-flex; gap: 6px; }
-.ed-msg { font-family: var(--f-mono); font-size: 0.75rem; color: var(--ink-2); }
-body.editing [data-tk] { outline: 1px dashed color-mix(in srgb, var(--accent) 55%, transparent); outline-offset: 2px; border-radius: 3px; }
-body.editing [data-tk]:focus { outline: 2px solid var(--accent); }
-body.editing .step .card { opacity: 1; visibility: visible; }
-body.editing .layer:not(.on) { pointer-events: none; }
-.edpanel { position: fixed; right: 16px; bottom: 64px; z-index: 40; width: min(440px, calc(100vw - 32px)); max-height: 60vh; display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--rule); border-radius: 12px; box-shadow: 0 10px 30px rgb(0 0 0 / 0.25); }
-.ed-head { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; font-family: var(--f-display); font-weight: 700; border-bottom: 1px solid var(--rule); }
-.ed-list { overflow-y: auto; padding: 8px 12px 12px; display: grid; gap: 6px; }
-.ed-list input { width: 100%; font: 0.85rem var(--f-mono); color: var(--ink); background: var(--bg); border: 1px solid var(--rule); border-radius: 6px; padding: 5px 7px; }
-.ed-list input.changed { border-color: var(--accent); }
 @media (prefers-reduced-motion: reduce) { .layer, .bar, .vlabel, #L-cancel tbody tr, .x::after { transition: none !important; } }
+</style>
+<style id="article-text-css">
+/* Slop editor: who wrote what (see the article-text script). Canonical copy: ~/Desktop/Coding/slop-editor/article-text.css.
+   Uses the article's tokens: --bg, --panel, --ink, --ink-2, --ink-3, --rule, --accent, --f-display, --f-mono. */
+:root {
+  /* my words in the body ink, anything AI-generated in purple, facts and quotes in amber */
+  --mine: var(--ink); --ai: #6e36d0; --data: #8f5a00;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --ai: #ba89ff; --data: #e8b65a; }
+}
+:root[data-theme="dark"] { --ai: #ba89ff; --data: #e8b65a; }
+
+/* the colors show while the Slop-o-meter is on */
+.slop-on .tx-mine { color: var(--tx-mine, var(--mine)); }
+.slop-on .tx-ai { color: var(--tx-ai, var(--ai)); }
+.slop-on .tx-data { color: var(--tx-data, var(--data)); }
+.tx-data { font-variant-numeric: tabular-nums; }
+/* quieter text keeps the three colors, a step down */
+.note, .lede, .dek, .hint, .eyebrow, .lay-sub, .cta-sub, .fan-note {
+  --tx-mine: var(--ink-2);
+  --tx-ai: color-mix(in srgb, var(--ai) 74%, var(--ink-3));
+  --tx-data: color-mix(in srgb, var(--data) 74%, var(--ink-3));
+}
+
+/* Slop-o-meter: a switch at the top of the article */
+.tx-meter { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 0 0 14px; font-family: var(--f-mono); font-size: 0.74rem; color: var(--ink-3); }
+.tx-meter-btn { display: inline-flex; align-items: center; gap: 8px; padding: 4px 10px 4px 5px; border-radius: 99px; border: 1px solid var(--rule); background: var(--panel); color: var(--ink-2); font: 600 0.74rem var(--f-mono); letter-spacing: 0.04em; cursor: pointer; }
+.tx-meter-btn:hover { border-color: var(--ai); }
+.tx-switch { position: relative; width: 26px; height: 15px; border-radius: 99px; background: var(--rule); transition: background .2s; }
+.tx-switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 11px; height: 11px; border-radius: 50%; background: var(--panel); box-shadow: 0 1px 2px rgb(0 0 0 / 0.3); transition: transform .2s; }
+.tx-meter-btn[aria-pressed="true"] { border-color: var(--ai); color: var(--ink); }
+.tx-meter-btn[aria-pressed="true"] .tx-switch { background: var(--ai); }
+.tx-meter-btn[aria-pressed="true"] .tx-switch::after { transform: translateX(11px); }
+.tx-meter-key { display: none; flex-wrap: wrap; gap: 2px 12px; }
+.slop-on .tx-meter-key { display: inline-flex; }
+.tx-legend .tx-mine { color: var(--mine); } .tx-legend .tx-ai { color: var(--ai); } .tx-legend .tx-data { color: var(--data); }
+.tx-legend { font-weight: 600; }
+
+/* Edit text: only under tools/edit.mjs */
+.tx-edit-btn { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: max(14px, env(safe-area-inset-bottom, 0px)); z-index: 60; font: 600 0.86rem var(--f-display); padding: 9px 15px; border-radius: 99px; border: 1px solid var(--ai); background: var(--panel); color: var(--ai); cursor: pointer; box-shadow: 0 6px 24px rgb(0 0 0 / 0.14); }
+.tx-edit-btn[hidden], .tx-panel[hidden] { display: none; }
+.tx-panel { position: fixed; top: 12px; right: 12px; bottom: 12px; z-index: 60; width: min(400px, calc(100vw - 24px)); display: flex; flex-direction: column; background: var(--panel); color: var(--ink); border: 1px solid var(--rule); border-radius: 16px; box-shadow: 0 16px 48px rgb(0 0 0 / 0.28); font-family: var(--f-display); }
+.tx-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; padding: 14px 16px 10px; border-bottom: 1px solid var(--rule); }
+.tx-head h2 { font-size: 1.1rem; margin: 0; }
+.tx-status { margin: 2px 0 0; font: 0.74rem var(--f-mono); color: var(--ink-3); }
+.tx-status[data-kind="dirty"] { color: var(--ink-2); }
+.tx-status[data-kind="error"] { color: #d0453a; }
+.tx-close { font-size: 1.3rem; line-height: 1; width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--rule); background: none; color: var(--ink); cursor: pointer; }
+.tx-cover { padding: 10px 16px; border-bottom: 1px solid var(--rule); display: grid; gap: 6px; font: 0.78rem var(--f-mono); color: var(--ink-2); }
+.tx-cover-nums { display: flex; justify-content: space-between; gap: 8px; }
+.tx-cover-nums .tx-mine { color: var(--mine); font-weight: 600; }
+.tx-track { height: 6px; border-radius: 3px; background: color-mix(in srgb, var(--ai) 35%, var(--rule)); overflow: hidden; }
+.tx-track span { display: block; height: 100%; background: var(--mine); transition: width .3s; }
+.tx-body { overflow-y: auto; padding: 6px 12px 16px; overscroll-behavior: contain; }
+.tx-group { border-bottom: 1px solid var(--rule); }
+.tx-group summary { display: flex; justify-content: space-between; gap: 10px; padding: 10px 4px; cursor: pointer; font-weight: 700; font-size: 0.92rem; }
+.tx-gshare { font: 0.72rem var(--f-mono); color: var(--ink-3); white-space: nowrap; padding-top: 2px; }
+.tx-gshare.tx-some { color: var(--ink); }
+.tx-field { display: grid; gap: 4px; margin: 0 4px 12px; }
+.tx-flabel { display: flex; justify-content: space-between; gap: 8px; font: 0.72rem var(--f-mono); color: var(--ink-3); }
+.tx-fmine { color: var(--ink); }
+.tx-field input, .tx-field textarea { width: 100%; font: 0.88rem/1.45 var(--f-mono); color: var(--ink); background: var(--bg); border: 1px solid var(--rule); border-radius: 8px; padding: 6px 8px; resize: vertical; }
+.tx-field input:focus, .tx-field textarea:focus { outline: 2px solid var(--ai); outline-offset: 0; border-color: transparent; }
+.tx-reslop { font: 600 0.7rem var(--f-mono); padding: 3px 9px; border-radius: 99px; border: 1px solid color-mix(in srgb, var(--ai) 55%, var(--rule)); background: none; color: var(--ai); cursor: pointer; white-space: nowrap; }
+.tx-reslop:hover:not(:disabled) { background: color-mix(in srgb, var(--ai) 12%, transparent); }
+.tx-unslop, .tx-unslop-all, .tx-unslop-group { border-color: var(--rule); color: var(--mine); }
+.tx-unslop:hover:not(:disabled), .tx-unslop-all:hover:not(:disabled), .tx-unslop-group:hover:not(:disabled) { background: color-mix(in srgb, var(--mine) 8%, transparent); }
+.tx-reslop:disabled { opacity: 0.35; cursor: default; background: none; }
+.tx-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.tx-group-actions { margin: 0 4px 12px; }
+.tx-flabel { align-items: center; }
+.tx-fmine { margin-left: auto; }
+.tx-flabel .tx-reslop { padding: 0 7px; font-size: 0.66rem; }
+.tx-focus { outline: 2px dashed var(--ai); outline-offset: 3px; border-radius: 3px; }
+@media (max-width: 900px) {
+  .tx-panel { top: auto; left: 8px; right: 8px; bottom: 8px; width: auto; height: 56svh; }
+}
 </style>
 
 <div class="scrolly">
@@ -269,13 +327,13 @@ body.editing .layer:not(.on) { pointer-events: none; }
           </svg>
         </div>
         <div class="layer panel-layer" id="L-chart">
-          <div class="lay-title">Chance that the edges form one cycle of length k</div>
+          <div class="lay-title" data-tx="term.stageTitle"></div>
           <div class="legend"><span><i class="sw" style="background: var(--c1)"></i>Ignoring flips</span><span class="t2"><i class="sw" style="background: var(--c2)"></i>Counting flips</span></div>
           <svg id="chart-svg" viewBox="0 0 640 330" role="img" aria-label="Bar chart of single-cycle probability by cycle length 6 to 12. Long cycles dominate."></svg>
           <div class="total"><div><b>24.94%</b><span>total, ignoring flips</span></div><div class="t2"><b>14.40%</b><span>total, counting flips</span></div></div>
         </div>
         <div class="layer panel-layer" id="L-cancel" data-b="0">
-          <div class="lay-title">Following the arrows out of UR</div>
+          <div class="lay-title" data-tx="uniform.stageTitle"></div>
           <div class="fanrow"><svg id="fan-svg" viewBox="0 0 300 300" role="img" aria-label="The ring of slots, with the arrows out of UR so far and every home the next one could point to."></svg><div class="fan-note" id="fan-note"></div></div>
           <div class="tablebox">
             <table class="ctable">
@@ -302,18 +360,18 @@ body.editing .layer:not(.on) { pointer-events: none; }
                   <td><span class="ev ret">back to UR</span><span class="fr"><span>1</span><span class="x xb">10</span></span></td>
                   <td class="res"><span class="fr"><span>1</span><span>12</span></span></td></tr>
                 <tr class="r4"><td>4…12</td>
-                  <td colspan="3" style="font-size: 0.9rem; color: var(--ink-2); white-space: normal">Same pattern, one more arrow each time</td>
+                  <td colspan="3" style="font-size: 0.9rem; color: var(--ink-2); white-space: normal" data-tx="uniform.tableRest"></td>
                   <td class="res"><span class="fr"><span>1</span><span>12</span></span></td></tr>
               </tbody>
             </table>
           </div>
           <div class="histstrip">
-            <div class="hs-head"><span>Check it on real scrambles: length of the buffer's cycle</span><span class="lab-count" id="hist-count"></span><button class="mini" id="hist-more" hidden="">Run another million</button></div>
+            <div class="hs-head"><span data-tx="uniform.histHead"></span><span class="lab-count" id="hist-count"></span><button class="mini" id="hist-more" hidden="">Run another million</button></div>
             <svg id="hist-svg" viewBox="0 0 640 112" role="img" aria-label="Live histogram of the buffer's cycle length in random scrambles: flat at one twelfth."></svg>
           </div>
         </div>
         <div class="layer panel-layer" id="L-lab">
-          <div class="lay-title">Live simulation</div>
+          <div class="lay-title" data-tx="lab.stageTitle"></div>
           <div class="runbar"><span class="lab-count" id="lab-count">0 scrambles</span><button class="mini" id="lab-more" hidden="">Run another million</button></div>
           <div class="lab-group">The answer · traced from UR, solved cube excluded</div>
           <div class="lab-row"><span class="name">No cycle break</span><span class="nums"><b id="sim2">–</b> · exact 22.65%</span><div class="track"><div class="fill" id="fill2"></div><div class="tick" style="left: 75.51%"></div></div></div>
@@ -321,7 +379,7 @@ body.editing .layer:not(.on) { pointer-events: none; }
           <div class="lab-group">First attempt · one cycle anywhere, solved cube included</div>
           <div class="lab-row"><span class="name">Ignoring flips</span><span class="nums"><b id="sim0">–</b> · exact 24.94%</span><div class="track"><div class="fill" id="fill0"></div><div class="tick" style="left: 83.13%"></div></div></div>
           <div class="lab-row"><span class="name">Counting flips</span><span class="nums"><b id="sim1">–</b> · exact 14.40%</span><div class="track"><div class="fill" id="fill1"></div><div class="tick" style="left: 47.99%"></div></div></div>
-          <div class="hint">Bars run from 0 to 30%. The dark tick marks the exact answer.</div>
+          <div class="hint" data-tx="lab.stageHint"></div>
         </div>
         <div class="nav" id="nav">
           <button class="key" id="k-prev" aria-label="Previous screen">←</button>
@@ -338,162 +396,163 @@ body.editing .layer:not(.on) { pointer-events: none; }
 
   <div class="steps">
     <section class="step" data-scene="hero"><div class="card">
-      <div class="eyebrow">Combinatorics · blindfolded cubing</div>
-      <h1>Single Cycles</h1>
-      <p class="dek">Scramble a Rubik's Cube. How often can a blindfolded solver fix every edge in one unbroken chain of swaps?</p>
+      <div data-slopmeter="on"></div>
+      <div class="eyebrow" data-tx="hero.eyebrow"></div>
+      <h1 data-tx="hero.title"></h1>
+      <p class="dek" data-tx="hero.dek"></p>
       <div class="answers">
         <div class="answer"><span class="who">No cycle break</span><b>22.65%</b></div>
         <div class="answer"><span class="who">No break, no flips</span><b>13.74%</b></div>
       </div>
-      <p class="note" style="margin-top: 18px">Look closer and both are made of <em>e</em>: they're <math><mi>e</mi><mo lspace="0" rspace="0">/</mo><mn>12</mn></math> and <math><msqrt><mpadded height="0.7em" depth="0"><mi>e</mi></mpadded></msqrt><mo lspace="0" rspace="0">/</mo><mn>12</mn></math>. Euler's number, hiding in a Rubik's Cube!</p>
-      <p class="hint" style="margin-top: 20px">Press <kbd>→</kbd> to step through like slides, or scroll. Drag the cube to turn it.</p>
+      <p class="note" style="margin-top: 18px" data-tx="hero.note"></p>
+      <p class="hint" style="margin-top: 20px" data-tx="hero.hint"></p>
     </div></section>
 
     <section class="step" data-scene="pieces"><div class="card">
-      <h2>Twelve edges</h2>
-      <p>A cube has 26 visible pieces: 6 centers, 8 corners and 12 edges. The centers never move relative to each other, so they fix each face's color.</p>
-      <p>This article is only about the edges. The corners are grayed out from here on.</p>
+      <h2 data-tx="pieces.title"></h2>
+      <p data-tx="pieces.p1"></p>
+      <p data-tx="pieces.p2"></p>
     </div></section>
 
     <section class="step" data-scene="homes"><div class="card">
-      <h2>Every edge has a home</h2>
-      <p>On a solved cube, each edge sits in one particular slot: its <em>home</em>. Slots are named by the two faces they touch. <span class="pos">UF</span> is between Up and Front. <span class="pos">DB</span> is between Down and Back.</p>
-      <p>Twelve slots, twelve names. Three of them, <span class="pos">BL</span>, <span class="pos">DL</span> and <span class="pos">DB</span>, are on the back. Drag the cube to see them.</p>
+      <h2 data-tx="homes.title"></h2>
+      <p data-tx="homes.p1"></p>
+      <p data-tx="homes.p2"></p>
     </div></section>
 
     <section class="step" data-scene="scramble"><div class="card">
-      <h2>A scramble</h2>
-      <p>A scramble moves edges away from home. In this one, seven edges have moved and five are still home.</p>
-      <p>Each piece still knows where it belongs from its colors. The yellow-green edge belongs in <span class="pos">DF</span> wherever it is.</p>
+      <h2 data-tx="scramble.title"></h2>
+      <p data-tx="scramble.p1"></p>
+      <p data-tx="scramble.p2"></p>
     </div></section>
 
     <section class="step" data-scene="buffer"><div class="card">
-      <h2>The buffer</h2>
-      <p>The beginner method for blindfolded solving is <a href="https://www.speedcubereview.com/blind-solving-algorithms.html" target="_blank" rel="noopener">Old Pochmann</a>. One slot, <span class="pos">UR</span>, is the <em>buffer</em>.</p>
-      <p>You look at the piece in the buffer, work out where it belongs, and swap it there using one memorized algorithm. Here the buffer holds the yellow-green edge, so the first swap is with <span class="pos">DF</span>.</p>
+      <h2 data-tx="buffer.title"></h2>
+      <p data-tx="buffer.p1"></p>
+      <p data-tx="buffer.p2"></p>
     </div></section>
 
     <section class="step tall" data-scene="tperm"><div class="card">
-      <h2>One swap, up close</h2>
-      <p>The swap is an algorithm called the <em>T-perm</em>: fourteen face turns that swap whatever is in <span class="pos">UR</span> with whatever is in <span class="pos">UL</span>. It also swaps two corners, shown in color on this slide so you can watch them.</p>
-      <p>Our first swap is with <span class="pos">DF</span>, so a solver first makes two setup turns, <span class="pos">D' L2</span>, that bring the edge in <span class="pos">DF</span> up to <span class="pos">UL</span> without touching the buffer. Then the T-perm, then the setup turns undone. Every swap drags the same two corners along, but Old Pochmann fixes the corners in a separate pass afterwards (with one extra algorithm if the number of edge swaps was odd).</p>
-      <p>So for our purposes, the buffer can be swapped with any edge at will, and the corners can be ignored.</p>
-      <p class="hint scrub">press → to play the T-perm, then again to undo the setup</p>
+      <h2 data-tx="tperm.title"></h2>
+      <p data-tx="tperm.p1"></p>
+      <p data-tx="tperm.p2"></p>
+      <p data-tx="tperm.p3"></p>
+      <p class="hint scrub" data-tx="tperm.hint"></p>
     </div></section>
 
     <section class="step tall" data-scene="swaps"><div class="card">
-      <h2>Swap, swap, swap</h2>
-      <p>Each swap sends one piece home and brings a new piece into the buffer. The swap with <span class="pos">DF</span> brought in the piece that belongs in <span class="pos">FL</span>, so you repeat with whatever arrives: <span class="pos">FL</span>, then <span class="pos">UB</span>.</p>
-      <p>The arrows point from each piece to its home. They form a loop, and every swap removes one arrow.</p>
-      <p class="hint scrub">press → once for each swap</p>
+      <h2 data-tx="swaps.title"></h2>
+      <p data-tx="swaps.p1"></p>
+      <p data-tx="swaps.p2"></p>
+      <p class="hint scrub" data-tx="swaps.hint"></p>
     </div></section>
 
     <section class="step" data-scene="closed"><div class="card">
-      <h2>The loop closes</h2>
-      <p>After three swaps, the buffer's own white-red piece arrives back in <span class="pos">UR</span>. Four edges were solved in three swaps. A loop like this is called a <em>cycle</em>.</p>
-      <p>But <span class="pos">UF</span>, <span class="pos">DR</span> and <span class="pos">BR</span> are still wrong. They form a cycle of their own, and the buffer isn't in it. Swapping the buffer with itself does nothing, so the method is stuck.</p>
+      <h2 data-tx="closed.title"></h2>
+      <p data-tx="closed.p1"></p>
+      <p data-tx="closed.p2"></p>
     </div></section>
 
     <section class="step tall" data-scene="break"><div class="card">
-      <h2>A cycle break</h2>
-      <p>To get unstuck, you deliberately swap the solved buffer piece into the other cycle, then follow that cycle until the buffer piece comes back. Solvers call this a <em>cycle break</em>.</p>
-      <p>These three edges took four swaps. Had they been part of the buffer's cycle, they would have taken three. Each break costs an extra swap and an extra thing to memorize.</p>
-      <p class="hint scrub">press → to make the break, then again to finish it</p>
+      <h2 data-tx="break.title"></h2>
+      <p data-tx="break.p1"></p>
+      <p data-tx="break.p2"></p>
+      <p class="hint scrub" data-tx="break.hint"></p>
     </div></section>
 
     <section class="step" data-scene="rewind"><div class="card">
-      <h2>Every scramble is a set of cycles</h2>
-      <p>Finish the solve, then rewind it swap by swap back to the scramble, and draw an arrow from every misplaced piece to its home. Follow the arrows from any piece and you always come back to where you started. So the arrows always split into closed loops.</p>
-      <p>This scramble has two: four edges through the buffer, and three without it.</p>
+      <h2 data-tx="rewind.title"></h2>
+      <p data-tx="rewind.p1"></p>
+      <p data-tx="rewind.p2"></p>
     </div></section>
 
     <section class="step tall" data-scene="ring"><div class="card">
-      <h2>Flatten it</h2>
-      <p>For counting, the cube's shape doesn't matter, only which slot points to which. So peel the twelve slots off the cube and lay them in a ring, keeping the arrows.</p>
+      <h2 data-tx="ring.title"></h2>
+      <p data-tx="ring.p1"></p>
       <div class="qbox">
-        <div class="eyebrow">The question</div>
-        <p>Call a scramble a <strong>single cycle</strong> when one loop covers every edge that's out of place. Then the solve needs no cycle break.</p>
-        <p>Ours has two loops, so it doesn't count. Press → to see one that does: a single loop through eight edges, with the other four home. On a random scramble, how often does this happen?</p>
+        <div class="eyebrow" data-tx="ring.question"></div>
+        <p data-tx="ring.p2"></p>
+        <p data-tx="ring.p3"></p>
       </div>
     </div></section>
 
     <section class="step tall" data-scene="flips"><div class="card">
-      <h2>First, a wrinkle: flips</h2>
-      <p>An edge can be home but <em>flipped</em>, sitting in its slot with its colors swapped. Is that edge solved? Not quite.</p>
-      <p>A cube can never have exactly one flipped edge. Every move flips an even number of edges, <a href="https://puzzling.stackexchange.com/questions/521/why-cant-i-have-only-one-edge-piece-flipped-on-a-3x3-rubiks-cube" target="_blank" rel="noopener">so flips come in pairs</a>.</p>
-      <p>So there are two answers to find: how often the solve needs no cycle break, and how often it needs no break <em>and</em> no flip algorithm.</p>
-      <p class="hint scrub">press → to flip a second edge</p>
+      <h2 data-tx="flips.title"></h2>
+      <p data-tx="flips.p1"></p>
+      <p data-tx="flips.p2"></p>
+      <p data-tx="flips.p3"></p>
+      <p class="hint scrub" data-tx="flips.hint"></p>
     </div></section>
 
     <section class="step tall" data-scene="uniform"><div class="card">
-      <h2>The buffer's cycle</h2>
-      <p>A solver always traces from <span class="pos">UR</span>. So the question is: does the buffer's cycle cover every misplaced edge?</p>
-      <p>The way in is to <strong>sort scrambles by the length of the buffer's cycle</strong> and handle each length on its own. Nothing about the cube forces that split; it's a choice. But it's the choice that makes counting easy: a fixed length means a fixed number of arrows to follow out of <span class="pos">UR</span>, and every other edge simply has to be home.</p>
-      <p>A neat fact helps: <strong>the buffer's cycle is equally likely to have any length from 1 to 12.</strong> Follow the arrows out of <span class="pos">UR</span>. The first can point to any of the 12 homes, and only one of them, UR's own, closes the loop at once. Each later arrow has one home fewer to choose from, and the chances cancel down to <math><mfrac><mn>1</mn><mn>12</mn></mfrac></math> for every length.</p>
-      <p>The strip at the bottom is sampling random scrambles live. Every bar settles at <math><mfrac><mn>1</mn><mn>12</mn></mfrac></math>.</p>
-      <p class="hint scrub">press → to follow each arrow</p>
+      <h2 data-tx="uniform.title"></h2>
+      <p data-tx="uniform.p1"></p>
+      <p data-tx="uniform.p2"></p>
+      <p data-tx="uniform.p3"></p>
+      <p data-tx="uniform.p4"></p>
+      <p class="hint scrub" data-tx="uniform.hint"></p>
     </div></section>
 
     <section class="step" data-scene="cuber"><div class="card">
-      <h2>The answers</h2>
-      <p>If the buffer's cycle has length <math><mi>k</mi></math>, the other <math><mi>j</mi><mo>=</mo><mn>12</mn><mo>−</mo><mi>k</mi></math> edges must all be home, with chance <math><mn>1</mn><mo>/</mo><mi>j</mi><mo>!</mo></math>. The ring steps through a few lengths. Dropping <math><mi>k</mi><mo>=</mo><mn>1</mn></math>, the solved cube:</p>
+      <h2 data-tx="cuber.title"></h2>
+      <p data-tx="cuber.p1"></p>
       <math display="block"><mfrac><mn>1</mn><mn>12</mn></mfrac><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>0</mn></mrow><mn>10</mn></munderover><mfrac><mn>1</mn><mrow><mi>j</mi><mo>!</mo></mrow></mfrac><mo>≈</mo><mfrac><mi>e</mi><mn>12</mn></mfrac><mo>≈</mo><mn>22.65</mn><mo>%</mo></math>
-      <p>That sum is the series for <math><mi>e</mi></math>. It's the chance of <strong>no cycle break</strong>, about 2 scrambles in 9.</p>
-      <p>A flipped edge sitting at home doesn't cause a break, but it does need a separate flip algorithm. Requiring that there are none adds <math><msup><mn>2</mn><mi>j</mi></msup></math> to each term, which gives the series for <math class="sq"><msqrt><mpadded height="0.7em" depth="0"><mi>e</mi></mpadded></msqrt></math>:</p>
+      <p data-tx="cuber.p2"></p>
+      <p data-tx="cuber.p3"></p>
       <math display="block"><mfrac><mn>1</mn><mn>12</mn></mfrac><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>0</mn></mrow><mn>10</mn></munderover><mfrac><mn>1</mn><mrow><mi>j</mi><mo>!</mo><mspace width="0.17em"/><msup><mn>2</mn><mi>j</mi></msup></mrow></mfrac><mo>≈</mo><mfrac><msqrt><mpadded height="0.7em" depth="0"><mi>e</mi></mpadded></msqrt><mn>12</mn></mfrac><mo>≈</mo><mn>13.74</mn><mo>%</mo></math>
-      <p>That's the chance the edges are just one clean cycle from the buffer, with no break and no flip algorithm.</p>
+      <p data-tx="cuber.p4"></p>
     </div></section>
 
     <section class="step" data-scene="attempt"><div class="card">
-      <div class="eyebrow">My first attempt</div>
-      <h2>Where I first went wrong</h2>
-      <p>When I first wrote this up, I answered a slightly different question: how often do the edges form a single cycle <em>anywhere</em>, with the solved cube counted too?</p>
-      <p>That isn't what a solver needs. A single cycle that skips <span class="pos">UR</span>, like this one, still needs a cycle break, and nobody is handed a solved cube to solve. Claude pointed this out while building this page; the answers above are the corrected ones.</p>
-      <p>The original counting is still a nice piece of combinatorics, so here it is.</p>
+      <div class="eyebrow" data-tx="attempt.eyebrow"></div>
+      <h2 data-tx="attempt.title"></h2>
+      <p data-tx="attempt.p1"></p>
+      <p data-tx="attempt.p2"></p>
+      <p data-tx="attempt.p3"></p>
     </div></section>
 
     <section class="step" data-scene="count"><div class="card">
-      <h2>Counting cycles anywhere</h2>
-      <p>The edges can be in any of <math><mn>12</mn><mo>!</mo></math> arrangements, all equally likely. (A real cube can't swap just two edges, but the corners take up the difference, so the edges alone reach all of them.)</p>
-      <p>The trick is the same as before: <strong>sort single cycles by their length</strong> <math><mi>k</mi></math> and count each length separately. It's a choice, not something the cube imposes, and it's what makes the count manageable. With <math><mi>k</mi></math> fixed, a single cycle is just two independent choices.</p>
-      <p>A single cycle of length <math><mi>k</mi></math> takes two choices. <strong>Which edges:</strong> <math><mrow><mo>(</mo><mfrac linethickness="0"><mn>12</mn><mi>k</mi></mfrac><mo>)</mo></mrow></math> ways, with the rest at home. <strong>What order:</strong> start at one edge and follow the arrows. The other <math><mi>k</mi><mo>−</mo><mn>1</mn></math> edges appear in some order, giving <math><mo>(</mo><mi>k</mi><mo>−</mo><mn>1</mn><mo>)</mo><mo>!</mo></math> cycles.</p>
-      <p>Three edges make exactly <math><mo>(</mo><mn>3</mn><mo>−</mo><mn>1</mn><mo>)</mo><mo>!</mo><mo>=</mo><mn>2</mn></math> cycles: the same triangle, traveled one way or the other.</p>
+      <h2 data-tx="count.title"></h2>
+      <p data-tx="count.p1"></p>
+      <p data-tx="count.p2"></p>
+      <p data-tx="count.p3"></p>
+      <p data-tx="count.p4"></p>
     </div></section>
 
     <section class="step" data-scene="term"><div class="card">
-      <h2>First answer</h2>
-      <p>Divide by <math><mn>12</mn><mo>!</mo></math> and most of the factorials cancel:</p>
+      <h2 data-tx="term.title"></h2>
+      <p data-tx="term.p1"></p>
       <math display="block"><mfrac><mrow><mrow><mo>(</mo><mfrac linethickness="0"><mn>12</mn><mi>k</mi></mfrac><mo>)</mo></mrow><mo>(</mo><mi>k</mi><mo>−</mo><mn>1</mn><mo>)</mo><mo>!</mo></mrow><mrow><mn>12</mn><mo>!</mo></mrow></mfrac><mo>=</mo><mfrac><mn>1</mn><mrow><mi>k</mi><mspace width="0.17em"/><mo>(</mo><mn>12</mn><mo>−</mo><mi>k</mi><mo>)</mo><mo>!</mo></mrow></mfrac></math>
-      <p>Every edge left out of the cycle has to happen to be home, which <math><mo>(</mo><mn>12</mn><mo>−</mo><mi>k</mi><mo>)</mo><mo>!</mo></math> makes unlikely fast: <math><mfrac><mn>1</mn><mn>12</mn></mfrac></math> for 12 edges, <math><mfrac><mn>1</mn><mn>11</mn></mfrac></math> for 11 (the edge left out can be any of the 12), under 2% by 9. Add every length, plus a lone <math><mn>1</mn><mo>/</mo><mn>12</mn><mo>!</mo></math> for the solved cube:</p>
+      <p data-tx="term.p2"></p>
       <math display="block"><mfrac><mn>1</mn><mrow><mn>12</mn><mo>!</mo></mrow></mfrac><mo>+</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>2</mn></mrow><mn>12</mn></munderover><mfrac><mn>1</mn><mrow><mi>k</mi><mspace width="0.17em"/><mo>(</mo><mn>12</mn><mo>−</mo><mi>k</mi><mo>)</mo><mo>!</mo></mrow></mfrac><mo>=</mo><mfrac><mn>103447</mn><mn>414720</mn></mfrac><mo>≈</mo><mn>24.94</mn><mo>%</mo></math>
     </div></section>
 
     <section class="step" data-scene="flipcount"><div class="card">
-      <h2>Full: adding flips back</h2>
-      <p>With flips, there are <math><mn>12</mn><mo>!</mo><mo>×</mo><msup><mn>2</mn><mn>11</mn></msup></math> edge states: the first 11 edges can each be flipped or not, and the 12th is forced to keep the count even.</p>
-      <p>Edges outside the cycle must be home <em>and</em> unflipped. Edges inside can be flipped in any even-sized pattern: choose freely for <math><mi>k</mi><mo>−</mo><mn>1</mn></math> of them and the last is forced. That's <math><msup><mn>2</mn><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msup></math> patterns. The cube is cycling through all 8 for this 4-edge cycle.</p>
+      <h2 data-tx="flipcount.title"></h2>
+      <p data-tx="flipcount.p1"></p>
+      <p data-tx="flipcount.p2"></p>
     </div></section>
 
     <section class="step" data-scene="full"><div class="card">
-      <h2>First answer: counting flips</h2>
-      <p>Dividing by <math><msup><mn>2</mn><mn>11</mn></msup></math> as well, each term picks up one more factor:</p>
+      <h2 data-tx="full.title"></h2>
+      <p data-tx="full.p1"></p>
       <math display="block"><mfrac><mn>1</mn><mrow><mi>k</mi><mspace width="0.17em"/><mo>(</mo><mn>12</mn><mo>−</mo><mi>k</mi><mo>)</mo><mo>!</mo><mspace width="0.17em"/><msup><mn>2</mn><mrow><mn>12</mn><mo>−</mo><mi>k</mi></mrow></msup></mrow></mfrac></math>
-      <p>Each edge left out of the cycle now has to be home and unflipped, a further 1-in-2 chance. The 12-edge cycle stays at <math><mfrac><mn>1</mn><mn>12</mn></mfrac></math>, but the 11-edge cycle halves and shorter ones shrink faster.</p>
+      <p data-tx="full.p2"></p>
       <math display="block"><mfrac><mn>1</mn><mrow><mn>12</mn><mo>!</mo><mspace width="0.17em"/><msup><mn>2</mn><mn>11</mn></msup></mrow></mfrac><mo>+</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>2</mn></mrow><mn>12</mn></munderover><mfrac><mn>1</mn><mrow><mi>k</mi><mspace width="0.17em"/><mo>(</mo><mn>12</mn><mo>−</mo><mi>k</mi><mo>)</mo><mo>!</mo><mspace width="0.17em"/><msup><mn>2</mn><mrow><mn>12</mn><mo>−</mo><mi>k</mi></mrow></msup></mrow></mfrac><mo>≈</mo><mn>14.40</mn><mo>%</mo></math>
-      <p>Those were my original answers: a cycle anywhere, with the solved cube counted. They're within a couple of points of the real ones, 22.65% and 13.74%, but they answer a question no solver asks.</p>
+      <p data-tx="full.p3"></p>
     </div></section>
 
     <section class="step" data-scene="lab"><div class="card">
-      <h2>Check all four</h2>
-      <p>The stage is generating random edge states, each a uniformly random permutation with a random even set of flips, and sorting them under all four definitions: the two real answers and the two from my first attempt. The bars settle onto the exact answers well before the run stops at a million.</p>
-      <p class="note">The original counting and verification code is on <a href="https://github.com/baphaelman/one-cycles" target="_blank" rel="noopener">GitHub</a>.</p>
+      <h2 data-tx="lab.title"></h2>
+      <p data-tx="lab.p1"></p>
+      <p class="note" data-tx="lab.note"></p>
     </div></section>
   </div>
 </div>
 
 
 <section class="after" id="after">
-  <h2>All four numbers</h2>
+  <h2 data-tx="after.title"></h2>
   <div class="tablewrap">
     <table class="plain">
       <thead><tr><th>Question</th><th>Exact</th><th>Approx.</th></tr></thead>
@@ -507,50 +566,752 @@ body.editing .layer:not(.on) { pointer-events: none; }
       </tbody>
     </table>
   </div>
-  <h3>Counts by cycle length</h3>
+  <h3 data-tx="after.countsTitle"></h3>
   <div class="tablewrap">
     <table class="plain">
       <thead><tr><th>k</th><th>Cycles, ignoring flips</th><th>Share</th><th>Cycles, counting flips</th><th>Share</th></tr></thead>
       <tbody id="ktable"></tbody>
     </table>
   </div>
-  <p class="note">Notation: <math><mrow><mo>(</mo><mfrac linethickness="0"><mi>n</mi><mi>k</mi></mfrac><mo>)</mo></mrow></math> is “n choose k”, the number of ways to pick k items from n. Slots are named with the standard face letters U, D, F, B, L, R. Colors follow the common scheme with white on top and green in front.</p>
+  <p class="note" data-tx="after.note"></p>
 </section>
 
-<div class="editbar" id="editbar" hidden="">
-  <button class="mini" id="ed-toggle">Edit text</button>
-  <span class="ed-tools" hidden=""><button class="mini" id="ed-stage">Stage text</button><button class="mini" id="ed-cancel">Cancel</button><button class="mini ed-save" id="ed-save">Save</button></span>
-  <span class="ed-msg" id="ed-msg" role="status"></span>
-</div>
-<div class="edpanel" id="edpanel" hidden="">
-  <div class="ed-head">Stage captions and labels <button class="mini" id="ed-close">Done</button></div>
-  <div class="ed-list" id="ed-list"></div>
-</div>
-<!-- Text edits saved from the page: {key: replacement}. Keys hash the original text, so edits survive code changes elsewhere. -->
-<script type="application/json" id="sc-text">{"t2ja6te":"Running tally","hlddv6e":"The Cube","h1vw6z26":"A Rubik's cube has 26 pieces: 6 centers, 8 corners, and 12 edges. The centers never move relative to each other, so they fix each face's color.","h188pv85":"Names","h1k1ur2r":"On a solved cube, each edge belongs in one particular slot: its \u003cem>home\u003c/em>. Slots are named by the two faces they touch, so&nbsp;\u003cspan class=\"pos\">UF\u003c/span>&nbsp;, the white-green edge, belongs between the Up (white) and Front (green) faces. \u003cspan class=\"pos\">DB\u003c/span> is between Down and Back, etc.","h7lottj":"The process of a blindfolded solve involves gradually getting displaced edges back to their homes.","h118hbdf":"The way in is to \u003cstrong>sort scrambles by the length of the buffer's cycle\u003c/strong> and handle each length on its own. This makes counting easy: a fixed length means a fixed number of arrows to follow out of \u003cspan class=\"pos\">UR\u003c/span>, and every other edge simply has to be home.","h1mdylns":"\u003cb id=\"sim2\">22.64%\u003c/b> · exact 22.65%","h1d3nnot":"\u003cb id=\"sim3\">13.76%\u003c/b> · exact 13.74%","h1oqochs":"\u003cb id=\"sim0\">24.92%\u003c/b> · exact 24.94%","h66dih7":"\u003cb id=\"sim1\">14.40%\u003c/b> · exact 14.40%","h9kn1mn":"This article is about the edges.","hfu1q55":"A scramble displaces edges from their homes :(. In this one, seven edges have moved and five are still home.","hp6dh1v":"The swap is an algorithm called the \u003cem>T-perm\u003c/em>: fourteen face turns that swap whatever is in \u003cspan class=\"pos\">UR\u003c/span> with whatever is in \u003cspan class=\"pos\">UL\u003c/span>. It also swaps two corners, shown in color on this slide so you can watch them. Everything else stays fixed, which is how solvers accumulate solved pieces.","h1jchzea":"Look closer and both are made of \u003cem>e\u003c/em>: they're \u003cmath>\u003cmi>e\u003c/mi>\u003cmo lspace=\"0\" rspace=\"0\">/\u003c/mo>\u003cmn>12\u003c/mn>\u003c/math> and \u003cmath>\u003cmsqrt>\u003cmpadded height=\"0.7em\" depth=\"0\">\u003cmi>e\u003c/mi>\u003c/mpadded>\u003c/msqrt>\u003cmo lspace=\"0\" rspace=\"0\">/\u003c/mo>\u003cmn>12\u003c/mn>\u003c/math>&nbsp;!"}</script>
+<!-- Every word a reader sees, and who wrote it (see CLAUDE.md, "Text and authorship"). tools/edit.mjs saves the Edit text panel into it. -->
+<script type="application/json" id="article-text">
+{
+  "version": 3,
+  "hero": {
+    "eyebrow": "Combinatorics · blindfolded cubing",
+    "title": "Single Cycles",
+    "dek": "Scramble a Rubik's Cube. How often can a blindfolded solver fix every edge in one unbroken chain of swaps?",
+    "note": [
+      "Look closer and both are made of *e*: they're {eOver12} and {sqrtEOver12}",
+      {
+        "me": " "
+      },
+      "!"
+    ],
+    "hint": "Press [[→]] to step through like slides, or scroll. Drag the cube to turn it.",
+    "caption": "A solved cube, and the same cube as a ring"
+  },
+  "pieces": {
+    "title": [
+      {
+        "me": "The Cube"
+      }
+    ],
+    "p1": [
+      "A",
+      {
+        "me": " Rubik's"
+      },
+      " cube has 26 pieces: 6 centers, 8 corners",
+      {
+        "me": ","
+      },
+      " and 12 edges. The centers never move relative to each other, so they fix each face's color."
+    ],
+    "p2": "This article is about the edges.",
+    "caption": "12 edges · 6 centers · 8 corners"
+  },
+  "homes": {
+    "title": [
+      {
+        "me": "Names"
+      }
+    ],
+    "p1": [
+      "On a solved cube, each edge ",
+      {
+        "me": "belongs"
+      },
+      " in one particular slot: its *home*. Slots are named by the two faces they touch",
+      {
+        "me": ", so `UF` , the white-green edge, belongs between the Up (white)"
+      },
+      " and Front",
+      {
+        "me": " (green) faces"
+      },
+      ". `DB` is between Down and Back",
+      {
+        "me": ", etc"
+      },
+      "."
+    ],
+    "p2": [
+      {
+        "me": "The process of a blindfolded solve involves gradually getting displaced edges back to their homes"
+      },
+      "."
+    ],
+    "caption": "Twelve slots, named by the faces they touch"
+  },
+  "scramble": {
+    "title": [
+      {
+        "me": "Scrambling"
+      }
+    ],
+    "p1": [
+      "A scramble ",
+      {
+        "me": "displaces edges from their homes"
+      },
+      ". In this one, seven edges have moved and five are ",
+      {
+        "me": "solved"
+      },
+      "."
+    ],
+    "p2": "Each piece still knows where it belongs from its colors. The yellow-green edge belongs in `DF` wherever it is.",
+    "caption": "Scrambled · seven edges have left home"
+  },
+  "buffer": {
+    "title": "The buffer",
+    "p1": "The beginner method for blindfolded solving is [Old Pochmann](https://www.speedcubereview.com/blind-solving-algorithms.html). One slot, `UR`, is the *buffer*.",
+    "p2": "You look at the piece in the buffer, work out where it belongs, and swap it there using one memorized algorithm. Here the buffer holds the yellow-green edge, so the first swap is with `DF`.",
+    "caption": "The buffer holds yellow-green, which belongs in DF"
+  },
+  "tperm": {
+    "title": "One swap, up close",
+    "p1": [
+      "The swap is an algorithm called the *T-perm*: fourteen face turns that swap whatever is in `UR` with whatever is in `UL`. It also swaps two corners, shown in color on this slide so you can watch them.",
+      {
+        "me": " Everything else stays fixed, which is how solvers accumulate solved pieces."
+      }
+    ],
+    "p2": "Our first swap is with `DF`, so a solver first makes two setup turns, `D' L2`, that bring the edge in `DF` up to `UL` without touching the buffer. Then the T-perm, then the setup turns undone. Every swap drags the same two corners along, but Old Pochmann fixes the corners in a separate pass afterwards (with one extra algorithm if the number of edge swaps was odd).",
+    "p3": "So for our purposes, the buffer can be swapped with any edge at will, and the corners can be ignored.",
+    "hint": "press → to play the T-perm, then again to undo the setup",
+    "caption1": "Setup D' L2 · DF's edge is now in UL, ready to swap",
+    "caption2": "T-perm · UR ↔ UL swapped, and two corners with them",
+    "caption3": "Setup undone · yellow-green is home in DF"
+  },
+  "swaps": {
+    "title": "Swap, swap, swap",
+    "p1": "Each swap sends one piece home and brings a new piece into the buffer. The swap with `DF` brought in the piece that belongs in `FL`, so you repeat with whatever arrives: `FL`, then `UB`.",
+    "p2": "The arrows point from each piece to its home. They form a loop, and every swap removes one arrow.",
+    "hint": "press → once for each swap",
+    "swapping": "Swapping UR ↔ {slot}",
+    "caption1": "DF solved · next: swap UR ↔ FL",
+    "caption2": "FL solved · next: swap UR ↔ UB"
+  },
+  "closed": {
+    "title": "The loop closes",
+    "p1": "After three swaps, the buffer's own white-red piece arrives back in `UR`. Four edges were solved in three swaps. A loop like this is called a *cycle*.",
+    "p2": "But `UF`, `DR` and `BR` are still wrong. They form a cycle of their own, and the buffer isn't in it. Swapping the buffer with itself does nothing, so the method is stuck.",
+    "caption": "UB solved · loop closed · UF, DR and BR still wrong"
+  },
+  "break": {
+    "title": "A cycle break",
+    "p1": "To get unstuck, you deliberately swap the solved buffer piece into the other cycle, then follow that cycle until the buffer piece comes back. Solvers call this a *cycle break*.",
+    "p2": "These three edges took four swaps. Had they been part of the buffer's cycle, they would have taken three. Each break costs an extra swap and an extra thing to memorize.",
+    "hint": "press → to make the break, then again to finish it",
+    "caption1": "Next: break into the other cycle",
+    "breaking": "Cycle break: swapping UR ↔ UF",
+    "caption2": "White-red parked in UF · the buffer is now in that cycle",
+    "finishing": "Finishing the break: UR ↔ DR, BR, UF",
+    "caption3": "Every edge solved · 3 edges took 4 swaps"
+  },
+  "rewind": {
+    "title": "Every scramble is a set of cycles",
+    "p1": "Finish the solve, then rewind it swap by swap back to the scramble, and draw an arrow from every misplaced piece to its home. Follow the arrows from any piece and you always come back to where you started. So the arrows always split into closed loops.",
+    "p2": "This scramble has two: four edges through the buffer, and three without it.",
+    "rewinding": "Rewinding the solve, swap by swap",
+    "caption": "Rewound · two cycles: 4 edges with the buffer, 3 without"
+  },
+  "ring": {
+    "title": "Flatten it",
+    "p1": "For counting, the cube's shape doesn't matter, only which slot points to which. So peel the twelve slots off the cube and lay them in a ring, keeping the arrows.",
+    "question": "The question",
+    "p2": "Call a scramble a **single cycle** when one loop covers every edge that's out of place. Then the solve needs no cycle break.",
+    "p3": "Ours has two loops, so it doesn't count. Press → to see one that does: a single loop through eight edges, with the other four home. On a random scramble, how often does this happen?",
+    "caption1": "Same slots, same arrows, laid out in a ring · two cycles",
+    "moving": "Moving the pieces to a new scramble",
+    "caption2": "One cycle through 8 edges · no cycle break"
+  },
+  "flips": {
+    "title": "First, a wrinkle: flips",
+    "p1": "An edge can be home but *flipped*, sitting in its slot with its colors swapped. Is that edge solved? Not quite.",
+    "p2": "A cube can never have exactly one flipped edge. Every move flips an even number of edges, [so flips come in pairs](https://puzzling.stackexchange.com/questions/521/why-cant-i-have-only-one-edge-piece-flipped-on-a-3x3-rubiks-cube).",
+    "p3": "So there are two answers to find: how often the solve needs no cycle break, and how often it needs no break *and* no flip algorithm.",
+    "hint": "press → to flip a second edge",
+    "caption1": "Each edge has two ways to sit in its slot",
+    "caption2": "One flipped edge: no sequence of moves gives this",
+    "caption3": "Two flipped edges: a real cube can do this"
+  },
+  "uniform": {
+    "title": "The buffer's cycle",
+    "p1": "A solver always traces from `UR`. So the question is: does the buffer's cycle cover every misplaced edge?",
+    "p2": [
+      "The way in is to **sort scrambles by the length of the buffer's cycle** and handle each length on its own. ",
+      {
+        "me": "This"
+      },
+      " makes counting easy: a fixed length means a fixed number of arrows to follow out of `UR`, and every other edge simply has to be home."
+    ],
+    "p3": "A neat fact helps: **the buffer's cycle is equally likely to have any length from 1 to 12.** Follow the arrows out of `UR`. The first can point to any of the 12 homes, and only one of them, UR's own, closes the loop at once. Each later arrow has one home fewer to choose from, and the chances cancel down to {oneTwelfth} for every length.",
+    "p4": "The strip at the bottom is sampling random scrambles live. Every bar settles at {oneTwelfth}.",
+    "hint": "press → to follow each arrow",
+    "stageTitle": "Following the arrows out of UR",
+    "fan1": "**Arrow 1** leaves UR. All 12 homes are free: **1** (UR's own) closes the loop at length 1; the other **11** move on.",
+    "fan2": "**Arrow 2** leaves DF. DF's home is taken, so 11 are free: **1** goes back to UR (length 2); **10** move on.",
+    "fan3": "**Arrow 3** leaves FL. 10 homes are free: **1** goes back to UR (length 3); **9** move on.",
+    "fan4": "Multiply along a row: each “moves on” numerator cancels the next denominator, so every length comes out at **1/12**. This loop closed on arrow 4.",
+    "tableRest": "Same pattern, one more arrow each time",
+    "histHead": "Check it on real scrambles: length of the buffer's cycle"
+  },
+  "cuber": {
+    "title": "The answers",
+    "p1": "If the buffer's cycle has length {k}, the other {jIs12MinusK} edges must all be home, with chance {oneOverJFact}. The ring steps through a few lengths. Dropping {kIs1}, the solved cube:",
+    "p2": "That sum is the series for {e}. It's the chance of **no cycle break**, about 2 scrambles in 9.",
+    "p3": "A flipped edge sitting at home doesn't cause a break, but it does need a separate flip algorithm. Requiring that there are none adds {twoToJ} to each term, which gives the series for {sqrtE}:",
+    "p4": "That's the chance the edges are just one clean cycle from the buffer, with no break and no flip algorithm.",
+    "caption1": "Buffer's cycle: {k} edges · the last edge can only be home",
+    "caption2": "Buffer's cycle: {k} edges · the other {j} must all be home: 1 in {j}! = 1 in {jFact}"
+  },
+  "attempt": {
+    "eyebrow": "My first attempt",
+    "title": "Where I first went wrong",
+    "p1": "When I first wrote this up, I answered a slightly different question: how often do the edges form a single cycle *anywhere*, with the solved cube counted too?",
+    "p2": "That isn't what a solver needs. A single cycle that skips `UR`, like this one, still needs a cycle break, and nobody is handed a solved cube to solve. Claude pointed this out while building this page; the answers above are the corrected ones.",
+    "p3": "The original counting is still a nice piece of combinatorics, so here it is.",
+    "caption": "One cycle, but UR isn't in it · my first attempt counted it; a solver needs a break"
+  },
+  "count": {
+    "title": "Counting cycles anywhere",
+    "p1": "The edges can be in any of {twelveFact} arrangements, all equally likely. (A real cube can't swap just two edges, but the corners take up the difference, so the edges alone reach all of them.)",
+    "p2": "The trick is the same as before: **sort single cycles by their length** {k} and count each length separately. It's a choice, not something the cube imposes, and it's what makes the count manageable. With {k} fixed, a single cycle is just two independent choices.",
+    "p3": "A single cycle of length {k} takes two choices. **Which edges:** {twelveChooseK} ways, with the rest at home. **What order:** start at one edge and follow the arrows. The other {kMinus1} edges appear in some order, giving {kMinus1Fact} cycles.",
+    "p4": "Three edges make exactly {threeMinus1Fact} cycles: the same triangle, traveled one way or the other.",
+    "caption1": "Cycle 1 of 2 · UF → FL → DF → UF",
+    "caption2": "Cycle 2 of 2 · UF → DF → FL → UF · same lines, reversed"
+  },
+  "term": {
+    "title": "First answer",
+    "p1": "Divide by {twelveFact} and most of the factorials cancel:",
+    "p2": "Every edge left out of the cycle has to happen to be home, which {twelveMinusKFact} makes unlikely fast: {oneTwelfth} for 12 edges, {oneEleventh} for 11 (the edge left out can be any of the 12), under 2% by 9. Add every length, plus a lone {oneOverTwelveFact} for the solved cube:",
+    "stageTitle": "Chance that the edges form one cycle of length k"
+  },
+  "flipcount": {
+    "title": "Full: adding flips back",
+    "p1": "With flips, there are {twelveFactTimes2to11} edge states: the first 11 edges can each be flipped or not, and the 12th is forced to keep the count even.",
+    "p2": "Edges outside the cycle must be home *and* unflipped. Edges inside can be flipped in any even-sized pattern: choose freely for {kMinus1} of them and the last is forced. That's {twoToKMinus1} patterns. The cube is cycling through all 8 for this 4-edge cycle."
+  },
+  "full": {
+    "title": "First answer: counting flips",
+    "p1": "Dividing by {twoTo11} as well, each term picks up one more factor:",
+    "p2": "Each edge left out of the cycle now has to be home and unflipped, a further 1-in-2 chance. The 12-edge cycle stays at {oneTwelfth}, but the 11-edge cycle halves and shorter ones shrink faster.",
+    "p3": "Those were my original answers: a cycle anywhere, with the solved cube counted. They're within a couple of points of the real ones, 22.65% and 13.74%, but they answer a question no solver asks."
+  },
+  "lab": {
+    "title": "Check all four",
+    "p1": "The stage is generating random edge states, each a uniformly random permutation with a random even set of flips, and sorting them under all four definitions: the two real answers and the two from my first attempt. The bars settle onto the exact answers well before the run stops at a million.",
+    "note": "The original counting and verification code is on [GitHub](https://github.com/baphaelman/one-cycles).",
+    "stageTitle": "Live simulation",
+    "stageHint": "Bars run from 0 to 30%. The dark tick marks the exact answer."
+  },
+  "after": {
+    "title": "All four numbers",
+    "countsTitle": "Counts by cycle length",
+    "note": "Notation: {nChooseK} is “n choose k”, the number of ways to pick k items from n. Slots are named with the standard face letters U, D, F, B, L, R. Colors follow the common scheme with white on top and green in front."
+  }
+}
+</script>
+<script id="article-text-js">
+/* Slop editor: every word a reader sees, and who wrote it. Canonical copy: ~/Desktop/Coding/slop-editor/article-text.js
+   (`node slop.mjs sync` inlines it into every page it's installed in). Ported from the Slop Zone on raphaelbajet.com.
+
+   The words live in the page's JSON block (a script element with id "article-text"): an object with a top-level
+   "version", and groups (objects) of texts in reading order. A text is a plain string (AI's words) or a list of
+   pieces: a string (AI's), {"me": "..."} (mine: typed in the Edit text panel, or dictated word for word) or
+   {"data": "..."} (nobody's: a fact, or someone else's words quoted). Lists are always one text, never a list of texts.
+   Inside any text: [label](url) is a link, **bold**, *italic*, `code`, [[key]] a key cap, {name} a value the page
+   fills in (a computed number or a formula, from TX.vars), and \ makes the next character literal.
+
+   Elements with data-tx="group.key" are filled from the block (TX.fill). Code renders the rest with TX.html(path).
+   The Slop-o-meter ([data-slopmeter]) switches the authorship colors on; data-slopmeter="on" makes on the default
+   until the reader picks. Served by tools/edit.mjs, the page also
+   gets the Edit text panel, which saves back into the file. */
+const TX = (() => {
+    'use strict';
+    // 'ai', 'mine' or 'data'
+    const authorOf = (piece) => (typeof piece === 'string' ? 'ai' : 'me' in piece ? 'mine' : 'data');
+    const textOf = (piece) => (typeof piece === 'string' ? piece : piece.me ?? piece.data);
+    const PIECE = { ai: (text) => text, mine: (text) => ({ me: text }), data: (text) => ({ data: text }) };
+
+    // the text with its markup, as the panel edits it
+    function plain(value) {
+        return typeof value === 'string' ? value : value.map(textOf).join('');
+    }
+
+    // who wrote each character
+    function authorsByChar(value) {
+        if (typeof value === 'string') return new Array(value.length).fill('ai');
+        return value.flatMap((piece) => new Array(textOf(piece).length).fill(authorOf(piece)));
+    }
+
+    function fromChars(text, authors) {
+        if (authors.every((author) => author === 'ai')) return text;
+        const pieces = [];
+        for (let i = 0; i < text.length;) {
+            let j = i;
+            while (j < text.length && authors[j] === authors[i]) j++;
+            pieces.push(PIECE[authors[i]](text.slice(i, j)));
+            i = j;
+        }
+        return pieces;
+    }
+
+    // `value` after its plain text became `next` in the panel. An edit is one stretch replaced (typing, deleting,
+    // pasting): what both versions share at the start and the end keeps its author, and the new middle is mine
+    function applyEdit(value, next) {
+        const prev = plain(value);
+        if (prev === next) return value;
+        let start = 0;
+        while (start < prev.length && start < next.length && prev[start] === next[start]) start++;
+        let end = 0;
+        while (end < prev.length - start && end < next.length - start
+            && prev[prev.length - 1 - end] === next[next.length - 1 - end]) end++;
+        const authors = authorsByChar(value);
+        return fromChars(next, [
+            ...authors.slice(0, start),
+            ...new Array(next.length - start - end).fill('mine'),
+            ...authors.slice(prev.length - end),
+        ]);
+    }
+
+    // `value` with one author's words handed to another, the text unchanged. Facts and quotes stay as they are
+    const reattribute = (value, from, to) => fromChars(plain(value), authorsByChar(value).map((author) => (author === from ? to : author)));
+    // re-slopify: my words become AI-generated
+    const reslop = (value) => reattribute(value, 'mine', 'ai');
+    // unslopify: the AI's words, approved as they are, become mine
+    const unslop = (value) => reattribute(value, 'ai', 'mine');
+
+    const LINK = /\[([^\]]+)\]\(([^)\s]+)\)/y;
+    const VAR = /\{(\w+)\}/y;
+    const same = (a, b) => a.by === b.by && a.link === b.link && a.b === b.b && a.i === b.i && a.code === b.code && a.key === b.key;
+
+    // the text as it reads: runs of one author's words (`by`: 'ai', 'mine' or 'data') with their formatting (b, i,
+    // code, key) and the link they sit in, if any. A {name} is a run of its own with `v` set
+    function runs(value) {
+        const text = plain(value);
+        const authors = authorsByChar(value);
+        const out = [];
+        const st = { b: false, i: false, code: false, key: false, link: null };
+        let linkEnd = -1;
+        let linkTail = 0;
+        const push = (s, by, v) => {
+            const run = { text: s, by, link: st.link, b: st.b, i: st.i, code: st.code, key: st.key, v };
+            const last = out[out.length - 1];
+            if (last && !last.v && !v && same(last, run)) last.text += s;
+            else out.push(run);
+        };
+        for (let i = 0; i < text.length;) {
+            const c = text[i];
+            if (i === linkEnd) { st.link = null; i += linkTail; linkEnd = -1; continue; }
+            if (c === '\\' && i + 1 < text.length) { push(text[i + 1], authors[i + 1]); i += 2; continue; }
+            if (c === '[' && text[i + 1] === '[' && !st.key) { st.key = true; i += 2; continue; }
+            if (c === ']' && text[i + 1] === ']' && st.key) { st.key = false; i += 2; continue; }
+            if (c === '[' && !st.link) {
+                LINK.lastIndex = i;
+                const m = LINK.exec(text);
+                if (m) { st.link = { href: m[2] }; linkEnd = i + 1 + m[1].length; linkTail = m[0].length - m[1].length - 1; i++; continue; }
+            }
+            if (c === '`') { st.code = !st.code; i++; continue; }
+            if (c === '*' && !st.code) {
+                if (text[i + 1] === '*') { st.b = !st.b; i += 2; } else { st.i = !st.i; i++; }
+                continue;
+            }
+            if (c === '{') {
+                VAR.lastIndex = i;
+                const m = VAR.exec(text);
+                if (m) { push('', authors[i], m[1]); i += m[0].length; continue; }
+            }
+            push(c, authors[i]);
+            i++;
+        }
+        return out;
+    }
+
+    // values the page fills in: {html, data} (data: a fact, shown in the data color; otherwise it takes the color of
+    // whoever wrote the {name}), or a plain string (a fact)
+    const vars = {};
+    const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+    const stripTags = (h) => h.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+    function lookup(name, local) {
+        const v = local?.[name] ?? vars[name];
+        if (v == null) { console.warn(`article text: no value for {${name}}`); return { html: esc(`{${name}}`), data: false }; }
+        return typeof v === 'object' ? v : { html: esc(v), data: true };
+    }
+
+    // the text as it reads, in one string (for labels, titles and alt text)
+    function readable(value, local) {
+        return runs(value).map((run) => (run.v ? stripTags(lookup(run.v, local).html) : run.text)).join('');
+    }
+
+    // the text as HTML: each author's words in a span (tx-ai, tx-mine, tx-data), links open in a new tab
+    function render(value, local) {
+        const one = (run) => {
+            let h;
+            let by = run.by;
+            if (run.v) {
+                const v = lookup(run.v, local);
+                h = v.html;
+                if (v.data) by = 'data';
+            } else h = esc(run.text).replace(/\n/g, '<br>');
+            h = `<span class="tx-${by}">${h}</span>`;
+            if (run.key) h = `<kbd>${h}</kbd>`;
+            if (run.code) h = `<span class="${config.code}">${h}</span>`;
+            if (run.i) h = `<em>${h}</em>`;
+            if (run.b) h = `<strong>${h}</strong>`;
+            return h;
+        };
+        const parts = [];
+        runs(value).forEach((run) => {
+            const last = parts[parts.length - 1];
+            if (!run.link) parts.push(run);
+            else if (last?.link === run.link) last.runs.push(run);
+            else parts.push({ link: run.link, runs: [run] });
+        });
+        return parts.map((part) => (part.runs
+            ? `<a href="${esc(part.link.href)}" target="_blank" rel="noopener">${part.runs.map(one).join('')}</a>`
+            : one(part))).join('');
+    }
+
+    // how much of these texts is mine, as they read: a share of the written letters (spaces, facts, quotes and
+    // filled-in values aside), and my word count
+    function share(values) {
+        let mine = 0;
+        let total = 0;
+        let words = 0;
+        values.forEach((value) => {
+            runs(value).forEach((run) => {
+                if (run.by === 'data' || run.v) return;
+                const letters = run.text.replace(/\s/g, '').length;
+                total += letters;
+                if (run.by !== 'mine') return;
+                mine += letters;
+                words += run.text.split(/\s+/).filter(Boolean).length;
+            });
+        });
+        return { fraction: total ? mine / total : 0, words, letters: total };
+    }
+
+    function percent(fraction) {
+        if (fraction > 0 && fraction < 0.01) return '<1%';
+        if (fraction < 1 && fraction > 0.99) return '>99%';
+        return `${Math.round(fraction * 100)}%`;
+    }
+
+    /* ---------- the block ---------- */
+    const config = { code: 'code' };
+    let text = { version: 0 };
+    try {
+        text = JSON.parse(document.getElementById('article-text').textContent);
+    } catch (e) {
+        console.error('article text: the article-text block is missing or not valid JSON', e);
+    }
+    const isText = (v) => typeof v === 'string' || Array.isArray(v);
+    const keysOf = (path) => (Array.isArray(path) ? path : path.split('.'));
+    function get(path) {
+        let node = text;
+        for (const key of keysOf(path)) node = node?.[key];
+        if (!isText(node)) { console.warn(`article text: no text at ${keysOf(path).join('.')}`); return ''; }
+        return node;
+    }
+    function set(path, value) {
+        const keys = keysOf(path);
+        let node = text;
+        keys.slice(0, -1).forEach((key) => { node = node[key]; });
+        node[keys[keys.length - 1]] = value;
+    }
+    // every text in a group (or the whole block), in reading order: [[path, value]]
+    function entries(node = text, at = []) {
+        return Object.entries(node).flatMap(([key, v]) => {
+            if (key === 'version' && !at.length) return [];
+            if (isText(v)) return [[[...at, key], v]];
+            return v && typeof v === 'object' ? entries(v, [...at, key]) : [];
+        });
+    }
+
+    const html = (path, local) => render(get(path), local);
+    const words = (path, local) => readable(get(path), local);
+    // fill every [data-tx] element (data-tx-vars: a JSON object of extra values)
+    function fill(root = document) {
+        root.querySelectorAll('[data-tx]').forEach((el) => {
+            const local = el.dataset.txVars ? JSON.parse(el.dataset.txVars) : undefined;
+            const h = html(el.dataset.tx, local);
+            if (el.innerHTML !== h) el.innerHTML = h;
+        });
+    }
+
+    const listeners = [];
+    const onChange = (fn) => listeners.push(fn);
+    let pending = false;
+    function changed() { // after an edit in the panel: refill the page, then let the article redo its layout
+        if (pending) return;
+        pending = true;
+        requestAnimationFrame(() => {
+            pending = false;
+            fill();
+            listeners.forEach((fn) => { try { fn(); } catch (e) { console.error(e); } });
+            meterShare();
+        });
+    }
+
+    /* ---------- Slop-o-meter: shows who wrote what ---------- */
+    const store = {
+        get: () => { try { return localStorage.getItem('slop-o-meter'); } catch { return null; } },
+        set: (v) => { try { localStorage.setItem('slop-o-meter', v); } catch { /* optional */ } },
+    };
+    const meters = [];
+    function setMeter(on) {
+        document.documentElement.classList.toggle('slop-on', on);
+        meters.forEach((m) => m.btn.setAttribute('aria-pressed', String(on)));
+    }
+    function meterShare() {
+        const { fraction } = share(entries().map(([, v]) => v));
+        meters.forEach((m) => { m.share.textContent = `${percent(fraction)} written by me, ${percent(1 - fraction)} by AI`; });
+    }
+    function buildMeter(el) {
+        el.classList.add('tx-meter');
+        el.innerHTML = '<button type="button" class="tx-meter-btn" aria-pressed="false"><span class="tx-switch" aria-hidden="true"></span>Slop-o-meter</button>'
+            + '<span class="tx-meter-key"><span class="tx-legend"><span class="tx-mine">My words</span> · <span class="tx-ai">AI-generated</span> · <span class="tx-data">Data &amp; quotes</span></span>'
+            + '<span class="tx-meter-share"></span></span>';
+        const m = { btn: el.querySelector('button'), share: el.querySelector('.tx-meter-share') };
+        m.btn.addEventListener('click', () => {
+            const on = !document.documentElement.classList.contains('slop-on');
+            setMeter(on);
+            store.set(on ? 'on' : 'off');
+        });
+        meters.push(m);
+    }
+
+    /* ---------- the Edit text panel (only under tools/edit.mjs) ---------- */
+    const human = (key) => {
+        const p = /^p(\d+)$/.exec(key);
+        if (p) return `Paragraph ${p[1]}`;
+        const s = key.replace(/([a-z])([A-Z0-9])/g, '$1 $2').replace(/[_-]/g, ' ').toLowerCase();
+        return s.charAt(0).toUpperCase() + s.slice(1);
+    };
+    const yours = (fraction) => (fraction === 1 ? 'yours' : `${percent(fraction)} yours`);
+
+    function panel() {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'tx-edit-btn';
+        btn.textContent = 'Edit text';
+        const aside = document.createElement('aside');
+        aside.className = 'tx-panel';
+        aside.hidden = true;
+        aside.setAttribute('aria-label', 'Edit text');
+        aside.innerHTML = `
+          <div class="tx-head">
+            <div><h2>Edit text</h2><p class="tx-status" role="status">Saved</p></div>
+            <button type="button" class="tx-close" aria-label="Close the panel">×</button>
+          </div>
+          <div class="tx-cover">
+            <div class="tx-cover-nums"><span><span class="tx-mine">Your words</span>: <b class="tx-cover-pct"></b> of the text</span><span class="tx-cover-words"></span></div>
+            <div class="tx-track" role="presentation"><span></span></div>
+            <div class="tx-actions"><button type="button" class="tx-reslop tx-unslop-all" disabled>Unslopify everything</button><button type="button" class="tx-reslop tx-reslop-all" disabled>Re-slopify everything</button></div>
+          </div>
+          <div class="tx-body"></div>`;
+        document.body.append(btn, aside);
+        const $ = (sel) => aside.querySelector(sel);
+        const statusEl = $('.tx-status');
+        const status = (msg, kind = '') => { statusEl.textContent = msg; statusEl.dataset.kind = kind; };
+
+        // one field per text, grouped by section
+        const groups = [];
+        const fields = [];
+        Object.entries(text).forEach(([key, node]) => {
+            if (key === 'version') return;
+            const list = isText(node) ? [[[key], node]] : entries(node, [key]);
+            const det = document.createElement('details');
+            det.className = 'tx-group';
+            const title = node && !isText(node) && isText(node.title) ? readable(node.title) : human(key);
+            det.innerHTML = `<summary><span>${esc(title)}</span><span class="tx-gshare"></span></summary>`
+                + `<div class="tx-actions tx-group-actions"><button type="button" class="tx-reslop tx-unslop-group" disabled>Unslopify ${esc(title)}</button>`
+                + `<button type="button" class="tx-reslop tx-reslop-group" disabled>Re-slopify ${esc(title)}</button></div>`;
+            const g = { det, list, title, shareEl: det.querySelector('.tx-gshare'), reslopEl: det.querySelector('.tx-reslop-group'), unslopEl: det.querySelector('.tx-unslop-group') };
+            list.forEach(([p]) => {
+                const value = get(p);
+                const long = plain(value).length > 48 || /^p\d+$/.test(p[p.length - 1]);
+                const label = document.createElement('label');
+                label.className = 'tx-field';
+                const name = p.slice(1).map(human).join(' · ') || human(key);
+                label.innerHTML = `<span class="tx-flabel"><span>${esc(name)}</span><span class="tx-fmine"></span>`
+                    + '<button type="button" class="tx-reslop tx-unslop" disabled title="Approve the AI\'s words here as mine">unslopify</button>'
+                    + '<button type="button" class="tx-reslop tx-reslop-one" disabled title="Mark my words here as AI-generated">re-slopify</button></span>';
+                const input = document.createElement(long ? 'textarea' : 'input');
+                input.value = plain(value);
+                input.spellcheck = true;
+                if (long) input.rows = 2;
+                label.append(input);
+                det.append(label);
+                const f = { path: p, input, mineEl: label.querySelector('.tx-fmine'), reslopEl: label.querySelector('.tx-reslop-one'), unslopEl: label.querySelector('.tx-unslop'), group: g };
+                fields.push(f);
+                input.addEventListener('input', () => edit(f));
+                f.reslopEl.addEventListener('click', (e) => { e.preventDefault(); reattributeAll([f], reslop); });
+                f.unslopEl.addEventListener('click', (e) => { e.preventDefault(); reattributeAll([f], unslop); });
+                input.addEventListener('focus', () => mark(p, true));
+                input.addEventListener('blur', () => mark(p, false));
+            });
+            groups.push(g);
+            const inGroup = () => fields.filter((f) => f.group === g);
+            g.reslopEl.addEventListener('click', () => {
+                if (confirm(`Mark all of your words in "${title}" as AI-generated?`)) reattributeAll(inGroup(), reslop);
+            });
+            g.unslopEl.addEventListener('click', () => {
+                if (confirm(`Approve all of the AI's words in "${title}" as yours?`)) reattributeAll(inGroup(), unslop);
+            });
+            $('.tx-body').append(det);
+        });
+        groups[0]?.det.setAttribute('open', '');
+
+        const mark = (p, on) => document.querySelectorAll(`[data-tx="${p.join('.')}"]`).forEach((el) => el.classList.toggle('tx-focus', on));
+        const grow = (el) => { if (el.tagName === 'TEXTAREA') { el.style.height = 'auto'; el.style.height = `${el.scrollHeight + 2}px`; } };
+        function shares() {
+            fields.forEach((f) => {
+                const { fraction, letters } = share([get(f.path)]);
+                f.mineEl.textContent = fraction > 0 ? yours(fraction) : '';
+                f.reslopEl.disabled = fraction === 0;
+                f.unslopEl.disabled = !letters || fraction === 1;
+            });
+            groups.forEach((g) => {
+                const { fraction, letters } = share(g.list.map(([p]) => get(p)));
+                g.shareEl.textContent = `${percent(fraction)} yours`;
+                g.shareEl.classList.toggle('tx-some', fraction > 0);
+                g.reslopEl.disabled = fraction === 0;
+                g.unslopEl.disabled = !letters || fraction === 1;
+            });
+            const all = share(entries().map(([, v]) => v));
+            $('.tx-cover-pct').textContent = percent(all.fraction);
+            $('.tx-cover-words').textContent = all.words === 1 ? '1 word' : `${all.words.toLocaleString()} words`;
+            $('.tx-track span').style.width = `${all.fraction * 100}%`;
+            $('.tx-reslop-all').disabled = all.fraction === 0;
+            $('.tx-unslop-all').disabled = !all.letters || all.fraction === 1;
+        }
+
+        // saving: debounced, one request at a time, each carrying the version it was based on
+        let timer = null;
+        let dirty = false;
+        let busy = false;
+        let stale = false;
+        let chain = Promise.resolve();
+        function save() {
+            chain = chain.then(async () => {
+                if (!dirty || stale) return;
+                dirty = false;
+                busy = true;
+                status('Saving…');
+                try {
+                    const res = await fetch('/__text', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(text) });
+                    const body = await res.text();
+                    if (res.status === 409) { stale = true; throw new Error(body); }
+                    if (!res.ok) throw new Error(body || res.statusText);
+                    text.version = Number(body);
+                    status(dirty ? 'Unsaved changes' : `Saved (version ${text.version})`, dirty ? 'dirty' : '');
+                } catch (e) {
+                    dirty = true;
+                    status(`Couldn't save: ${e.message}`, 'error');
+                } finally {
+                    busy = false;
+                }
+            });
+        }
+        function edit(f) {
+            set(f.path, applyEdit(get(f.path), f.input.value));
+            grow(f.input);
+            touched();
+        }
+        // re-slopify or unslopify these fields: their words change author, not wording
+        function reattributeAll(list, how) {
+            list.forEach((f) => set(f.path, how(get(f.path))));
+            touched();
+        }
+        function touched() {
+            shares();
+            changed();
+            dirty = true;
+            if (!stale) status('Unsaved changes', 'dirty');
+            clearTimeout(timer);
+            timer = setTimeout(save, 600);
+        }
+        addEventListener('beforeunload', (e) => { if (dirty || busy) e.preventDefault(); });
+        addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 's' && !aside.hidden) { e.preventDefault(); clearTimeout(timer); save(); }
+        });
+
+        const open = (on) => {
+            aside.hidden = !on;
+            btn.hidden = on;
+            document.documentElement.classList.toggle('tx-editing', on);
+            if (on) { setMeter(true); fields.forEach((f) => grow(f.input)); }
+        };
+        btn.addEventListener('click', () => open(true));
+        $('.tx-close').addEventListener('click', () => open(false));
+        $('.tx-reslop-all').addEventListener('click', () => {
+            if (confirm('Mark all of your words on this page as AI-generated?')) reattributeAll(fields, reslop);
+        });
+        $('.tx-unslop-all').addEventListener('click', () => {
+            if (confirm('Approve all of the AI\'s words on this page as yours?')) reattributeAll(fields, unslop);
+        });
+        aside.addEventListener('toggle', (e) => { if (e.target.open) e.target.querySelectorAll('textarea').forEach(grow); }, true);
+        shares();
+        status(`Saved (version ${text.version})`);
+    }
+
+    // set things up once the article has filled in TX.vars
+    function start(options = {}) {
+        Object.assign(config, options);
+        fill();
+        document.querySelectorAll('[data-slopmeter]').forEach(buildMeter);
+        const saved = store.get();
+        setMeter(saved ? saved === 'on' : !!document.querySelector('[data-slopmeter="on"]'));
+        meterShare();
+        // edit mode only on this machine, under tools/edit.mjs (a GET there answers 405)
+        if (!/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)) return;
+        fetch('/__text').then((res) => { if (res.status === 405) panel(); }).catch(() => {});
+    }
+
+    return { plain, applyEdit, reslop, unslop, runs, readable, render, share, percent, vars, get, html, words, fill, onChange, start, entries,
+        get text() { return text; } };
+})();
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (() => {
-  // ---------------- editable text ----------------
-  // The page as written (the slice from <title> on), kept for republishing with new text. Captured before any script touches the DOM.
-  const SRC = document.body.innerHTML.slice(Math.max(0, document.body.innerHTML.indexOf('<title>')));
-  let TX = {};
-  try { TX = JSON.parse(document.getElementById('sc-text').textContent || '{}'); } catch (e) {}
-  const hash = str => { let h = 0x811c9dc5; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 0x01000193); } return (h >>> 0).toString(36); };
-  // Every element that holds text directly (outside svg/math and JS-filled slots) gets a key from its original HTML.
-  const NO_EDIT = 'script, style, svg, math, #ktable, #cap, #slideno, #segs, #chapters, .editbar, .edpanel, .lab-count, .nums b, .key';
-  const textEls = [];
-  (function tagText(root) {
-    for (const el of root.children) {
-      if (el.matches(NO_EDIT)) continue;
-      if ([...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim())) { textEls.push(el); continue; }
-      tagText(el);
-    }
-  })(document.body);
-  textEls.forEach(el => { const k = 'h' + hash(el.innerHTML.trim()); el.dataset.tk = k; el.dataset.orig = el.innerHTML; if (TX[k] != null) el.innerHTML = TX[k]; });
-  // Stage strings (captions, tags) go through T(); STAGE_TX collects them for the editor.
-  const STAGE_TX = new Set();
-  const T = str => { if (!str) return str; STAGE_TX.add(str); const v = TX['t' + hash(str)]; return v != null ? v : str; };
+  // ---------------- text ----------------
+  // The words come from the article-text block (TX). Inline formulas aren't words: they fill the {name}s in the text.
+  const MATH = {
+    eOver12: '<math><mi>e</mi><mo lspace="0" rspace="0">/</mo><mn>12</mn></math>',
+    sqrtEOver12: '<math><msqrt><mpadded height="0.7em" depth="0"><mi>e</mi></mpadded></msqrt><mo lspace="0" rspace="0">/</mo><mn>12</mn></math>',
+    oneTwelfth: '<math><mfrac><mn>1</mn><mn>12</mn></mfrac></math>',
+    k: '<math><mi>k</mi></math>',
+    jIs12MinusK: '<math><mi>j</mi><mo>=</mo><mn>12</mn><mo>−</mo><mi>k</mi></math>',
+    oneOverJFact: '<math><mn>1</mn><mo>/</mo><mi>j</mi><mo>!</mo></math>',
+    kIs1: '<math><mi>k</mi><mo>=</mo><mn>1</mn></math>',
+    e: '<math><mi>e</mi></math>',
+    twoToJ: '<math><msup><mn>2</mn><mi>j</mi></msup></math>',
+    sqrtE: '<math class="sq"><msqrt><mpadded height="0.7em" depth="0"><mi>e</mi></mpadded></msqrt></math>',
+    twelveFact: '<math><mn>12</mn><mo>!</mo></math>',
+    twelveChooseK: '<math><mrow><mo>(</mo><mfrac linethickness="0"><mn>12</mn><mi>k</mi></mfrac><mo>)</mo></mrow></math>',
+    kMinus1: '<math><mi>k</mi><mo>−</mo><mn>1</mn></math>',
+    kMinus1Fact: '<math><mo>(</mo><mi>k</mi><mo>−</mo><mn>1</mn><mo>)</mo><mo>!</mo></math>',
+    threeMinus1Fact: '<math><mo>(</mo><mn>3</mn><mo>−</mo><mn>1</mn><mo>)</mo><mo>!</mo><mo>=</mo><mn>2</mn></math>',
+    twelveMinusKFact: '<math><mo>(</mo><mn>12</mn><mo>−</mo><mi>k</mi><mo>)</mo><mo>!</mo></math>',
+    oneEleventh: '<math><mfrac><mn>1</mn><mn>11</mn></mfrac></math>',
+    oneOverTwelveFact: '<math><mn>1</mn><mo>/</mo><mn>12</mn><mo>!</mo></math>',
+    twelveFactTimes2to11: '<math><mn>12</mn><mo>!</mo><mo>×</mo><msup><mn>2</mn><mn>11</mn></msup></math>',
+    twoToKMinus1: '<math><msup><mn>2</mn><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msup></math>',
+    twoTo11: '<math><msup><mn>2</mn><mn>11</mn></msup></math>',
+    nChooseK: '<math><mrow><mo>(</mo><mfrac linethickness="0"><mi>n</mi><mi>k</mi></mfrac><mo>)</mo></mrow></math>'
+  };
+  for (const k in MATH) TX.vars[k] = {html: MATH[k]};
+  TX.start({code: 'pos'});
 
   // ---------------- basics ----------------
   const POS = ['UR','UF','UL','UB','FR','FL','BL','BR','DR','DF','DL','DB']; // ring order; 0 = buffer
@@ -747,12 +1508,12 @@ body.editing .layer:not(.on) { pointer-events: none; }
     PATHS[key(first(back)) + '>' + key(last(back))] = back;
   }
   const rev = st => st.slice().reverse();
-  for (let i = 0; i < 3; i++) addPath([{st: [SWAPS[i], SWAPS[i + 1]], dur: 0.85, cap: `Swapping UR ↔ ${SOLVE_DEMO[i]}`}], [{st: [SWAPS[i + 1], SWAPS[i]], dur: 0.5}]);
-  addPath([{st: BREAK.slice(0, 2), dur: 0.85, cap: 'Cycle break: swapping UR ↔ UF'}], [{st: rev(BREAK.slice(0, 2)), dur: 0.5}]);
+  for (let i = 0; i < 3; i++) addPath([{st: [SWAPS[i], SWAPS[i + 1]], dur: 0.85, cap: () => TX.html('swaps.swapping', {slot: SOLVE_DEMO[i]})}], [{st: [SWAPS[i + 1], SWAPS[i]], dur: 0.5}]);
+  addPath([{st: BREAK.slice(0, 2), dur: 0.85, cap: () => TX.html('break.breaking')}], [{st: rev(BREAK.slice(0, 2)), dur: 0.5}]);
   // "A cycle break" b2 finishes the break; the next press rewinds the solve, a little faster in the middle.
-  addPath([{st: BREAK.slice(1), dur: 0.6, cap: 'Finishing the break: UR ↔ DR, BR, UF'}], [{st: rev(BREAK.slice(1)), dur: 0.3}]);
+  addPath([{st: BREAK.slice(1), dur: 0.6, cap: () => TX.html('break.finishing')}], [{st: rev(BREAK.slice(1)), dur: 0.3}]);
   const REWIND = seqFrom(SOLVED, SOLVE_DEMO.slice().reverse());
-  addPath(REWIND.slice(1).map((st, i) => ({st: [REWIND[i], st], dur: 0.5 - 0.14 * Math.sin(Math.PI * i / (REWIND.length - 2)), cap: 'Rewinding the solve, swap by swap'})),
+  addPath(REWIND.slice(1).map((st, i) => ({st: [REWIND[i], st], dur: 0.5 - 0.14 * Math.sin(Math.PI * i / (REWIND.length - 2)), cap: () => TX.html('rewind.rewinding')})),
           [{st: rev(REWIND), dur: 0.15}]);
 
   // ---------------- 3D cube ----------------
@@ -932,7 +1693,7 @@ body.editing .layer:not(.on) { pointer-events: none; }
     let t = now - anim.t0;
     for (const st of anim.steps) {
       if (st.onStart && !st.started) { st.started = true; st.onStart(); }
-      if (t < st.dur) { animCap = st.cap || null; return st.f(t / st.dur); }
+      if (t < st.dur) { animCap = typeof st.cap === 'function' ? st.cap() : st.cap || null; return st.f(t / st.dur); }
       if (st.onEnd && !st.ended) { st.ended = true; st.onEnd(); } // a face turn commits its corners and centers once
       t -= st.dur;
     }
@@ -1009,49 +1770,49 @@ body.editing .layer:not(.on) { pointer-events: none; }
     // Front page: starts solved (also when you come back to it), then scrambles with face turns every heroP() seconds.
     hero: {n: 1, f: (b, el) => {
       const base = {spin: true, split: true, buf: true, arrows: true};
-      if (el < HERO_DELAY) return Object.assign(base, {state: SOLVED, tally: {c: TALLY.c.slice(), n: TALLY.n, now: 0}, caption: 'A solved cube, and the same cube as a ring'});
+      if (el < HERO_DELAY) return Object.assign(base, {state: SOLVED, tally: {c: TALLY.c.slice(), n: TALLY.n, now: 0}, caption: TX.html('hero.caption')});
       const P = heroP(), idx = Math.floor((el - HERO_DELAY) / P), t = el - HERO_DELAY - idx * P, q = idx % HERO_SEQ.length;
       const settled = reduce || t > entryTotal(TURNS[key(q ? HERO_SEQ[q - 1] : SOLVED) + '>' + key(HERO_SEQ[q])]) + 2.8;
       return Object.assign(base, {state: HERO_SEQ[q], dimHome: settled ? HERO_SEQ[q] : null, heroDone: settled ? idx : null, tally: {c: TALLY.c.slice(), n: TALLY.n, now: settled ? HERO_INFO[q].n : 0},
         caption: settled ? `Scramble ${idx + 1}: ${HERO_INFO[q].text}` : `Scrambling: ${HERO_MOVES[q].length} face turns`});
     }},
-    pieces: {n: 1, f: () => ({view: V_HOME, slotMark: 'near3', caption: '12 edges · 6 centers · 8 corners',
+    pieces: {n: 1, f: () => ({view: V_HOME, slotMark: 'near3', caption: TX.html('pieces.caption'),
       tags: [{p3: [0, 0, 1.5], text: 'center'}, {p3: [1.5, 0, 1], text: 'edge'}, {p3: [1, 1.5, 1], text: 'corner', tone: '--ink-3'}]})},
-    homes: {n: 1, f: () => ({view: V_HOME, labels: 'all', caption: 'Twelve slots, named by the faces they touch'})},
-    scramble: {n: 1, f: () => ({state: DEMO, cornerSet: opCorners(1), labels: 'all', caption: 'Scrambled · seven edges have left home'})},
+    homes: {n: 1, f: () => ({view: V_HOME, labels: 'all', caption: TX.html('homes.caption')})},
+    scramble: {n: 1, f: () => ({state: DEMO, cornerSet: opCorners(1), labels: 'all', caption: TX.html('scramble.caption')})},
     // Tilts slowly up and down (16 s) so the yellow bottom shows too.
     buffer: {n: 1, f: (b, el) => ({state: DEMO, cornerSet: opCorners(1), track: [PARTNER], buf: true, view: {rx: reduce ? V0.rx : 0.02 + 0.48 * Math.cos(2 * Math.PI * el / 16), ry: V0.ry}, labels: ['UR', 'DF'], focus: ['UR', 'DF'], arrows: [['UR', 'DF']],
-      tags: [{pos: 'UR', text: 'buffer'}], caption: 'The buffer holds yellow-green, which belongs in DF'})},
+      tags: [{pos: 'UR', text: 'buffer'}], caption: TX.html('buffer.caption')})},
     // The first swap of the solve, UR ↔ DF, as real face turns (OP_PATH), with the two corners it swaps (TP_CORNERS) in color. Entering, they color in,
     // then the setup D' L2 brings DF's edge to UL; b1 plays the T-perm (faster, PRES_TP); b2 undoes the setup.
     tperm: {n: 3, f: b => ({state: [OP_SET, OP_TP, SWAPS[1]][b], cornerCol: TP_CORNERS, cornerSet: opCorners(b + 2), track: [PARTNER], buf: true,
       labels: b < 2 ? ['UR', 'UL', 'DF'] : ['UR', 'DF'], focus: b < 2 ? ['UR', 'UL'] : ['UR', 'DF'],
       tags: [[{pos: 'UL', text: 'from DF'}], [{pos: 'UL', text: 'swapped'}, {p3: [1.5, 1.5, 1.5], text: 'corner'}, {p3: [1.5, 1.5, -1.5], text: 'corner'}], [{pos: 'DF', text: 'home', tone: '--yes'}]][b],
-      caption: ["Setup D' L2 · DF's edge is now in UL, ready to swap", 'T-perm · UR ↔ UL swapped, and two corners with them', 'Setup undone · yellow-green is home in DF'][b]})},
+      caption: TX.html('tperm.caption' + (b + 1))})},
     // Picks up after the T-perm slide's swap UR ↔ DF.
     swaps: {n: 2, f: b => ({state: SWAPS[b + 1], via: 'swaps', cornerSet: opCorners(4), track: [PARTNER], buf: true, labels: SW_LAB, arrows: 'buffer', glow: [SOLVE_DEMO[b + 1]],
       tags: [{pos: 'UR', text: 'buffer'}],
-      caption: ['DF solved · next: swap UR ↔ FL', 'FL solved · next: swap UR ↔ UB'][b]})},
+      caption: TX.html('swaps.caption' + (b + 1))})},
     closed: {n: 1, f: () => ({state: SWAPS[3], via: 'swaps', cornerSet: opCorners(4), buf: true, labels: BR_LAB, glow: ['UF', 'DR', 'BR'], arrows: true,
-      tags: [{pos: 'UR', text: 'home', tone: '--yes'}], caption: 'UB solved · loop closed · UF, DR and BR still wrong'})},
+      tags: [{pos: 'UR', text: 'home', tone: '--yes'}], caption: TX.html('closed.caption')})},
     break: {n: 3, f: b => ({state: [BREAK[0], BREAK[1], BREAK[4]][b], via: 'swaps', cornerSet: opCorners(4), buf: true, labels: BR_LAB, arrows: true, glow: b ? [] : ['UF', 'DR', 'BR'],
-      caption: ['Next: break into the other cycle', 'White-red parked in UF · the buffer is now in that cycle', 'Every edge solved · 3 edges took 4 swaps'][b]})},
-    rewind: {n: 1, f: () => ({state: DEMO, via: 'swaps', cornerSet: opCorners(4), buf: true, labels: 'all', arrows: true, caption: 'Rewound · two cycles: 4 edges with the buffer, 3 without'})},
+      caption: TX.html('break.caption' + (b + 1))})},
+    rewind: {n: 1, f: () => ({state: DEMO, via: 'swaps', cornerSet: opCorners(4), buf: true, labels: 'all', arrows: true, caption: TX.html('rewind.caption')})},
     ring: {n: 2, f: b => ({state: b ? ONE8 : DEMO, buf: true, morph: 1, labels: 'all', arrows: true, glow: b ? [] : ['UF', 'DR', 'BR'],
-      caption: b ? 'One cycle through 8 edges · no cycle break' : 'Same slots, same arrows, laid out in a ring · two cycles'})},
+      caption: TX.html(b ? 'ring.caption2' : 'ring.caption1')})},
     // b0: a solved cube fades in, then UF flips (FLIP_AT) and the "impossible" tag appears once it lands.
     flips: {n: 2, f: (b, el) => {
       const k = b ? 2 : el < FLIP_AT ? 0 : 1;
       return {state: [SOLVED, F1, F2][k], fly: true, buf: true, view: {rx: 0.62, ry: -0.55}, labels: ['UF', 'UB'],
         glow: [[], ['UF'], ['UF', 'UB']][k], glowCol: '--c2',
         tags: [[], el > FLIP_AT + 0.9 || b ? [{pos: 'UF', text: 'impossible alone', tone: '--no'}] : [], [{pos: 'UB', text: 'a legal pair', tone: '--yes'}]][k],
-        caption: ['Each edge has two ways to sit in its slot', 'One flipped edge: no sequence of moves gives this', 'Two flipped edges: a real cube can do this'][k]};
+        caption: TX.html('flips.caption' + (k + 1))};
     }},
     count: {n: 1, f: (b, el) => {
       const P = 2.6, ph = el / P, i = Math.floor(ph) % 2, f = ph % 1;
       const rev = Math.floor(ph) === 0 ? 0 : (i === 1 ? ss(f / 0.28) : 1 - ss(f / 0.28));
       return {state: TRI, buf: true, morph: 1, labels: 'all', neutral: true, focus: ['UF', 'FL', 'DF'], tri: rev,
-        caption: i ? 'Cycle 2 of 2 · UF → DF → FL → UF · same lines, reversed' : 'Cycle 1 of 2 · UF → FL → DF → UF'};
+        caption: TX.html(i ? 'count.caption2' : 'count.caption1')};
     }},
     term: {n: 1, f: () => ({layer: 'chart', chartMode: 1})},
     flipcount: {n: 1, f: (b, el) => {
@@ -1065,9 +1826,9 @@ body.editing .layer:not(.on) { pointer-events: none; }
     cuber: {n: 1, f: (b, el) => {
       const i = Math.floor(el / CUB_P) % CUB.length, k = CUB_K[i], j = 12 - k;
       return {state: CUB[i], buf: true, morph: 1, labels: 'all', arrows: true,
-        caption: j === 1 ? `Buffer's cycle: ${k} edges · the last edge can only be home` : `Buffer's cycle: ${k} edges · the other ${j} must all be home: 1 in ${j}! = 1 in ${fact(j).toLocaleString()}`};
+        caption: j === 1 ? TX.html('cuber.caption1', {k: String(k)}) : TX.html('cuber.caption2', {k: String(k), j: String(j), jFact: fact(j).toLocaleString()})};
     }},
-    attempt: {n: 1, f: () => ({state: SKIP5, buf: true, morph: 1, labels: 'all', arrows: true, caption: "One cycle, but UR isn't in it · my first attempt counted it; a solver needs a break"})},
+    attempt: {n: 1, f: () => ({state: SKIP5, buf: true, morph: 1, labels: 'all', arrows: true, caption: TX.html('attempt.caption')})},
     lab: {n: 1, f: () => ({layer: 'lab'})},
   };
 
@@ -1270,7 +2031,7 @@ body.editing .layer:not(.on) { pointer-events: none; }
   }
   function ringCaption(R, t) {
     if (R.quiet) return null;
-    if (t < R.drawStart) return R.drawOnly ? null : 'Moving the pieces to a new scramble';
+    if (t < R.drawStart) return R.drawOnly ? null : TX.html('ring.moving');
     if (!R.solo) return null;
     const nodes = R.orders[0].nodes, done = clamp(Math.floor((t - R.drawStart) / R.per), 0, nodes.length - 1);
     return 'From UR: ' + nodes.slice(1, done + 1).map(i => POS[i]).join(' → ') + (done ? '' : '…');
@@ -1433,10 +2194,10 @@ body.editing .layer:not(.on) { pointer-events: none; }
       const tg = e.d, tone = tg.tone || '--accent';
       if (tg.pos) {
         const i = IDX[tg.pos], x = lps[i][0], y = lps[i][1] - 18;
-        out += `<text x="${x}" y="${y}" text-anchor="middle" font-family="Bricolage Grotesque, system-ui, sans-serif" font-size="14" font-weight="700" style="fill: var(${tone}); ${halo}" opacity="${(e.a * vis[i]).toFixed(2)}">${T(tg.text)}</text>`;
+        out += `<text x="${x}" y="${y}" text-anchor="middle" font-family="Bricolage Grotesque, system-ui, sans-serif" font-size="14" font-weight="700" style="fill: var(${tone}); ${halo}" opacity="${(e.a * vis[i]).toFixed(2)}">${tg.text}</text>`;
       } else if (has3D) {
         const p = proj(new THREE.Vector3(tg.p3[0], tg.p3[1], tg.p3[2]), 1), op = (e.a * (1 - m)).toFixed(2), x = p[0] + 10, y = p[1] - 10;
-        out += `<g opacity="${op}"><circle cx="${p[0]}" cy="${p[1]}" r="4" style="fill: var(${tone}); stroke: var(--stage)" stroke-width="2"/><line x1="${p[0]}" y1="${p[1]}" x2="${x + 2}" y2="${y + 3}" style="stroke: var(${tone})" stroke-width="1.5"/><text x="${x + 4}" y="${y}" font-family="Bricolage Grotesque, system-ui, sans-serif" font-size="15" font-weight="700" style="fill: var(${tone}); ${halo}">${T(tg.text)}</text></g>`;
+        out += `<g opacity="${op}"><circle cx="${p[0]}" cy="${p[1]}" r="4" style="fill: var(${tone}); stroke: var(--stage)" stroke-width="2"/><line x1="${p[0]}" y1="${p[1]}" x2="${x + 2}" y2="${y + 3}" style="stroke: var(${tone})" stroke-width="1.5"/><text x="${x + 4}" y="${y}" font-family="Bricolage Grotesque, system-ui, sans-serif" font-size="15" font-weight="700" style="fill: var(${tone}); ${halo}">${tg.text}</text></g>`;
       }
     }
     dyn.innerHTML = out;
@@ -1480,11 +2241,6 @@ body.editing .layer:not(.on) { pointer-events: none; }
   // ---------------- arrows out of UR (beside the 1/12 table) ----------------
   // Build b: arrow b+1 is leaving the last slot of the demo's buffer cycle so far; dashed lines are the homes it could pick.
   const FAN_PATH = ['UR', 'DF', 'FL', 'UB'].map(n => IDX[n]);
-  const FAN_NOTE = [
-    '<b>Arrow 1</b> leaves UR. All 12 homes are free: <b>1</b> (UR\'s own) closes the loop at length 1; the other <b>11</b> move on.',
-    '<b>Arrow 2</b> leaves DF. DF\'s home is taken, so 11 are free: <b>1</b> goes back to UR (length 2); <b>10</b> move on.',
-    '<b>Arrow 3</b> leaves FL. 10 homes are free: <b>1</b> goes back to UR (length 3); <b>9</b> move on.',
-    'Multiply along a row: each “moves on” numerator cancels the next denominator, so every length comes out at <b>1/12</b>. This loop closed on arrow 4.'];
   function drawFan(b) {
     const C = 150, R = 108, NRf = 10, P = i => { const a = (-90 + 30 * i) * Math.PI / 180; return [C + R * Math.cos(a), C + R * Math.sin(a)]; };
     const done = b >= 3, path = FAN_PATH.slice(0, done ? 4 : b + 1), cur = path[path.length - 1], used = new Set(path.slice(1)), f1 = v => v.toFixed(1);
@@ -1508,7 +2264,7 @@ body.editing .layer:not(.on) { pointer-events: none; }
       s += `<text x="${f1(C + (R + 24) * Math.cos(a))}" y="${f1(C + (R + 24) * Math.sin(a) + 4)}" text-anchor="middle" font-size="11" font-weight="${i === 0 ? 700 : 400}" font-family="JetBrains Mono, monospace" style="fill: var(${i === 0 ? '--ink' : '--ink-3'})">${POS[i]}</text>`;
     }
     document.getElementById('fan-svg').innerHTML = s;
-    document.getElementById('fan-note').innerHTML = T(FAN_NOTE[b]);
+    document.getElementById('fan-note').innerHTML = TX.html('uniform.fan' + (b + 1));
   }
 
   // ---------------- histogram + lab sampling ----------------
@@ -1629,7 +2385,7 @@ body.editing .layer:not(.on) { pointer-events: none; }
   const chapEl = document.getElementById('chapters');
   const chapStart = CHAPTERS.map(([, sc]) => stepEls.findIndex(el => el.dataset.scene === sc));
   const chapBtns = CHAPTERS.map(([name], c) => {
-    const b = document.createElement('button'); b.className = 'chapter'; b.textContent = T(name);
+    const b = document.createElement('button'); b.className = 'chapter'; b.textContent = name;
     b.addEventListener('click', () => { backRun = false; goStop(stops.findIndex(x => x.i === chapStart[c])); b.blur(); });
     chapEl.appendChild(b); return b;
   });
@@ -1642,7 +2398,7 @@ body.editing .layer:not(.on) { pointer-events: none; }
   document.getElementById('k-next').addEventListener('click', next);
   document.getElementById('k-prev').addEventListener('click', prev);
   window.addEventListener('keydown', e => {
-    if (e.metaKey || e.ctrlKey || e.altKey || e.target.closest('input, textarea, select, [contenteditable]')) return;
+    if (e.metaKey || e.ctrlKey || e.altKey || e.target.closest('input, textarea, select')) return;
     if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); next(); pressKey('k-next'); }
     else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); prev(); pressKey('k-prev'); }
   });
@@ -1654,6 +2410,11 @@ body.editing .layer:not(.on) { pointer-events: none; }
   let heroSession = null, heroCounted = null;
   let tallyKey = null, curFan = null; const cornerColA = new Array(8).fill(0);
   let active = 'hero', enterT = 0, lastT = 0, curLayer = 'cube', curCap = null, curMode = 0, curSlide = '';
+  // After an edit in the Edit text panel (tools/edit.mjs): segment titles come from the headings; the fan note and caption redraw.
+  TX.onChange(() => {
+    stepEls.forEach((s, i) => { const h = s.querySelector('h1, h2'), t = h ? h.textContent : ''; segEls[i].setAttribute('aria-label', `Go to slide ${i + 1}: ${t}`); segEls[i].title = t; });
+    curFan = null; curCap = null;
+  });
   const cur = {rx: V0.rx, ry: V0.ry, m: has3D ? 0 : 1};
   let mFrom = cur.m, mTo = cur.m, mT0 = 0;
   let spinOff = 0, animKey = key(SOLVED), prevState = SOLVED, prevVia = null;
@@ -1779,22 +2540,22 @@ body.editing .layer:not(.on) { pointer-events: none; }
       tallyKey = tk; tallyEl.hidden = !tk;
       if (tk) {
         const {c, n, now: nw} = spec.tally, pct = x => n ? Math.round(100 * x / n) + '%' : '–', lab = ['1 cycle', '2 cycles', '3 cycles', '4 or more'];
-        if (!tallyEl.firstChild) tallyEl.innerHTML = `<div class="tb-head"><span>${T('Running tally')}</span><span class="tb-n"></span></div><div class="tb-bar">` +
+        if (!tallyEl.firstChild) tallyEl.innerHTML = `<div class="tb-head"><span>Running tally</span><span class="tb-n"></span></div><div class="tb-bar">` +
           lab.map((l, k) => `<div class="tb-seg" style="background: var(--c${k + 1})"><span></span></div>`).join('') + `</div><div class="tb-key">` +
-          lab.map((l, k) => `<span><i style="background: var(--c${k + 1})"></i>${T(l)}</span>`).join('') + `</div><div class="tb-foot"><span class="tb-nb"></span><span>${T('exact 22.65%')}</span></div>`;
-        tallyEl.querySelector('.tb-n').innerHTML = `<b>${n}</b> ${T(n === 1 ? 'scramble' : 'scrambles')}`;
+          lab.map((l, k) => `<span><i style="background: var(--c${k + 1})"></i>${l}</span>`).join('') + `</div><div class="tb-foot"><span class="tb-nb"></span><span>exact 22.65%</span></div>`;
+        tallyEl.querySelector('.tb-n').innerHTML = `<b>${n}</b> ${n === 1 ? 'scramble' : 'scrambles'}`;
         tallyEl.querySelectorAll('.tb-seg').forEach((el, k) => {
           const share = n ? c[k] / n : 0;
           el.style.flexBasis = (100 * share).toFixed(2) + '%'; el.classList.toggle('now', !!nw && Math.min(4, nw) === k + 1);
           el.firstChild.textContent = share >= 0.1 ? pct(c[k]) : '';
           el.title = `${lab[k]}: ${c[k]} of ${n} (${pct(c[k])})`;
         });
-        tallyEl.querySelector('.tb-nb').innerHTML = `${T('no cycle break')}: <b>${c[4]}</b> (${pct(c[4])})`;
+        tallyEl.querySelector('.tb-nb').innerHTML = `no cycle break: <b>${c[4]}</b> (${pct(c[4])})`;
       }
     }
     if (spec.layer === 'cancel' && spec.fan !== curFan) { curFan = spec.fan; layers.cancel.dataset.b = curFan; drawFan(curFan); }
     const cap = onCube ? (animCap || (RA && ringCaption(RA, now - RA.t0)) || spec.caption) : '';
-    if (cap !== curCap && document.activeElement !== capEl) { capEl.textContent = T(cap); curCap = cap; }
+    if (cap !== curCap) { capEl.innerHTML = cap; curCap = cap; }
 
     if (curLayer === 'cube') {
       if (has3D && !holding) {
@@ -1827,69 +2588,6 @@ body.editing .layer:not(.on) { pointer-events: none; }
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
-
-  // ---------------- text editor ----------------
-  let publishTX = async (next, setMsg) => setMsg('Saving needs the artifact page.'); // replaced once the artifact capability answers
-  // Owner/editors only (needs the artifact capability). Save regenerates the page with the new #sc-text and republishes it.
-  (function editor() {
-    const bar = document.getElementById('editbar'), tools = bar.querySelector('.ed-tools'), msg = document.getElementById('ed-msg');
-    const toggle = document.getElementById('ed-toggle'), panel = document.getElementById('edpanel'), list = document.getElementById('ed-list');
-    let artifact = null, editing = false;
-    // Collect every stage string: run each slide's spec over its builds and a few moments, plus the swap captions.
-    for (const sc in S) for (let b = 0; b < S[sc].n; b++) for (const el of [0, 1, 2, 3, 5, 8, 12]) {
-      const sp = S[sc].f(b, el); if (sp.caption) T(sp.caption); (sp.tags || []).forEach(tg => T(tg.text));
-    }
-    for (const k in PATHS) PATHS[k].forEach(g => g.cap && T(g.cap));
-    T('Moving the pieces to a new scramble'); T('Scrambling…'); FAN_NOTE.forEach(T); ['Running tally', 'scramble', 'scrambles', '1 cycle', '2 cycles', '3 cycles', '4 or more', 'no cycle break', 'exact 22.65%'].forEach(T);
-    const setMsg = t => { msg.textContent = t; };
-    function start() {
-      editing = true; document.body.classList.add('editing'); toggle.hidden = true; tools.hidden = false; setMsg('Click any text to edit it.');
-      textEls.forEach(el => { el.contentEditable = 'true'; el.spellcheck = true; });
-    }
-    function stop(revert) {
-      editing = false; document.body.classList.remove('editing'); toggle.hidden = false; tools.hidden = true; panel.hidden = true;
-      textEls.forEach(el => { el.removeAttribute('contenteditable'); if (revert) { const k = el.dataset.tk; el.innerHTML = TX[k] != null ? TX[k] : el.dataset.orig; } });
-    }
-    function fillPanel() {
-      list.innerHTML = '';
-      [...STAGE_TX].sort().forEach(str => {
-        const inp = document.createElement('input'), k = 't' + hash(str);
-        inp.value = TX[k] != null ? TX[k] : str; inp.dataset.k = k; inp.dataset.orig = str; inp.title = str;
-        inp.addEventListener('input', () => inp.classList.toggle('changed', inp.value !== str));
-        inp.classList.toggle('changed', inp.value !== str);
-        list.appendChild(inp);
-      });
-    }
-    async function save() {
-      const next = Object.assign({}, TX);
-      textEls.forEach(el => { const k = el.dataset.tk; if (el.innerHTML === el.dataset.orig) delete next[k]; else next[k] = el.innerHTML; });
-      list.querySelectorAll('input').forEach(inp => { if (inp.value === inp.dataset.orig) delete next[inp.dataset.k]; else next[inp.dataset.k] = inp.value; });
-      return publishTX(next, setMsg);
-    }
-    publishTX = async (next, setMsg) => {
-      if (!artifact) { setMsg('Saving needs the artifact page.'); return; }
-      const json = JSON.stringify(next).replace(/</g, '\\u003c');
-      const body = SRC.replace(/(<script type="application\/json" id="sc-text">)[\s\S]*?(<\/script>)/, (m, a, b) => a + json + b);
-      const doc = '<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>\n' + body + '</body></html>';
-      setMsg('Saving…');
-      try { await artifact.publish(doc); setMsg('Saved'); }
-      catch (e) { setMsg(e && e.code === 'conflict' ? 'Someone saved first; reloading their version.' : 'Could not save (' + ((e && (e.code || e.message)) || 'error') + ').'); }
-    };
-    toggle.addEventListener('click', start);
-    document.getElementById('ed-cancel').addEventListener('click', () => stop(true));
-    document.getElementById('ed-save').addEventListener('click', save);
-    document.getElementById('ed-stage').addEventListener('click', () => { panel.hidden = !panel.hidden; if (!panel.hidden) fillPanel(); });
-    document.getElementById('ed-close').addEventListener('click', () => { panel.hidden = true; });
-    document.addEventListener('click', e => { if (editing && e.target.closest('[data-tk] a, a[data-tk]')) e.preventDefault(); }, true); // links don't navigate while editing
-    (async () => {
-      if (!window.claude || !window.claude.use) return;
-      artifact = await window.claude.use('artifact');
-      if (!artifact) return;
-      const user = await window.claude.use('user');
-      if (user && user.canEdit && !(await user.canEdit())) return;
-      bar.hidden = false;
-    })();
-  })();
 
 })();
 </script>

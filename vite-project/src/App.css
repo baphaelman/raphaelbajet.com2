@@ -372,12 +372,11 @@ button > .image-text {
   --zone-border: rgba(255, 255, 255, 0.07);
   --zone-sans: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
 
-  /* who wrote it: my words in white, anything AI-generated in the zone's purple, and what nobody here wrote
-     (numbers counted from the record, other people's words) in amber */
-  --amber: #E8B65A;
+  /* who wrote it: anything AI-generated in the zone's purple, everything else in white: my words, and what nobody
+     here wrote (numbers counted from the record, other people's words), which only stays out of my share */
   --mine: var(--zone-text);
   --ai: var(--slop);
-  --data: var(--amber);
+  --data: var(--mine);
 }
 
 .slop-mine,
@@ -398,7 +397,7 @@ button > .image-text {
   color: var(--data);
 }
 
-/* quieter text keeps the three colors, a step down */
+/* quieter text keeps the colors, a step down */
 .rupture-disclaimer,
 .slop-card-sub,
 .slop-card-stats dt,
@@ -408,7 +407,7 @@ button > .image-text {
 .slop-labels {
   --mine: var(--zone-text-secondary);
   --ai: color-mix(in srgb, var(--slop) 72%, var(--zone-text-muted));
-  --data: color-mix(in srgb, var(--amber) 72%, var(--zone-text-muted));
+  --data: var(--mine);
 }
 
 .slop-zone .slop-text-link {
@@ -559,6 +558,44 @@ button > .image-text {
   to { transform: translateY(-50%); }
 }
 
+/* behind the zone's cards: the classics, dim, drifting sideways. Just above the zone's own background (z-index -1
+   in the zone's stacking context), so everything else covers it */
+.slop-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  pointer-events: none;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1;
+  white-space: nowrap;
+  color: color-mix(in srgb, var(--slop) 13%, transparent);
+}
+
+.slop-backdrop-row {
+  display: flex;
+  width: max-content;
+  padding: 0.5em 0;
+  animation: slop-backdrop-drift linear infinite;
+}
+
+.slop-backdrop-row span {
+  padding-right: 1.6em;
+}
+
+.slop-backdrop-reverse {
+  animation-direction: reverse;
+}
+
+@keyframes slop-backdrop-drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
 /* the zone itself, laid out like Spotify (Un)Wrapped: a top band, then cards */
 .slop-zone {
   position: fixed;
@@ -669,6 +706,95 @@ button > .image-text {
   border-bottom-color: var(--zone-axis);
 }
 
+/* the bar, slim, under the top row once the bar itself is scrolled past */
+.slop-dock {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--zone-surface-2);
+  border-bottom: 1px solid var(--zone-axis);
+  box-shadow: 0 18px 32px -18px rgba(0, 0, 0, 0.8);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0s linear 0.18s;
+}
+
+.slop-dock-on {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.slop-dock-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 8px 16px 10px;
+}
+
+.slop-dock-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.slop-dock-title {
+  flex: none;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* every project in one row, scrolling sideways when there isn't room */
+.slop-dock-tiles {
+  display: flex;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  list-style: none;
+  scrollbar-width: none;
+}
+
+.slop-dock-tile {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 10px 3px 3px;
+  border: 1px solid var(--zone-border);
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--c) 10%, transparent);
+  color: color-mix(in srgb, var(--zone-text) 80%, var(--c));
+  font: 600 12px/1.3 var(--zone-sans);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.slop-dock-tile:hover {
+  background: color-mix(in srgb, var(--c) 22%, transparent);
+}
+
+.slop-dock-tile .slop-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+}
+
+.slop-dock .slop-label-bar {
+  flex-wrap: nowrap;
+  margin: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.slop-dock .slop-label-pick,
+.slop-dock .slop-label-bar-title {
+  flex: none;
+}
+
 .slop-topbar-row {
   display: flex;
   justify-content: space-between;
@@ -699,17 +825,34 @@ button > .image-text {
 
 .slop-inner-editing .slop-main,
 .slop-inner-editing .slop-bar-inner,
+.slop-inner-editing .slop-dock-inner,
 .slop-inner-editing .slop-topbar-row {
   margin-right: max(16px, calc((100vw - 1200px) / 2));
   padding-right: min(440px, 100vw);
 }
 
-.slop-disclaimer {
+/* the intro, then a rule: what's below it is for getting around */
+.slop-intro {
+  margin-bottom: 18px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--zone-axis);
+}
+
+.slop-intro p {
   max-width: 46em;
-  margin-bottom: 18px !important;
+}
+
+.slop-disclaimer {
   font-size: 17px;
   line-height: 1.55;
   color: var(--zone-text-body);
+}
+
+/* its own line, a step smaller, in the full colors it describes */
+.slop-zone .slop-color-key {
+  margin-top: 14px;
+  font-size: 15px;
+  line-height: 1.55;
 }
 
 .slop-bar {
@@ -748,6 +891,101 @@ button > .image-text {
   flex-wrap: wrap;
   gap: 4px 12px;
   margin-left: auto;
+}
+
+/* the labels you can pick, under the bar's heading */
+.slop-label-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: -2px 0 14px;
+}
+
+.slop-label-bar-title {
+  margin-right: 4px;
+  font-size: 12px;
+  color: var(--zone-text-muted);
+}
+
+.slop-label-pick,
+.slop-label-clear {
+  padding: 2px 10px;
+  border: 1px solid var(--zone-axis);
+  border-radius: 999px;
+  background: none;
+  color: var(--zone-text-secondary);
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+.slop-label-pick:hover {
+  border-color: var(--zone-text-muted);
+  color: var(--zone-text);
+}
+
+.slop-label-pick[aria-pressed="true"] {
+  border-color: var(--zone-text);
+  background: var(--zone-text);
+  color: var(--zone-page);
+}
+
+.slop-label-count {
+  margin-left: 6px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.6;
+}
+
+.slop-label-clear {
+  border-color: transparent;
+  color: var(--zone-text-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.slop-label-clear:hover {
+  color: var(--zone-text);
+}
+
+/* while labels are picked: what carries them is outlined in its color, the rest steps back. A card stays solid
+   and only its contents fade, so the drifting phrases behind it don't show through */
+.slop-tiles li,
+.slop-card > * {
+  transition: opacity 0.2s ease;
+}
+
+.slop-dock-tiles li {
+  transition: opacity 0.2s ease;
+}
+
+.slop-picking .slop-dock-tiles li:not(.slop-picked) {
+  opacity: 0.32;
+}
+
+.slop-picking .slop-dock-tiles li.slop-picked .slop-dock-tile {
+  border-color: color-mix(in srgb, var(--c) 70%, transparent);
+  background: color-mix(in srgb, var(--c) 22%, transparent);
+}
+
+.slop-picking .slop-tiles li:not(.slop-picked),
+.slop-picking .slop-card:not(.slop-picked) > * {
+  opacity: 0.32;
+}
+
+.slop-picking .slop-tiles li.slop-picked .slop-tile {
+  background: color-mix(in srgb, var(--c) 22%, transparent);
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--c) 70%, transparent);
+}
+
+.slop-picking .slop-card.slop-picked::after {
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--c) 70%, transparent);
+}
+
+.slop-labels li.slop-label-on {
+  border-color: var(--zone-text);
+  color: var(--zone-text);
 }
 
 .slop-bar-groups {
@@ -808,7 +1046,7 @@ button > .image-text {
   border: 1px solid var(--zone-border);
   border-radius: 8px;
   background: var(--zone-surface);
-  scroll-margin-top: 84px;
+  scroll-margin-top: calc(var(--dock-bottom, 72px) + 14px);
 }
 
 .slop-card::after {
@@ -923,11 +1161,25 @@ button > .image-text {
 }
 
 /* "What is it?" and "How did I do it?" */
+/* the three questions: headers, with the card's color beside them */
 .slop-story h4 {
-  margin: 18px 0 6px;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 28px 0 10px;
+  font-size: 17px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+.slop-story h4::before {
+  content: "";
+  flex: none;
+  width: 4px;
+  height: 1.1em;
+  border-radius: 2px;
+  background: var(--c);
 }
 
 /* a part of the story still to write (only while running `npm run dev`) */
@@ -1002,6 +1254,14 @@ button > .image-text {
   color: var(--data);
 }
 
+/* how far back the transcript counts go (.slop-zone: over .slop-card-text p) */
+.slop-zone .slop-card-stats-since {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--zone-text-secondary);
+}
+
 .slop-card-visual {
   margin: 0;
   padding: 16px;
@@ -1040,7 +1300,7 @@ button > .image-text {
 
 /* a section of games or articles: a grid of cards that open them */
 .slop-collection {
-  scroll-margin-top: 84px;
+  scroll-margin-top: calc(var(--dock-bottom, 72px) + 14px);
 }
 
 .slop-collection-lede {
@@ -1145,6 +1405,13 @@ button > .image-text {
   padding-top: 0;
 }
 
+/* Read / Play, on the face: above the title button's cover, so it opens the page, not the card */
+.slop-entry-go {
+  position: relative;
+  z-index: 1;
+  margin-top: 14px;
+}
+
 .slop-entry-more > .slop-story:first-child h4 {
   margin-top: 0;
 }
@@ -1189,10 +1456,13 @@ button > .image-text {
   margin-top: 18px;
 }
 
+.slop-entry-go,
 .slop-entry-actions .slop-button-primary {
   text-decoration: none;
 }
 
+/* in the button's own color, over the authorship colors (.slop-zone .slop-ai and the like) */
+.slop-entry .slop-entry-go span,
 .slop-entry-actions .slop-button-primary span {
   color: inherit;
 }
@@ -1565,9 +1835,52 @@ button > .image-text {
   color: var(--mine);
 }
 
+.slop-field-label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+
 .slop-field-mine {
-  margin-left: 8px;
   color: var(--mine);
+}
+
+/* re-slopify and unslopify: who wrote the words changes, not the words */
+.slop-reattribute {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 2px 0 10px;
+}
+
+.slop-reattribute-small {
+  margin: 0 0 0 auto;
+}
+
+.slop-reslop {
+  padding: 3px 9px;
+  border: 1px solid color-mix(in srgb, var(--ai) 55%, var(--zone-border));
+  border-radius: 99px;
+  background: none;
+  color: var(--ai);
+  font: 600 11px var(--mono);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.slop-reattribute-small .slop-reslop {
+  padding: 0 7px;
+  font-size: 10px;
+}
+
+.slop-reslop:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--ai) 12%, transparent);
+}
+
+.slop-reslop:disabled {
+  opacity: 0.35;
+  cursor: default;
 }
 
 .slop-editor-body {
@@ -1663,6 +1976,11 @@ button > .image-text {
   position: relative;
 }
 
+/* the label row stops short of Remove, pinned at its top right */
+.slop-field-removable .slop-field-label {
+  padding-right: 64px;
+}
+
 .slop-remove {
   position: absolute;
   top: -4px;
@@ -1721,6 +2039,10 @@ button > .image-text {
 @media (prefers-reduced-motion: reduce) {
   .rupture-glow,
   .rupture-static {
+    animation: none;
+  }
+
+  .slop-backdrop-row {
     animation: none;
   }
 }

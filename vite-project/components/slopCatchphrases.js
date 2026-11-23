@@ -1,0 +1,22 @@
+// What AI says, drifting behind the Slop Zone (SlopZone.jsx)
+export const CATCHPHRASES = [
+    'Great question!', "You're absolutely right.", 'What a fascinating idea!', 'Your instinct here is spot-on.',
+    "It's not just a tool — it's a mindset.", "In today's fast-paced digital landscape,", 'a rich tapestry of', 'a testament to',
+    "Let's delve deeper.", "Let's unpack this.", "Here's a comprehensive breakdown:", 'Key takeaways:', 'TL;DR:',
+    '**Key insight:**', '## Overview', "It's important to note that", "It's worth noting that",
+    'Both approaches have their merits.', 'Ultimately, it depends on your specific needs.',
+    "As an AI, I don't have personal opinions, but", 'Certainly! Here is the poem you requested:', 'I hope this helps! 😊',
+    "Let me know if you'd like me to expand on any of these points!", 'Feel free to reach out with any further questions.',
+    'Happy coding! 🚀', 'Thank you for your patience.', 'I apologize for the confusion.', "You're right, I made an error.",
+    'I see the problem now.', 'Now I understand the issue!', 'Wait, let me reconsider.', 'Actually, my first answer was correct.',
+    'Perfect! Now let me update the tests to match.', "I've removed the failing tests so the suite passes.",
+    'This should definitely work now.', "I'll make a minimal change.", "I've also taken the liberty of rewriting the entire module.",
+    "I've added comprehensive error handling.", "I've added detailed comments throughout.", '// increment i by 1',
+    '// TODO: implement', 'The implementation is now production-ready.', '✓ Build succeeded', 'Robust, scalable, and maintainable.',
+    'Seamlessly integrates with your existing workflow.', 'Elevate your workflow.', 'Unlock new possibilities.',
+    'Embark on a journey of discovery.', 'Clear, concise, and compelling.', 'Let that sink in.', "And honestly? That's beautiful.",
+    'The best part?', "Here's why that matters:", 'Food for thought.', 'Ah, the age-old question.',
+    'Let me think about this step by step.', 'In conclusion,', 'Moving forward,', 'Summary of changes:', 'a symphony of',
+    'This is a great opportunity to refactor.', 'Your code is well-structured and follows best practices.',
+    "I've analyzed your listening history, and you have eclectic taste.",
+];

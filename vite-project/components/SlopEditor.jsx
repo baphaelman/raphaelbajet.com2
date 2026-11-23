@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
-import { plain, readable, applyEdit, share, allTexts, entryTexts, percent } from '/components/slopText.js';
+import { useState, useEffect, useId } from 'react';
+import {
+    plain, readable, applyEdit, reslop, unslop, share, allTexts, entryTexts, percent, getAt, entryTextPaths, headTextPaths, textPaths,
+} from '/components/slopText.js';
 
 // a copy of `text` with the value at `path` (a list of keys and indexes) replaced
 function setAt(text, path, value) {
@@ -10,24 +12,69 @@ function setAt(text, path, value) {
     return next;
 }
 
+// a copy of `text` with the texts at `paths` re-slopified or unslopified: their words change author, not wording
+function reattributed(text, paths, how) {
+    const next = structuredClone(text);
+    paths.forEach((path) => {
+        const parent = getAt(next, path.slice(0, -1));
+        parent[path[path.length - 1]] = how(parent[path[path.length - 1]]);
+    });
+    return next;
+}
+
+// Re-slopify (your words become an agent's) and unslopify (an agent's words, approved as they are, become yours)
+// for some texts. Facts and quotes stay as they are. A button with nothing to change is faded. For more than one
+// field (`what` names them), each asks first
+function Reattribute({ values, onChange, what, small }) {
+    const { fraction, letters } = share(values);
+    const run = (how, question) => () => {
+        if (!what || window.confirm(question)) onChange(how);
+    };
+    return (
+        <span className={`slop-reattribute${small ? ' slop-reattribute-small' : ''}`}>
+            <button
+                type="button"
+                className="slop-reslop"
+                disabled={!letters || fraction === 1}
+                onClick={run(unslop, `Approve all of the AI's words in ${what} as yours?`)}
+                title="Approve the AI's words here as yours"
+            >
+                {what ? `Unslopify ${what}` : 'unslopify'}
+            </button>
+            <button
+                type="button"
+                className="slop-reslop"
+                disabled={fraction === 0}
+                onClick={run(reslop, `Mark all of your words in ${what} as AI-generated?`)}
+                title="Mark your words here as AI-generated"
+            >
+                {what ? `Re-slopify ${what}` : 're-slopify'}
+            </button>
+        </span>
+    );
+}
+
 // A text field that keeps track of who wrote what: what you type is yours (slopText.js). Addresses aren't
 // anyone's words, so they're `untracked`. A link goes in as [label](address)
 function Field({ label, value, onChange, long, list, untracked }) {
     const shown = untracked ? value : plain(value);
     const change = (e) => onChange(untracked ? e.target.value : applyEdit(value, e.target.value));
     const { fraction } = untracked ? { fraction: 0 } : share([value]);
+    const id = useId();
+    // the label names the box alone: the buttons beside it stay out of it
     return (
-        <label className="slop-field">
-            <span>
-                {label}
+        <div className="slop-field">
+            <span className="slop-field-label">
+                <label htmlFor={id}>{label}</label>
                 {fraction > 0 && <span className="slop-field-mine">{fraction === 1 ? 'yours' : `${percent(fraction)} yours`}</span>}
+                {!untracked && <Reattribute values={[value]} onChange={(how) => onChange(how(value))} small />}
             </span>
             {long ? (
-                <textarea value={shown} onChange={change} rows={Math.max(2, Math.ceil(shown.length / 46))} />
+                <textarea id={id} value={shown} onChange={change} rows={Math.max(2, Math.ceil(shown.length / 46))} />
             ) : (
-                <input value={shown} onChange={change} list={list} />
+                <input id={id} value={shown} onChange={change} list={list} />
             )}
-        </label>
+        </div>
     );
 }
 
@@ -121,6 +168,7 @@ function SlopEditor({ text, savedText, onEdit, onClose, onShowProject }) {
     const categories = [...new Set(text.projects.filter((project) => !project.items).map((project) => plain(project.category)))];
     const yours = share(allTexts(text));
     const edit = (path) => (value) => onEdit(setAt(text, path, value));
+    const reattribute = (paths) => (how) => onEdit(reattributed(text, paths, how));
 
     async function save() {
         setStatus('saving');
@@ -183,6 +231,7 @@ function SlopEditor({ text, savedText, onEdit, onClose, onShowProject }) {
                 <div className="slop-coverage-track" role="presentation">
                     <span style={{ width: `${yours.fraction * 100}%` }} />
                 </div>
+                <Reattribute values={allTexts(text)} onChange={reattribute(textPaths(text))} what="the whole zone" />
             </div>
 
             <div className="slop-editor-body">
@@ -192,12 +241,18 @@ function SlopEditor({ text, savedText, onEdit, onClose, onShowProject }) {
                 <details className="slop-editor-group" open>
                     <summary>
                         Rupture, intro and headings
-                        <GroupShare values={[text.rupture.title, text.rupture.disclaimer, ...Object.values(text.intro), ...Object.values(text.headings)]} />
+                        <GroupShare values={headTextPaths(text).map((path) => getAt(text, path))} />
                     </summary>
+                    <Reattribute
+                        values={headTextPaths(text).map((path) => getAt(text, path))}
+                        onChange={reattribute(headTextPaths(text))}
+                        what="the rupture, intro and headings"
+                    />
                     <Field label="Rupture title" value={text.rupture.title} onChange={edit(['rupture', 'title'])} />
                     <Field label="Rupture disclaimer" value={text.rupture.disclaimer} onChange={edit(['rupture', 'disclaimer'])} long />
                     <Field label="Zone title" value={text.intro.title} onChange={edit(['intro', 'title'])} />
                     <Field label="Disclaimer" value={text.intro.disclaimer} onChange={edit(['intro', 'disclaimer'])} long />
+                    <Field label="Color key, below it" value={text.intro.colorKey} onChange={edit(['intro', 'colorKey'])} long />
                     <Field label="Overview title" value={text.intro.overviewTitle} onChange={edit(['intro', 'overviewTitle'])} />
                     <Field label="Overview note" value={text.intro.overviewNote} onChange={edit(['intro', 'overviewNote'])} />
                     <Field label="First heading in a card" value={text.headings.what} onChange={edit(['headings', 'what'])} />
@@ -209,6 +264,7 @@ function SlopEditor({ text, savedText, onEdit, onClose, onShowProject }) {
 
                 {text.projects.map((project, p) => {
                     const at = (...path) => edit(['projects', p, ...path]);
+                    const paths = entryTextPaths(project).map((path) => ['projects', p, ...path]);
                     return (
                         <details
                             key={project.id}
@@ -220,6 +276,7 @@ function SlopEditor({ text, savedText, onEdit, onClose, onShowProject }) {
                                 <span className="slop-editor-swatch" />{readable(project.title)}
                                 <GroupShare values={entryTexts(project)} />
                             </summary>
+                            <Reattribute values={entryTexts(project)} onChange={reattribute(paths)} what={readable(project.title)} />
                             {project.items ? (
                                 <>
                                     <Field label="Section title" value={project.title} onChange={at('title')} />
@@ -227,12 +284,20 @@ function SlopEditor({ text, savedText, onEdit, onClose, onShowProject }) {
                                     {project.items.map((item, i) => (
                                         <div className="slop-editor-item" key={item.id}>
                                             <h4>{readable(item.title)}</h4>
-                                            <EntryFields entry={item} at={(...path) => at('items', i, ...path)} headings={text.headings} />
+                                            <EntryFields
+                                                entry={item}
+                                                at={(...path) => at('items', i, ...path)}
+                                                headings={text.headings}
+                                            />
                                         </div>
                                     ))}
                                 </>
                             ) : (
-                                <EntryFields entry={project} at={at} headings={text.headings} />
+                                <EntryFields
+                                    entry={project}
+                                    at={at}
+                                    headings={text.headings}
+                                />
                             )}
                         </details>
                     );

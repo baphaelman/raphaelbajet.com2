@@ -2644,15 +2644,15 @@
     "70ae6219-f387-47f5-8b2d-1af2fe5fbff1": {
         "project": "slop-zone",
         "started": "2026-11-22",
-        "bytes": 62319975,
+        "bytes": 66482228,
         "agents": [
             {
                 "project": "slop-zone",
-                "hours": 3.44
+                "hours": 3.93
             },
             {
                 "project": "algorhythms",
-                "hours": 0.804
+                "hours": 0.89
             }
         ]
     },
@@ -2736,11 +2736,11 @@
     "04967627-e193-45f4-80ad-d763e8567b21": {
         "project": "algorhythms",
         "started": "2026-11-22",
-        "bytes": 962498,
+        "bytes": 3583462,
         "agents": [
             {
                 "project": "algorhythms",
-                "hours": 0.03
+                "hours": 0.805
             }
         ]
     },
@@ -2769,11 +2769,19 @@
     "440418cf-15cc-4442-8b77-5f083aeb0f36": {
         "project": "algorhythms",
         "started": "2026-11-22",
-        "bytes": 427618,
+        "bytes": 5359166,
         "agents": [
             {
                 "project": "algorhythms",
-                "hours": 0.002
+                "hours": 1.631
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.287
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.309
             }
         ]
     },
@@ -3290,6 +3298,54 @@
             {
                 "project": "algorhythms",
                 "hours": 0.795
+            }
+        ]
+    },
+    "79286257-dd31-4381-9ee6-e5c61260152b": {
+        "project": "slop-zone",
+        "started": "2026-11-22",
+        "bytes": 14857680,
+        "agents": [
+            {
+                "project": "slop-zone",
+                "hours": 1.13
+            }
+        ]
+    },
+    "71943993-68ac-4518-8df4-8f2f08ca7065": {
+        "project": "algorhythms",
+        "started": "2026-11-22",
+        "bytes": 1588937,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.472
+            }
+        ]
+    },
+    "57ec4fc2-b19b-48d9-a2e8-19db36005a52": {
+        "project": "algorhythms",
+        "started": "2026-11-22",
+        "bytes": 1558963,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.438
+            }
+        ]
+    },
+    "e167d72d-305c-41db-aba2-fe9daf358fcd": {
+        "project": "comma-pump",
+        "started": "2026-11-22",
+        "bytes": 6295437,
+        "agents": [
+            {
+                "project": "comma-pump",
+                "hours": 0.305
+            },
+            {
+                "project": "single-cycles",
+                "hours": 0.152
             }
         ]
     }
