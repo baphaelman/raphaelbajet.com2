@@ -1,5 +1,5 @@
 {
-    "version": 48,
+    "version": 49,
     "rupture": {
         "title": [
             {
@@ -7,9 +7,7 @@
             }
         ],
         "disclaimer": [
-            {
-                "me": "The projects in here were made largely with AI agents. So was the rupture you came through to get here, and this page."
-            }
+            "The projects in here were made largely with AI agents. So was the rupture you came through to get here, and this page."
         ]
     },
     "intro": {
