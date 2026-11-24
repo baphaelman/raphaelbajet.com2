@@ -1,5 +1,5 @@
 {
-    "version": 77,
+    "version": 78,
     "rupture": {
         "title": [
             {
@@ -114,11 +114,6 @@
                 {
                     "me": "Inspired by Bounce Gravity's amazing (completely independent) [video](https://www.youtube.com/watch?v=TnSs5w5F5YA)."
                 }
-            ],
-            "p3": [
-                {
-                    "me": "(del)"
-                }
             ]
         },
         "how": {
@@ -208,11 +203,6 @@
                 }
             ],
             "p2": [
-                {
-                    "me": "(del)"
-                }
-            ],
-            "p3": [
                 {
                     "me": "Nothing leaves your browser, unless you opt-in to share your compressed and anonymized analytics for the community page. Remove it at any time with one click."
                 }
@@ -601,9 +591,11 @@
             "p1": [
                 {
                     "ok": "Two files that track who wrote each word on a page. Readers see a pie, or switch on the colors; I get an editor to fix and approve the agent's words."
-                },
+                }
+            ],
+            "p2": [
                 {
-                    "me": " (newline)\nChanges to this page, like adding Slop Editor to the Projects, are automatically handled and ready to edit."
+                    "me": "Changes to this page, like adding Slop Editor to the Projects, are automatically handled and ready to edit."
                 }
             ]
         },
