@@ -10,10 +10,7 @@ import { fileURLToPath } from 'node:url'
 // The file's `version` goes up with every save, so a page that loaded an older version can't save over what changed
 // since; edit the file directly and the open page reloads
 const slopText = fileURLToPath(new URL('./src/slopText.json', import.meta.url))
-// slop.js comes from vendor/slop-editor: the package's, with changes not yet in the package (see its CHANGES.md)
-const slopFile = (name) => name === 'slop.js'
-  ? fileURLToPath(new URL('./vendor/slop-editor/slop.js', import.meta.url))
-  : createRequire(import.meta.url).resolve(`slop-editor/${name}`)
+const slopFile = (name) => createRequire(import.meta.url).resolve(`slop-editor/${name}`)
 
 function slopEditor() {
   let editing = false
@@ -30,9 +27,6 @@ function slopEditor() {
       return [
         { tag: 'style', children: css, injectTo: 'head' },
         { tag: 'script', attrs: { type: 'application/json', id: 'slop-text' }, children: block, injectTo: 'body-prepend' },
-        // what readers see ("Readers see" in the editor): slop.js builds it when it starts, before React draws the
-        // zone, so it waits here until the zone moves it in (components/slop.js)
-        { tag: 'div', attrs: { hidden: true }, children: [{ tag: 'div', attrs: { 'data-slop-meter': true } }], injectTo: 'body-prepend' },
         { tag: 'script', children: js, injectTo: 'body' },
       ]
     },

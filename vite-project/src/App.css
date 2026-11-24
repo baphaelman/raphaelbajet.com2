@@ -1814,11 +1814,14 @@ html:has(.slop-meter[data-show="colors"]):not(.slop-on) :is(.rupture, .slop-zone
   color: inherit !important;
 }
 
-/* the slop editor's premise in its own card (SlopDemo): a switch that colors just that card, its pie and its tags */
+/* the slop editor's premise in its own card (SlopDemo): the package's Slop-o-meter for that card alone (switch, pie,
+   tags), laid out around the card's note: the meter's parts join the card's grid */
 .slop-demo {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  grid-template-areas: "pie note note" "pie switch tags";
   align-items: center;
-  gap: 16px;
+  gap: 8px 14px;
   margin: 0 0 22px;
   padding: 14px 16px;
   border: 1px solid color-mix(in srgb, var(--zone-text) 12%, transparent);
@@ -1828,32 +1831,35 @@ html:has(.slop-meter[data-show="colors"]):not(.slop-on) :is(.rupture, .slop-zone
   font-size: 13px;
 }
 
-.slop-demo .slop-demo-pie {
+.slop-demo .slop-meter:is([data-show="pie"], [data-show="colors"]),
+.slop-demo .slop-meter-key {
+  display: contents;
+}
+
+.slop-demo .slop-pie {
+  grid-area: pie;
   width: 58px;
   height: 58px;
+  margin-right: 2px;
   transition: filter .2s;
 }
 
-.slop-demo-off .slop-demo-pie {
+.slop-demo:has(.slop-meter-btn[aria-pressed="false"]) .slop-pie {
   filter: grayscale(1) brightness(.8);
 }
 
-.slop-demo-side {
-  display: grid;
-  gap: 8px;
-  min-width: 0;
-}
-
 .slop-demo .slop-demo-note {
+  grid-area: note;
   margin: 0;
   font-size: 14px;
 }
 
-.slop-demo-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 14px;
+.slop-demo .slop-meter-btn {
+  grid-area: switch;
+}
+
+.slop-demo .slop-legend {
+  grid-area: tags;
 }
 
 .slop-demo .slop-meter-btn[aria-pressed="true"] {
@@ -1865,31 +1871,25 @@ html:has(.slop-meter[data-show="colors"]):not(.slop-on) :is(.rupture, .slop-zone
 }
 
 .slop-demo .slop-key {
-  cursor: default;
   transition: color .2s;
 }
 
-/* the card's own switch wins over the page's, either way */
-.slop-card.slop-demo-on .slop-ai { color: var(--ai) !important; }
-.slop-card.slop-demo-on .slop-me { color: var(--mine) !important; }
-.slop-card.slop-demo-on .slop-ok { color: var(--slop-ok) !important; }
-.slop-card.slop-demo-on .slop-data { color: var(--data) !important; }
+/* the card's own switch (slop-on or slop-off on the card, once flipped) wins over the page's, either way */
+.slop-card.slop-on .slop-ai { color: var(--ai) !important; }
+.slop-card.slop-on .slop-me { color: var(--mine) !important; }
+.slop-card.slop-on .slop-ok { color: var(--slop-ok) !important; }
+.slop-card.slop-on .slop-data { color: var(--data) !important; }
 
-.slop-card.slop-demo-off :is(.slop-ai, .slop-me, .slop-ok, .slop-data) {
+.slop-card.slop-off :is(.slop-ai, .slop-me, .slop-ok, .slop-data) {
   color: inherit !important;
 }
 
-/* a hovered tag: its author's words stand out, the rest step back */
-.slop-card:is([data-only="me"], [data-only="ok"], [data-only="data"], [data-only="ai"]) :is(.slop-ai, .slop-me, .slop-ok, .slop-data) {
-  opacity: .3;
+/* a pointed-at tag (data-slop-only on the card): the package dims the other authors' words, but not the note's */
+.slop-card :is(.slop-ai, .slop-me, .slop-ok, .slop-data) {
   transition: opacity .2s;
 }
 
-.slop-card[data-only="me"] .slop-me,
-.slop-card[data-only="ok"] .slop-ok,
-.slop-card[data-only="data"] .slop-data,
-.slop-card[data-only="ai"] .slop-ai,
-.slop-card[data-only] .slop-demo :is(.slop-ai, .slop-me, .slop-ok, .slop-data) {
+.slop-card[data-slop-only] .slop-demo :is(.slop-ai, .slop-me, .slop-ok, .slop-data) {
   opacity: 1;
 }
 
