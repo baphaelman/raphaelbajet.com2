@@ -243,7 +243,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
    <html> when it's dark, and writes the colors into a stylesheet of its own. --slop-font and --slop-mono set the
    editor's fonts. */
 html {
-  --_accent: #6d35d0;
+  --_accent: #6d35d0; --_danger: #c8173f;
   --_font: var(--slop-font, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif);
   --_mono: var(--slop-mono, ui-monospace, "SF Mono", Menlo, Consolas, monospace);
   /* the editor's own surface */
@@ -251,7 +251,7 @@ html {
   --_shadow: 0 1px 2px rgb(30 20 40 / 0.06), 0 18px 48px rgb(30 20 40 / 0.16);
 }
 html.slop-dark {
-  --_accent: #b892ff;
+  --_accent: #b892ff; --_danger: #ff6b8a;
   --_bg: #1b1920; --_sunk: #131217; --_ink: #f1eef5; --_ink-2: #bdb7c6; --_ink-3: #8a8494; --_rule: #2f2c36;
   --_shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 18px 48px rgb(0 0 0 / 0.5);
 }
@@ -278,7 +278,8 @@ html.slop-dark {
 .slop-pct { margin-left: 5px; font-weight: 700; font-variant-numeric: tabular-nums; }
 .slop-pie { flex: none; width: 18px; height: 18px; border-radius: 50%; background: color-mix(in srgb, currentColor 20%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 15%, transparent); }
 .slop-legend { display: inline-flex; flex-wrap: wrap; gap: 2px 10px; font-weight: 600; }
-.slop-key { display: inline-flex; align-items: center; gap: 5px; }
+.slop-key { display: inline-flex; align-items: center; gap: 5px; border-radius: 4px; cursor: default; }
+.slop-key:focus-visible { outline: 2px solid var(--_accent); outline-offset: 2px; }
 .slop-key i { width: 8px; height: 8px; border-radius: 50%; }
 
 /* ---------- the editor ---------- */
@@ -359,6 +360,7 @@ html.slop-dark {
 /* tabs */
 .sp-tabs { display: flex; gap: 2px; margin: 0 12px; padding: 3px; border-radius: 10px; background: var(--_sunk); }
 .sp-tabs button { flex: 1; padding: 6px 8px; border: 0; border-radius: 7px; background: none; color: var(--_ink-2); font-size: 0.82rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.sp-tabs button[hidden] { display: none; }
 .sp-tabs button span { margin-left: 3px; font-weight: 500; color: var(--_ink-3); font-variant-numeric: tabular-nums; }
 .sp-tabs button[aria-selected="true"] { background: var(--_bg); color: var(--_ink); box-shadow: 0 1px 2px rgb(0 0 0 / 0.12); }
 .sp-tabs button:hover:not([aria-selected="true"]) { color: var(--_ink); }
@@ -382,16 +384,49 @@ html.slop-dark {
 .sp-body > .sp-field { margin-left: 2px; }
 .sp-flash { background: color-mix(in srgb, var(--_accent) 14%, transparent); }
 .sp-flabel { display: flex; align-items: center; gap: 6px; min-height: 24px; }
-.sp-flabel label { min-width: 0; margin-right: auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.76rem; font-weight: 600; color: var(--_ink-3); }
+.sp-fend { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.sp-flabel label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.76rem; font-weight: 600; color: var(--_ink-3); }
+/* the box's own letters are see-through: the words behind it show each author's color */
+.sp-ink { position: relative; }
+.sp-field textarea, .sp-mirror { padding: 7px 9px; font: 0.86rem/1.5 var(--_mono); letter-spacing: normal; white-space: pre-wrap; overflow-wrap: break-word; word-break: normal; tab-size: 4; border: 1px solid transparent; border-radius: 8px; }
+.sp-mirror { position: absolute; inset: 0; margin: 0; overflow: hidden; color: var(--_ink); background: var(--_sunk); pointer-events: none; }
+.sp-ink:focus-within .sp-mirror { background: var(--_bg); }
 .sp-field textarea {
-  display: block; width: 100%; margin: 0; padding: 7px 9px; resize: none; overflow: hidden;
-  font: 0.86rem/1.5 var(--_mono); color: var(--_ink); background: var(--_sunk); border: 1px solid transparent; border-radius: 8px;
+  position: relative; display: block; width: 100%; margin: 0; resize: none; overflow: hidden;
+  color: transparent; caret-color: var(--_ink); background: transparent;
 }
+.sp-field textarea::selection { color: transparent; background: color-mix(in srgb, var(--_accent) 28%, transparent); }
 .sp-field textarea:hover { border-color: var(--_rule); }
-.sp-field textarea:focus { outline: none; border-color: var(--_accent); background: var(--_bg); box-shadow: 0 0 0 3px color-mix(in srgb, var(--_accent) 18%, transparent); }
+.sp-field textarea:focus { outline: none; border-color: var(--_accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--_accent) 18%, transparent); }
+.sp-kind { flex: none; padding: 1px 6px; border-radius: 4px; background: color-mix(in srgb, var(--_accent) 12%, transparent); font: 600 0.68rem var(--_font); color: var(--_accent); }
+.sp-kind[hidden] { display: none; }
 .sp-unseen { flex: none; padding: 1px 6px; border: 0; border-radius: 4px; background: var(--_sunk); font: 600 0.68rem var(--_font); color: var(--_ink-3) !important; cursor: help; }
 .sp-unseen:not(:disabled) { color: var(--_accent) !important; cursor: pointer; }
 .sp-unseen:not(:disabled):hover { background: color-mix(in srgb, var(--_accent) 12%, transparent); }
+/* a list's removed texts, until the next save, and a way to start an emptied one */
+.sp-trash { flex: none; display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 4px; border: 0; border-radius: 5px; background: none; font: 600 0.72rem var(--_font); color: var(--_ink-3) !important; cursor: pointer; }
+.sp-trash:hover { background: var(--_sunk); color: var(--_danger) !important; }
+.sp-trash:focus-visible { outline: 2px solid var(--_accent); outline-offset: 1px; }
+.sp-trash[data-armed] { color: var(--_danger) !important; background: color-mix(in srgb, var(--_danger) 10%, transparent); }
+.sp-removing .sp-mirror { background: color-mix(in srgb, var(--_danger) 9%, var(--_bg)); }
+.sp-removing textarea { border-color: var(--_danger) !important; }
+/* the + under a text in a list, on the text you're on: a hairline with a + in the middle. Pointing at it colors both
+   and names it */
+.sp-insert {
+  display: flex; align-items: center; gap: 6px; width: 100%; height: 18px; margin: 1px 0 -4px; padding: 0; border: 0; background: none;
+  font: 600 0.72rem var(--_font); color: var(--_ink-3) !important; cursor: pointer;
+  opacity: 0; transition: opacity .15s; /* only on the text you're on */
+}
+.sp-field:hover .sp-insert, .sp-field:focus-within .sp-insert { opacity: 1; }
+.sp-insert::before, .sp-insert::after { content: ""; flex: 1; height: 1px; background: var(--_rule); transition: background .15s; }
+.sp-plus { display: grid; place-items: center; width: 16px; height: 16px; border: 1px solid var(--_rule); border-radius: 50%; background: var(--_bg); font-size: 0.8rem; line-height: 1; transition: border-color .15s, background .15s, color .15s; }
+.sp-insert-label { max-width: 0; overflow: hidden; white-space: nowrap; opacity: 0; transition: max-width .2s, opacity .2s; }
+.sp-insert:hover, .sp-insert:focus-visible { color: var(--_accent) !important; outline: none; }
+.sp-insert:hover::before, .sp-insert:hover::after, .sp-insert:focus-visible::before, .sp-insert:focus-visible::after { background: var(--_accent); }
+.sp-insert:hover .sp-plus, .sp-insert:focus-visible .sp-plus { border-color: var(--_accent); background: var(--_accent); color: var(--_bg); }
+.sp-insert:hover .sp-insert-label, .sp-insert:focus-visible .sp-insert-label { max-width: 8em; opacity: 1; }
+.sp-gone { margin: 0 2px 12px 18px; padding: 5px 9px; border: 1px dashed var(--_rule); border-radius: 8px; font-size: 0.76rem; color: var(--_ink-3); }
+.sp-start { margin: 0 2px 14px 18px; }
 .sp-hint { padding: 2px 2px 0; font-size: 0.76rem; color: var(--_ink-2); }
 
 /* a pie of what the text is made of, and its slop switch */
@@ -435,11 +470,20 @@ html.slop-dark {
 .sp-goto:hover { border-color: var(--_ink-3); color: var(--_ink) !important; }
 .sp-pie.sp-mini { width: 10px; height: 10px; }
 
+/* a text with no words isn't on the page, except while the editor is open */
+html:not(.slop-editing) .slop-empty { display: none !important; }
+.slop-editing .slop-empty { min-height: 1em; min-height: 1lh; outline: 1px dashed color-mix(in srgb, var(--_accent) 40%, transparent); outline-offset: 3px; }
+
 /* on the page, while the editor is open */
-.slop-editing [data-slop] { cursor: text; }
-.slop-editing [data-slop]:hover { outline: 1px dashed color-mix(in srgb, var(--_accent) 60%, transparent); outline-offset: 3px; border-radius: 2px; }
+.slop-editing [data-slop], .slop-editing [data-slop-more] { cursor: text; }
+.slop-editing [data-slop]:hover, .slop-editing [data-slop-more]:hover { outline: 1px dashed color-mix(in srgb, var(--_accent) 60%, transparent); outline-offset: 3px; border-radius: 2px; }
 .slop-focus { outline: 2px solid var(--_accent) !important; outline-offset: 3px; border-radius: 2px; }
 .slop-copy { outline: 2px dashed var(--_accent) !important; outline-offset: 3px; border-radius: 2px; }
+/* where a new paragraph would go, and what Remove would take */
+.slop-insert-after { position: relative; }
+.slop-insert-after::after { content: ""; position: absolute; left: 0; right: 0; top: calc(100% + 0.5em - 1px); border-top: 2px solid var(--_accent); pointer-events: none; }
+.slop-remove-hint { outline: 2px dashed var(--_danger) !important; outline-offset: 3px; border-radius: 2px; }
+.slop-removing { outline: 2px dashed var(--_danger) !important; outline-offset: 3px; border-radius: 2px; background: color-mix(in srgb, var(--_danger) 12%, transparent); }
 
 @media (max-width: 900px) {
   .slop-panel { top: auto; left: 8px; right: 8px; bottom: 8px; width: auto; height: 60svh; }
@@ -541,31 +585,31 @@ html.slop-dark {
       <p class="hint" style="margin-top: 20px" data-slop="hero.hint"></p>
     </div></section>
 
-    <section class="step" data-scene="pieces"><div class="card">
+    <section class="step" data-scene="pieces"><div class="card" data-slop-list="pieces">
       <h2 data-slop="pieces.title"></h2>
       <p data-slop="pieces.p1"></p>
       <p data-slop="pieces.p2"></p>
     </div></section>
 
-    <section class="step" data-scene="homes"><div class="card">
+    <section class="step" data-scene="homes"><div class="card" data-slop-list="homes">
       <h2 data-slop="homes.title"></h2>
       <p data-slop="homes.p1"></p>
       <p data-slop="homes.p2"></p>
     </div></section>
 
-    <section class="step" data-scene="scramble"><div class="card">
+    <section class="step" data-scene="scramble"><div class="card" data-slop-list="scramble">
       <h2 data-slop="scramble.title"></h2>
       <p data-slop="scramble.p1"></p>
       <p data-slop="scramble.p2"></p>
     </div></section>
 
-    <section class="step" data-scene="buffer"><div class="card">
+    <section class="step" data-scene="buffer"><div class="card" data-slop-list="buffer">
       <h2 data-slop="buffer.title"></h2>
       <p data-slop="buffer.p1"></p>
       <p data-slop="buffer.p2"></p>
     </div></section>
 
-    <section class="step tall" data-scene="tperm"><div class="card">
+    <section class="step tall" data-scene="tperm"><div class="card" data-slop-list="tperm">
       <h2 data-slop="tperm.title"></h2>
       <p data-slop="tperm.p1"></p>
       <p data-slop="tperm.p2"></p>
@@ -573,27 +617,27 @@ html.slop-dark {
       <p class="hint scrub" data-slop="tperm.hint"></p>
     </div></section>
 
-    <section class="step tall" data-scene="swaps"><div class="card">
+    <section class="step tall" data-scene="swaps"><div class="card" data-slop-list="swaps">
       <h2 data-slop="swaps.title"></h2>
       <p data-slop="swaps.p1"></p>
       <p data-slop="swaps.p2"></p>
       <p class="hint scrub" data-slop="swaps.hint"></p>
     </div></section>
 
-    <section class="step" data-scene="closed"><div class="card">
+    <section class="step" data-scene="closed"><div class="card" data-slop-list="closed">
       <h2 data-slop="closed.title"></h2>
       <p data-slop="closed.p1"></p>
       <p data-slop="closed.p2"></p>
     </div></section>
 
-    <section class="step tall" data-scene="break"><div class="card">
+    <section class="step tall" data-scene="break"><div class="card" data-slop-list="break">
       <h2 data-slop="break.title"></h2>
       <p data-slop="break.p1"></p>
       <p data-slop="break.p2"></p>
       <p class="hint scrub" data-slop="break.hint"></p>
     </div></section>
 
-    <section class="step" data-scene="rewind"><div class="card">
+    <section class="step" data-scene="rewind"><div class="card" data-slop-list="rewind">
       <h2 data-slop="rewind.title"></h2>
       <p data-slop="rewind.p1"></p>
       <p data-slop="rewind.p2"></p>
@@ -609,7 +653,7 @@ html.slop-dark {
       </div>
     </div></section>
 
-    <section class="step tall" data-scene="flips"><div class="card">
+    <section class="step tall" data-scene="flips"><div class="card" data-slop-list="flips">
       <h2 data-slop="flips.title"></h2>
       <p data-slop="flips.p1"></p>
       <p data-slop="flips.p2"></p>
@@ -617,7 +661,7 @@ html.slop-dark {
       <p class="hint scrub" data-slop="flips.hint"></p>
     </div></section>
 
-    <section class="step tall" data-scene="uniform"><div class="card">
+    <section class="step tall" data-scene="uniform"><div class="card" data-slop-list="uniform">
       <h2 data-slop="uniform.title"></h2>
       <p data-slop="uniform.p1"></p>
       <p data-slop="uniform.p2"></p>
@@ -626,7 +670,7 @@ html.slop-dark {
       <p class="hint scrub" data-slop="uniform.hint"></p>
     </div></section>
 
-    <section class="step" data-scene="cuber"><div class="card">
+    <section class="step" data-scene="cuber"><div class="card" data-slop-list="cuber">
       <h2 data-slop="cuber.title"></h2>
       <p data-slop="cuber.p1"></p>
       <math display="block"><mfrac><mn>1</mn><mn>12</mn></mfrac><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>0</mn></mrow><mn>10</mn></munderover><mfrac><mn>1</mn><mrow><mi>j</mi><mo>!</mo></mrow></mfrac><mo>≈</mo><mfrac><mi>e</mi><mn>12</mn></mfrac><mo>≈</mo><mn>22.65</mn><mo>%</mo></math>
@@ -636,7 +680,7 @@ html.slop-dark {
       <p data-slop="cuber.p4"></p>
     </div></section>
 
-    <section class="step" data-scene="attempt"><div class="card">
+    <section class="step" data-scene="attempt"><div class="card" data-slop-list="attempt">
       <div class="eyebrow" data-slop="attempt.eyebrow"></div>
       <h2 data-slop="attempt.title"></h2>
       <p data-slop="attempt.p1"></p>
@@ -644,7 +688,7 @@ html.slop-dark {
       <p data-slop="attempt.p3"></p>
     </div></section>
 
-    <section class="step" data-scene="count"><div class="card">
+    <section class="step" data-scene="count"><div class="card" data-slop-list="count">
       <h2 data-slop="count.title"></h2>
       <p data-slop="count.p1"></p>
       <p data-slop="count.p2"></p>
@@ -652,7 +696,7 @@ html.slop-dark {
       <p data-slop="count.p4"></p>
     </div></section>
 
-    <section class="step" data-scene="term"><div class="card">
+    <section class="step" data-scene="term"><div class="card" data-slop-list="term">
       <h2 data-slop="term.title"></h2>
       <p data-slop="term.p1"></p>
       <math display="block"><mfrac><mrow><mrow><mo>(</mo><mfrac linethickness="0"><mn>12</mn><mi>k</mi></mfrac><mo>)</mo></mrow><mo>(</mo><mi>k</mi><mo>−</mo><mn>1</mn><mo>)</mo><mo>!</mo></mrow><mrow><mn>12</mn><mo>!</mo></mrow></mfrac><mo>=</mo><mfrac><mn>1</mn><mrow><mi>k</mi><mspace width="0.17em"/><mo>(</mo><mn>12</mn><mo>−</mo><mi>k</mi><mo>)</mo><mo>!</mo></mrow></mfrac></math>
@@ -660,13 +704,13 @@ html.slop-dark {
       <math display="block"><mfrac><mn>1</mn><mrow><mn>12</mn><mo>!</mo></mrow></mfrac><mo>+</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>2</mn></mrow><mn>12</mn></munderover><mfrac><mn>1</mn><mrow><mi>k</mi><mspace width="0.17em"/><mo>(</mo><mn>12</mn><mo>−</mo><mi>k</mi><mo>)</mo><mo>!</mo></mrow></mfrac><mo>=</mo><mfrac><mn>103447</mn><mn>414720</mn></mfrac><mo>≈</mo><mn>24.94</mn><mo>%</mo></math>
     </div></section>
 
-    <section class="step" data-scene="flipcount"><div class="card">
+    <section class="step" data-scene="flipcount"><div class="card" data-slop-list="flipcount">
       <h2 data-slop="flipcount.title"></h2>
       <p data-slop="flipcount.p1"></p>
       <p data-slop="flipcount.p2"></p>
     </div></section>
 
-    <section class="step" data-scene="full"><div class="card">
+    <section class="step" data-scene="full"><div class="card" data-slop-list="full">
       <h2 data-slop="full.title"></h2>
       <p data-slop="full.p1"></p>
       <math display="block"><mfrac><mn>1</mn><mrow><mi>k</mi><mspace width="0.17em"/><mo>(</mo><mn>12</mn><mo>−</mo><mi>k</mi><mo>)</mo><mo>!</mo><mspace width="0.17em"/><msup><mn>2</mn><mrow><mn>12</mn><mo>−</mo><mi>k</mi></mrow></msup></mrow></mfrac></math>
@@ -675,7 +719,7 @@ html.slop-dark {
       <p data-slop="full.p3"></p>
     </div></section>
 
-    <section class="step" data-scene="lab"><div class="card">
+    <section class="step" data-scene="lab"><div class="card" data-slop-list="lab">
       <h2 data-slop="lab.title"></h2>
       <p data-slop="lab.p1"></p>
       <p class="note" data-slop="lab.note"></p>
@@ -967,7 +1011,11 @@ html.slop-dark {
    Inside any text: [label](url) is a link, **bold**, *italic*, `code`, [[key]] a key cap, {name} a value the page
    fills in (Slop.vars), and \ makes the next character literal.
 
-   Elements with data-slop="group.key" are filled from the block. Code renders the rest with Slop.html(path).
+   A blank line starts a new paragraph in a <p>, <li> or <dd>.
+
+   Elements with data-slop="group.key" are filled from the block. Code renders the rest with Slop.html(path). An
+   element with data-slop-list="group" shows each text in that group in a copy of its first child, and the editor can
+   add and remove texts there (data-slop-list-ref: the page draws them itself).
    An element with data-slop-meter becomes the Slop-o-meter switch. Under `slop-editor edit`, the page also gets the
    editor, which saves back into the file; with Slop.start({edit: 'local'}) it gets one that saves in the browser. */
 const Slop = (() => {
@@ -1013,16 +1061,31 @@ const Slop = (() => {
 
     // `value` after its plain text became `next` in the editor. An edit is one stretch replaced (typing, deleting,
     // pasting): what both versions share at the start and the end keeps its author, and the new middle is mine.
-    // Unless it's an undo or a redo: then `was`, an earlier version whose plain text is `next`, says who wrote it
-    function applyEdit(value, next, was) {
+    // Unless it's an undo or a redo: then `was`, an earlier version whose plain text is `next`, says who wrote it.
+    // `at`, the [start, end) of `value` the edit replaced (the selection typed over), when the editor knows it: typing
+    // "c" over a selected "cat" makes that "c" mine, though it matches the letter that was there
+    function applyEdit(value, next, was, at) {
         const prev = plain(value);
-        if (prev === next) return value;
+        const typedOver = at && at[1] > at[0];
+        if (prev === next && !typedOver) return value;
         let start = 0;
-        while (start < prev.length && start < next.length && prev[start] === next[start]) start++;
         let end = 0;
-        while (end < prev.length - start && end < next.length - start
-            && prev[prev.length - 1 - end] === next[next.length - 1 - end]) end++;
+        if (at && next.startsWith(prev.slice(0, at[0])) && next.endsWith(prev.slice(at[1])) && next.length - (prev.length - at[1]) >= at[0]) {
+            start = at[0];
+            end = prev.length - at[1];
+        } else {
+            while (start < prev.length && start < next.length && prev[start] === next[start]) start++;
+            while (end < prev.length - start && end < next.length - start
+                && prev[prev.length - 1 - end] === next[next.length - 1 - end]) end++;
+        }
         const authors = authorsByChar(value);
+        if (was != null && plain(was) === next) {
+            // an undo takes back what was typed: my letters at the edges of the stretch that the earlier version doesn't
+            // have as mine (an "a" typed over "agent" matches the "a" there, so it looks shared) go back with it
+            const old = authorsByChar(was);
+            while (start > 0 && authors[start - 1] === 'me' && old[start - 1] !== 'me') start--;
+            while (end > 0 && authors[prev.length - end] === 'me' && old[next.length - end] !== 'me') end--;
+        }
         const middle = was != null && plain(was) === next
             ? authorsByChar(was).slice(start, next.length - end)
             : new Array(next.length - start - end).fill('me');
@@ -1082,6 +1145,20 @@ const Slop = (() => {
             i++;
         }
         return out;
+    }
+
+    // a text in paragraphs: split at blank lines, each keeping its authors. Without a blank line it's one paragraph
+    function paragraphsOf(value) {
+        const text = plain(value);
+        const authors = authorsByChar(value);
+        const spans = [];
+        const gap = /\n[ \t]*\n\s*/g;
+        let at = 0;
+        for (let m; (m = gap.exec(text));) { spans.push([at, m.index]); at = m.index + m[0].length; }
+        if (!spans.length) return [value];
+        spans.push([at, text.length]);
+        const parts = spans.map(([s, e]) => fromChars(text.slice(s, e), authors.slice(s, e))).filter((p) => plain(p).trim());
+        return parts.length ? parts : [value];
     }
 
     // values the page fills in: {html, data} (data: a fact, shown in the data color; otherwise it takes the color of
@@ -1185,7 +1262,7 @@ const Slop = (() => {
         return [...byWords].filter(([, paths]) => paths.length > 1).map(([words, paths]) => ({ words, paths }));
     }
 
-    const core = { BUILTIN, plain, applyEdit, reslop, unslop, assign, reattribute, runs, readable, render, makeup, share, percent, repeats, wordsOf, vars };
+    const core = { BUILTIN, plain, applyEdit, reslop, unslop, assign, reattribute, runs, readable, render, makeup, share, percent, repeats, wordsOf, paragraphsOf, vars };
     if (typeof document === 'undefined') return core; // Node (the CLI and the tests) only needs the format
 
     /* ---------- the block ---------- */
@@ -1207,6 +1284,9 @@ const Slop = (() => {
         if (!isText(node)) { console.warn(`slop: no text at ${dotted(path)}`); return ''; }
         return node;
     }
+    const nodeAt = (root, path) => keysOf(path).reduce((node, key) => node?.[key], root);
+    // the keys of a group's texts, in order
+    const textKeys = (node) => (node && typeof node === 'object' && !isText(node) ? Object.keys(node).filter((k) => isText(node[k])) : []);
     function set(path, value) {
         const keys = keysOf(path);
         let node = text;
@@ -1222,12 +1302,34 @@ const Slop = (() => {
         });
     }
     const groupKeys = () => Object.keys(text).filter((k) => !isMeta(k) && text[k] && (isText(text[k]) || typeof text[k] === 'object'));
-    const elementsOf = (path) => document.querySelectorAll(`[data-slop="${CSS.escape(dotted(path))}"]`);
+    // the texts an element holds in its attributes, from data-slop-attr="alt:hero.photo title:hero.tip": [[name, path]]
+    const attrsOf = (x) => (x.dataset.slopAttr ?? '').split(/\s+/).map((s) => [s.slice(0, s.indexOf(':')), s.slice(s.indexOf(':') + 1)]).filter(([n, p]) => n && p);
+    // the elements that show a text: [data-slop] ones, which fill() writes, [data-slop-ref] ones, which the page writes
+    // itself (words inside a button or a link it builds) but the editor can still find, [data-slop-more] ones (the
+    // paragraphs after a blank line) and [data-slop-attr] ones
+    const elementsOf = (path) => {
+        const at = dotted(path);
+        const q = CSS.escape(at);
+        return [...document.querySelectorAll(`[data-slop="${q}"], [data-slop-ref="${q}"], [data-slop-more="${q}"], [data-slop-attr*=":${q}"]`)]
+            .filter((x) => x.dataset.slop === at || x.dataset.slopRef === at || x.dataset.slopMore === at || attrsOf(x).some(([, p]) => p === at));
+    };
+    const pathOf = (x) => x.dataset.slop || x.dataset.slopRef || x.dataset.slopMore || attrsOf(x)[0]?.[1];
+    // a text the page has but doesn't show as words (alt text, a tooltip, a label): the attribute it's in, or ''
+    function attrOf(path) {
+        const at = dotted(path);
+        for (const x of document.querySelectorAll('[data-slop-attr]')) {
+            const hit = attrsOf(x).find(([, p]) => p === at);
+            if (hit) return hit[0];
+        }
+        return '';
+    }
 
     // texts the page's code has rendered (Slop.html, Slop.words): with the [data-slop] elements, what's on the page
     const rendered = new Set();
     const html = (path, local) => { rendered.add(dotted(path)); return render(get(path), local); };
     const words = (path, local) => { rendered.add(dotted(path)); return readable(get(path), local); };
+    // the text as HTML, one string per paragraph, for code that draws a <p> for each
+    const paragraphs = (path, local) => { rendered.add(dotted(path)); return paragraphsOf(get(path)).map((v) => render(v, local)); };
     const onPage = (path) => rendered.has(dotted(path)) || elementsOf(path).length > 0;
     // how to show a text the page shows only some of the time: Slop.reveal(path, fn), where fn puts the page in a state
     // that shows it and returns a function that undoes that. A group's key covers all its texts
@@ -1235,16 +1337,113 @@ const Slop = (() => {
     const reveal = (path, fn) => { revealers.set(dotted(path), fn); };
     const revealerOf = (path) => revealers.get(dotted(path)) ?? revealers.get(keysOf(path)[0]);
     // fill every [data-slop] element (data-slop-vars: a JSON object of extra values)
-    function fill(root = document) {
-        root.querySelectorAll('[data-slop]').forEach((el) => {
-            const local = el.dataset.slopVars ? JSON.parse(el.dataset.slopVars) : undefined;
-            const h = render(get(el.dataset.slop), local);
+    // fill an element: its words from data-slop, its attributes from data-slop-attr (as plain text)
+    // a <p>, <li> or <dd> shows a text's first paragraph, and a copy of it after it shows each of the others. An
+    // element whose text is empty gets .slop-empty, which hides it
+    const SPLITS = /^(P|LI|DD)$/;
+    const spills = new WeakMap(); // element → the copies after it
+    const ownerOf = new WeakMap(); // copy → its element
+    function fillOne(el) {
+        const local = el.dataset.slopVars ? JSON.parse(el.dataset.slopVars) : undefined;
+        if (el.dataset.slop) {
+            const value = get(el.dataset.slop);
+            const parts = SPLITS.test(el.tagName) ? paragraphsOf(value) : [value];
+            const h = render(parts[0], local);
             if (el.innerHTML !== h) el.innerHTML = h;
+            el.classList.toggle('slop-empty', !plain(value).trim());
+            spill(el, parts.slice(1).map((v) => render(v, local)));
+        }
+        attrsOf(el).forEach(([name, path]) => {
+            const v = readable(get(path), local);
+            if (el.getAttribute(name) !== v) el.setAttribute(name, v);
         });
+    }
+    function spill(el, htmls) {
+        const copies = spills.get(el) ?? [];
+        while (copies.length > htmls.length) copies.pop().remove();
+        htmls.forEach((h, i) => {
+            let c = copies[i];
+            if (!c) {
+                c = el.cloneNode(false);
+                ['id', 'data-slop', 'data-slop-attr'].forEach((a) => c.removeAttribute(a));
+                c.classList.remove('slop-focus', 'slop-copy', 'slop-empty');
+                ownerOf.set(c, el);
+                copies.push(c);
+            }
+            c.dataset.slopMore = el.dataset.slop;
+            if (c.innerHTML !== h) c.innerHTML = h;
+            const before = i ? copies[i - 1] : el;
+            if (before.nextElementSibling !== c) before.after(c);
+        });
+        if (copies.length) spills.set(el, copies); else spills.delete(el);
+    }
+    // a list: an element with data-slop-list="group" shows the group's paragraphs (p1, p2, …), in order, each in a copy
+    // of the first. The group's other texts (a title, a caption) and the element's other children stay where they
+    // are. (With data-slop-list-ref, the page draws them itself.) Either way, the editor can add and remove paragraphs
+    const isParagraph = (key) => /^p\d+$/.test(key);
+    const templates = new WeakMap(); // list → the element its paragraphs are copies of
+    function fillList(box) {
+        const at = box.dataset.slopList;
+        const ours = (x) => x.dataset.slop?.startsWith(`${at}.`) && isParagraph(x.dataset.slop.slice(at.length + 1));
+        if (!templates.has(box)) {
+            const first = [...box.children].find(ours);
+            if (!first) return;
+            const t = first.cloneNode(false);
+            ['id', 'data-slop'].forEach((a) => t.removeAttribute(a));
+            templates.set(box, t);
+        }
+        const paths = textKeys(nodeAt(text, at)).filter(isParagraph).map((k) => `${at}.${k}`);
+        const have = new Map([...box.children].filter(ours).map((x) => [x.dataset.slop, x]));
+        have.forEach((x, p) => { if (!paths.includes(p)) { spill(x, []); x.remove(); } });
+        // a new one goes after the paragraph before it (and the paragraphs that one spilled into), or else before the
+        // one after it
+        const shown = (p) => [...box.children].find((x) => x.dataset.slop === p);
+        paths.forEach((p, i) => {
+            if (have.has(p)) return;
+            const x = templates.get(box).cloneNode(false);
+            x.dataset.slop = p;
+            const before = paths.slice(0, i).reverse().map(shown).find(Boolean);
+            const after = paths.slice(i + 1).map(shown).find(Boolean);
+            if (before) (spills.get(before)?.at(-1) ?? before).after(x);
+            else if (after) after.before(x);
+            else box.append(x);
+        });
+    }
+    const fill = (root = document) => {
+        root.querySelectorAll('[data-slop-list]').forEach(fillList);
+        root.querySelectorAll('[data-slop], [data-slop-attr]').forEach(fillOne);
+        // paragraphs whose element the page took away, or no longer shows that text in
+        root.querySelectorAll('[data-slop-more]').forEach((c) => {
+            const el = ownerOf.get(c);
+            if (!el?.isConnected || el.dataset.slop !== c.dataset.slopMore) c.remove();
+        });
+    };
+    // the editor's "not on the page" tags, checked again once the page has drawn what changed (a text just added or
+    // restored has no element until then, and a single-page app draws later still)
+    let reseen = () => {};
+    let seenPending = false;
+    const seenSoon = () => {
+        if (seenPending) return;
+        seenPending = true;
+        requestAnimationFrame(() => { seenPending = false; reseen(); });
+    };
+    // the [data-slop] elements and meters in what the page added after start (a single-page app draws late)
+    function added(n) {
+        if (n.nodeType !== 1 || n.closest('.slop-panel')) return;
+        seenSoon();
+        if (n.matches('[data-slop-list]')) fillList(n);
+        if (n.matches('[data-slop], [data-slop-attr]')) fillOne(n);
+        fill(n);
+        if (n.matches('[data-slop-meter]')) meter(n);
+        n.querySelectorAll('[data-slop-meter]').forEach(meter);
     }
 
     const listeners = [];
-    const onChange = (fn) => listeners.push(fn);
+    // returns a function that stops calling fn
+    const onChange = (fn) => {
+        listeners.push(fn);
+        return () => { const i = listeners.indexOf(fn); if (i >= 0) listeners.splice(i, 1); };
+    };
     let pending = false;
     function changed() { // after an edit: refill the page, then let the page redo whatever it built from the text
         if (pending) return;
@@ -1254,6 +1453,7 @@ const Slop = (() => {
             fill();
             listeners.forEach((fn) => { try { fn(); } catch (e) { console.error(e); } });
             paintMeters();
+            seenSoon();
         });
     }
 
@@ -1293,14 +1493,18 @@ const Slop = (() => {
     }
     const swatch = (cat) => cat.color ?? ink();
 
-    // the colors go in a stylesheet of their own: each category's words while the Slop-o-meter is on, and
-    // --slop-c-<id> for anything else that wants them
+    // the colors go in a stylesheet of their own: each category's words inside a .slop-on (the page, while the
+    // Slop-o-meter is on, or a section whose own switch is) but not inside a .slop-off (a section switched off), and
+    // --slop-c-<id> for anything else that wants them. Inside a [data-slop-only="<id>"] (a meter's tag is pointed at),
+    // everyone else's words are dimmed. :where keeps these as easy to override as html.slop-on .slop-<id> was
     let sheet = null;
     function applyColors() {
         sheet ??= document.head.appendChild(Object.assign(document.createElement('style'), { id: 'slop-colors' }));
-        const cats = categories().filter((c) => c.color);
+        const all = categories();
+        const cats = all.filter((c) => c.color);
         sheet.textContent = `:root{${cats.map((c) => `--${cls(c.id).replace('slop-', 'slop-c-')}:${c.color}`).join(';')}}\n`
-            + cats.map((c) => `html.slop-on .${cls(c.id)}{color:${c.color}}`).join('\n');
+            + cats.map((c) => `:where(.slop-on) .${cls(c.id)}:not(:where(.slop-off) .${cls(c.id)}){color:${c.color}}`).join('\n')
+            + `\n${all.map((c) => `[data-slop-only]:not([data-slop-only="${CSS.escape(c.id)}"]) .${cls(c.id)}{opacity:.3}`).join('\n')}`;
     }
 
     // a pie of what these texts are made of, and the same in words for its tooltip
@@ -1341,55 +1545,92 @@ const Slop = (() => {
 
     /* ---------- Slop-o-meter: a switch, a pie of what the page is made of, and what its colors mean ---------- */
 
-    const store = {
-        get: (k) => { try { return localStorage.getItem(k); } catch { return null; } },
-        set: (k, v) => { try { localStorage.setItem(k, v); } catch { /* optional */ } },
-        drop: (k) => { try { localStorage.removeItem(k); } catch { /* optional */ } },
-    };
+    const storage = (area) => ({
+        get: (k) => { try { return area().getItem(k); } catch { return null; } },
+        set: (k, v) => { try { area().setItem(k, v); } catch { /* optional */ } },
+        drop: (k) => { try { area().removeItem(k); } catch { /* optional */ } },
+    });
+    const store = storage(() => localStorage);
+    const session = storage(() => sessionStorage); // this tab only: the unsaved draft
     // what readers see is the page's choice, "nothing" unless it says otherwise. While the editor is open, its
     // author sees the colors whatever readers get
     const SHOW = ['nothing', 'pie', 'colors'];
     const shows = () => (SHOW.includes(text._show) ? text._show : 'nothing');
     const meters = [];
+    const built = new WeakMap(); // element → its meter
     let meterOn = false;
     let editing = false;
     function setMeter(on) {
         meterOn = on;
         paintShow();
     }
+    // a meter with a path (data-slop-meter="games.othello") measures the texts under it, and its switch colors only
+    // its section: the closest [data-slop-section], or its parent. A bare one measures the page and switches it
+    const inScope = (at) => ([path]) => !at || path === at || path.startsWith(`${at}.`);
+    const sectionOf = (m) => (m.at && m.el.parentElement ? m.el.closest('[data-slop-section]') ?? m.el.parentElement : document.documentElement);
     function paintShow() {
         const mode = shows();
         document.documentElement.classList.toggle('slop-on', editing || (mode === 'colors' && meterOn));
         meters.forEach((m) => {
             m.el.dataset.show = mode;
-            m.btn.setAttribute('aria-pressed', String(meterOn));
+            const section = sectionOf(m);
+            if (m.section && m.section !== section) m.section.classList.remove('slop-on', 'slop-off');
+            m.section = section;
+            // a section's switch follows the page's until it's flipped. The editor shows the author every color
+            if (m.at) {
+                const own = mode === 'colors' && !editing ? m.own : null;
+                section.classList.toggle('slop-on', own === true);
+                section.classList.toggle('slop-off', own === false);
+            }
+            m.btn.setAttribute('aria-pressed', String(m.own ?? meterOn));
         });
     }
     function paintMeters() {
+        // a meter the page took out of the document is dropped; it comes back if the page puts it back
+        meters.splice(0, meters.length, ...meters.filter((m) => m.el.isConnected));
         paintShow();
         if (!meters.length) return;
         const cats = categories();
-        const m = makeup(entries().map(([, v]) => v));
-        meters.forEach(({ pie, legend }) => {
+        const all = entries();
+        const byScope = new Map();
+        meters.forEach(({ at, pie, legend }) => {
+            if (!byScope.has(at)) byScope.set(at, makeup(all.filter(inScope(at)).map(([, v]) => v)));
+            const m = byScope.get(at);
             pie.style.background = gradient(m, cats);
             pie.title = breakdown(m, cats);
             pie.setAttribute('aria-label', pie.title);
-            // each category in its own color, with its share of the page's text
+            // each category in its own color, with its share of the text
             legend.innerHTML = cats.filter((c) => m.counts[c.id])
-                .map((c) => `<span class="slop-key" style="color:${swatch(c)}"><i style="background:${swatch(c)}"></i>${esc(c.label)}<b class="slop-pct">${percent(m.counts[c.id] / m.letters)}</b></span>`).join('');
+                .map((c) => `<span class="slop-key" tabindex="0" data-id="${esc(c.id)}" style="color:${swatch(c)}"><i style="background:${swatch(c)}"></i>${esc(c.label)}<b class="slop-pct">${percent(m.counts[c.id] / m.letters)}</b></span>`).join('');
         });
     }
     function buildMeter(el) {
         el.classList.add('slop-meter');
         el.innerHTML = '<button type="button" class="slop-meter-btn" aria-pressed="false"><span class="slop-switch" aria-hidden="true"></span>Slop-o-meter</button>'
             + '<span class="slop-meter-key"><span class="slop-pie" role="img"></span><span class="slop-legend"></span></span>';
-        const m = { el, btn: el.querySelector('button'), pie: el.querySelector('.slop-pie'), legend: el.querySelector('.slop-legend') };
+        const m = { el, at: el.dataset.slopMeter || '', own: null, section: null, btn: el.querySelector('button'), pie: el.querySelector('.slop-pie'), legend: el.querySelector('.slop-legend') };
         m.btn.addEventListener('click', () => {
-            const on = !meterOn;
+            const on = !(m.own ?? meterOn);
+            if (m.at) { m.own = on; paintShow(); return; } // only the page-wide choice is remembered
             setMeter(on);
             store.set('slop-o-meter', on ? 'on' : 'off');
         });
-        meters.push(m);
+        // pointing at a tag dims everyone else's words, in the meter's section
+        const only = (e) => {
+            const key = e.type === 'mouseover' || e.type === 'focusin' ? e.target.closest('.slop-key') : null;
+            const section = m.section ?? sectionOf(m);
+            if (key) section.dataset.slopOnly = key.dataset.id;
+            else delete section.dataset.slopOnly;
+        };
+        ['mouseover', 'mouseout', 'focusin', 'focusout'].forEach((type) => m.legend.addEventListener(type, only));
+        built.set(el, m);
+        return m;
+    }
+    // build a meter (or take back one the page moved), and paint it
+    function meter(el) {
+        const m = built.get(el) ?? buildMeter(el);
+        if (!meters.includes(m)) meters.push(m);
+        paintMeters();
     }
 
     /* ---------- the editor ---------- */
@@ -1406,14 +1647,25 @@ const Slop = (() => {
         const title = node && !isText(node) && isText(node.title) ? readable(node.title) : '';
         return title && title.length <= 32 ? title : human(key);
     };
+    // the groups the page shows as lists, where the editor can add and remove texts
+    const listed = () => new Set([...document.querySelectorAll('[data-slop-list], [data-slop-list-ref]')].map((x) => x.dataset.slopList || x.dataset.slopListRef));
+    // keys[i], for people. In a list, a paragraph is named by where it is: "Paragraph 3", even when its key is p7
+    function keyName(keys, i) {
+        const group = keys.slice(0, i).join('.');
+        if (!isParagraph(keys[i]) || !listed().has(group)) return human(keys[i]);
+        return `Paragraph ${textKeys(nodeAt(text, group)).filter(isParagraph).indexOf(keys[i]) + 1}`;
+    }
     // where a text is, for people: "Introduction · Paragraph 2"
     const where = (path) => {
-        const [g, ...rest] = keysOf(path);
-        return [groupTitle(g), ...rest.map(human)].join(' · ');
+        const keys = keysOf(path);
+        return [groupTitle(keys[0]), ...keys.slice(1).map((k, i) => keyName(keys, i + 1))].join(' · ');
     };
     const count = (n, one, many = `${one}s`) => `${n.toLocaleString()} ${n === 1 ? one : many}`;
     const isLong = (path, value) => plain(value).length > 48 || /^p\d+$/.test(keysOf(path).at(-1));
     const el = (tag, className, html = '') => Object.assign(document.createElement(tag), { className, innerHTML: html });
+
+    // what a hidden text is, by the attribute it's in
+    const KINDS = { alt: 'alt text', title: 'tooltip', 'aria-label': 'label', 'aria-description': 'description', placeholder: 'placeholder' };
 
     // the editor opens on repeated text that still has slop, or on any text that does, or on everything
     const slopIn = (path) => (makeup([get(path)]).counts.ai ?? 0) > 0;
@@ -1450,6 +1702,7 @@ const Slop = (() => {
             <button type="button" role="tab" data-tab="repeats">Repeats <span></span></button>
             <button type="button" role="tab" data-tab="slop">Slop left <span></span></button>
             <button type="button" role="tab" data-tab="all">All <span></span></button>
+            <button type="button" role="tab" data-tab="hidden" title="Words the page has but doesn't show: alt text, tooltips, labels">Hidden <span></span></button>
           </div>
           <div class="sp-body" role="tabpanel"></div>
           ${['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'].map((e) => `<div class="sp-edge" data-edge="${e}" aria-hidden="true"></div>`).join('')}`);
@@ -1499,7 +1752,8 @@ const Slop = (() => {
             return true;
         }
 
-        /* the slop switch, next to a pie of what the texts are made of */
+        /* the slop switch, next to a pie of what the texts are made of. A text's or section's row takes the pie out, to
+           sit by its name, and puts the switch at the end (c.pie, c.toggle) */
         function control(paths, what, after) {
             const c = el('span', 'sp-ctl', '<span class="sp-pie" role="img"></span>'
                 + '<button type="button" class="sp-toggle" role="switch"><span class="sp-switch" aria-hidden="true"></span>slop</button>');
@@ -1510,16 +1764,18 @@ const Slop = (() => {
                 const done = withUndo(on ? `Approved ${what}` : `Back to slop: ${what}`, () => paths().forEach((p) => set(p, on ? unslop(get(p)) : reslop(get(p)))));
                 if (done) after?.(on);
             });
+            c.pie = c.querySelector('.sp-pie');
+            c.toggle = toggle;
             controls.push({ el: c, paths });
             return c;
         }
         function paintControl({ el: c, paths }, cats) {
-            const m = makeup(paths().map(get));
-            const pie = c.querySelector('.sp-pie');
+            const m = makeup(paths().map((p) => valueAt(text, p) ?? '')); // a text just taken out is painted once more
+            const { pie } = c;
             pie.style.background = gradient(m, cats);
             pie.title = breakdown(m, cats);
             pie.setAttribute('aria-label', pie.title);
-            const toggle = c.querySelector('.sp-toggle');
+            const { toggle } = c;
             const on = (m.counts.ai ?? 0) > 0;
             toggle.setAttribute('aria-checked', String(on));
             toggle.disabled = !on && !m.counts.ok;
@@ -1616,7 +1872,7 @@ const Slop = (() => {
                 assignEl.append(b);
             });
             assignLabel(input);
-            wrap.append(assignEl);
+            if (wrap.insert) wrap.insert.before(assignEl); else wrap.append(assignEl); // the + stays last
         }
         const assignLabel = (input) => {
             if (assignEl.firstChild) assignEl.firstChild.textContent = input.selectionStart === input.selectionEnd ? 'Mark all as' : 'Mark selection as';
@@ -1650,11 +1906,13 @@ const Slop = (() => {
             const wrap = el('div', 'sp-field');
             wrap.dataset.path = path;
             const fid = `sp-${path.replace(/\W/g, '-')}${all ? '-all' : ''}`;
-            const name = all ? `${all.paths.length} copies` : keysOf(path).slice(1).map(human).join(' · ') || human(path);
+            const keys = keysOf(path);
+            const name = all ? `${all.paths.length} copies` : keys.slice(1).map((k, i) => keyName(keys, i + 1)).join(' · ') || human(path);
             wrap.innerHTML = `<div class="sp-flabel"><label for="${fid}">${esc(name)}</label>`
-                + '<button type="button" class="sp-unseen" hidden></button></div>'
-                + `<textarea id="${fid}" rows="1" spellcheck="true"></textarea><p class="sp-hint" hidden></p>`;
-            const row = wrap.querySelector('.sp-flabel');
+                + '<span class="sp-fend"><span class="sp-kind" hidden></span><button type="button" class="sp-unseen" hidden></button></span></div>'
+                + `<div class="sp-ink"><div class="sp-mirror" aria-hidden="true"></div><textarea id="${fid}" rows="1" spellcheck="true"></textarea></div>`
+                + '<p class="sp-hint" hidden></p>';
+            const row = wrap.querySelector('.sp-fend'); // the meter sits by the name; the rest at the end of the row
             const input = wrap.querySelector('textarea');
             input.value = plain(value);
             if (!isLong(path, value)) input.addEventListener('keydown', (e) => { if (e.key === 'Enter') e.preventDefault(); });
@@ -1667,6 +1925,12 @@ const Slop = (() => {
                 withUndo(`Reverted "${all ? all.words : where(path)}"`, () => paths().forEach((p) => { if (savedAt(p) !== undefined) set(p, savedAt(p)); }));
                 render();
             });
+            const group = keys.slice(0, -1).join('.');
+            const listItem = !all && group && listed().has(group) && isParagraph(keys.at(-1));
+            if (listItem) {
+                wrap.insert = plusRow(path, group);
+                wrap.append(wrap.insert);
+            }
             row.append(revert);
             if (!all) {
                 const rep = el('button', 'sp-rep');
@@ -1674,8 +1938,9 @@ const Slop = (() => {
                 rep.addEventListener('click', () => { const s = setOf(path); if (s) show('repeats', s.paths[0]); });
                 row.append(rep);
             }
-            // a copy's switch changes that copy only, and says so. A Repeats card's switch changes every copy
-            row.append(control(paths, all ? count(all.paths.length, 'copy', 'copies') : `"${where(path)}"`, all ? null : (approved) => {
+            // a copy's switch changes that copy only, and says so. A Repeats card's switch changes every copy.
+            // The row reads: name and pie, then at the end anything else, the trash can and the switch
+            const ctl = control(paths, all ? count(all.paths.length, 'copy', 'copies') : `"${where(path)}"`, all ? null : (approved) => {
                 const others = (setOf(path)?.paths ?? []).filter((p) => p !== path);
                 if (!others.length) return;
                 const how = approved ? unslop : reslop;
@@ -1683,8 +1948,17 @@ const Slop = (() => {
                     label: others.length === 1 ? 'Change it too' : 'Change them too',
                     run: () => withUndo(`${approved ? 'Approved' : 'Back to slop:'} ${count(others.length + 1, 'copy', 'copies')}`, () => others.forEach((p) => set(p, how(get(p))))),
                 });
-            }));
-            input.addEventListener('input', (e) => edit(paths(), input, /^history(Undo|Redo)$/.test(e.inputType)));
+            });
+            row.before(ctl.pie);
+            if (listItem) row.append(removeButton(path, wrap));
+            row.append(ctl);
+            // the stretch a keystroke or a paste replaces: the selection, or nothing at the caret
+            input.addEventListener('beforeinput', () => { input.at = [input.selectionStart, input.selectionEnd]; });
+            input.addEventListener('input', (e) => {
+                const restoring = /^history(Undo|Redo)$/.test(e.inputType);
+                edit(paths(), input, restoring, restoring || e.isComposing || /Composition/.test(e.inputType) ? undefined : input.at);
+                input.at = undefined;
+            });
             ['select', 'keyup', 'pointerup'].forEach((t) => input.addEventListener(t, () => assignLabel(input)));
             input.addEventListener('focus', () => { focus(path, all, input, wrap); showAssign(wrap, input, paths()); });
             input.addEventListener('blur', () => {
@@ -1698,7 +1972,9 @@ const Slop = (() => {
             });
             wrap.querySelector('.sp-unseen').addEventListener('click', () => input.focus());
             wrap.input = input;
+            wrap.mirror = wrap.querySelector('.sp-mirror');
             wrap.rep = wrap.querySelector('.sp-rep');
+            wrap.kind = wrap.querySelector('.sp-kind');
             wrap.revert = revert;
             wrap.paths = paths;
             return wrap;
@@ -1707,17 +1983,142 @@ const Slop = (() => {
         function groupView(key, paths) {
             const det = el('details', 'sp-group', `<summary><span class="sp-gname">${esc(groupTitle(key))}</span><span class="sp-gnote"></span></summary>`);
             det.dataset.group = key;
-            det.open = state.open.has(key);
-            const all = entries(text[key], [key]).map(([p]) => p);
-            det.querySelector('summary').append(control(() => all, `"${groupTitle(key)}"`));
+            det.open = state.open.has(key) || state.tab === 'hidden'; // there are few, so all of them show
+            const all = () => entries(text[key], [key]).map(([p]) => p);
+            const ctl = control(all, `"${groupTitle(key)}"`);
+            det.querySelector('.sp-gname').after(ctl.pie);
+            det.querySelector('summary').append(ctl);
             det.addEventListener('toggle', () => {
                 if (det.open) { state.open.add(key); det.querySelectorAll('textarea').forEach(grow); } else state.open.delete(key);
             });
             paths.forEach((p) => det.append(field(p)));
+            if (state.tab === 'all') listRows(key, det);
             return det;
         }
 
+        // the words behind a text box, each in its author's color. The box's own letters are see-through
+        function paintInk(wrap) {
+            const value = valueAt(text, wrap.paths()[0]) ?? ''; // a text just taken out is drawn once more
+            const key = JSON.stringify(value);
+            if (wrap.inked === key) return;
+            wrap.inked = key;
+            const s = plain(value);
+            const authors = authorsByChar(value);
+            let h = '';
+            for (let i = 0; i < s.length;) {
+                let j = i;
+                while (j < s.length && authors[j] === authors[i]) j++;
+                h += `<span class="${cls(authors[i])}">${esc(s.slice(i, j))}</span>`;
+                i = j;
+            }
+            wrap.mirror.innerHTML = `${h} `; // the space holds a last empty line open, as the box does
+        }
+
+        /* lists: where the page shows a group as a list, texts can be added and taken out */
+        const inList = (key) => [...listed()].some((g) => g === key || g.startsWith(`${key}.`));
+        // a key for a new paragraph in a group: the p<n> after any the group had in the file, at the last save or now
+        function freshKey(group) {
+            const taken = [text, saved, JSON.parse(original)].flatMap((root) => Object.keys(nodeAt(root, group) ?? {})).filter(isParagraph);
+            return `p${1 + Math.max(0, ...taken.map((k) => +k.slice(1)))}`;
+        }
+        // a text put in a group after the key `after` (or first), the rest in the order they were
+        function insert(group, after, key, value) {
+            const node = nodeAt(text, group) ?? {};
+            const next = after == null ? { [key]: value } : {};
+            Object.entries(node).forEach(([k, v]) => { next[k] = v; if (k === after) next[key] = value; });
+            if (!(key in next)) next[key] = value;
+            set(group, next);
+        }
+        function addText(group, after) {
+            const key = freshKey(group);
+            withUndo('Added a paragraph', () => insert(group, after, key, ''));
+            show('all', `${group}.${key}`);
+        }
+        const TRASH = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M2.5 4.5h11M6.2 4.5V2.8h3.6v1.7M4 4.5l.7 8.7h6.6l.7-8.7M6.7 7v4M9.3 7v4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        // a class on the page's elements for a text (`last`: only the last of them), off everything else
+        const FLAGS = ['slop-insert-after', 'slop-remove-hint', 'slop-removing'];
+        function flag(name, path, last) {
+            document.querySelectorAll(`.${name}`).forEach((x) => x.classList.remove(name));
+            if (!path) return;
+            const els = elementsOf(path);
+            (last ? els.slice(-1) : els).forEach((x) => x.classList.add(name));
+        }
+        // the + under a text in a list: pointing at it shows on the page where the new paragraph would go
+        function plusRow(path, group) {
+            const b = el('button', 'sp-insert', '<span class="sp-plus" aria-hidden="true">+</span><span class="sp-insert-label" aria-hidden="true">Add paragraph</span>');
+            b.type = 'button';
+            b.title = 'Add a paragraph below this one';
+            b.setAttribute('aria-label', 'Add a paragraph below this one');
+            const show = (on) => flag('slop-insert-after', on && path, true);
+            ['pointerenter', 'focus'].forEach((t) => b.addEventListener(t, () => show(true)));
+            ['pointerleave', 'blur'].forEach((t) => b.addEventListener(t, () => show(false)));
+            b.addEventListener('click', () => { show(false); addText(group, keysOf(path).at(-1)); });
+            return b;
+        }
+        // Remove: pointing at it outlines the text on the page in red. One with words takes a second click, and stays
+        // red, here and on the page, until then
+        function removeButton(path, wrap) {
+            const drop = el('button', 'sp-trash', TRASH);
+            drop.type = 'button';
+            drop.title = 'Remove this paragraph';
+            drop.setAttribute('aria-label', 'Remove this paragraph');
+            const armed = () => 'armed' in drop.dataset;
+            const hint = (on) => flag('slop-remove-hint', on && path);
+            const arm = (on) => {
+                if (on) drop.dataset.armed = ''; else delete drop.dataset.armed;
+                drop.innerHTML = on ? `${TRASH}Remove?` : TRASH;
+                wrap.classList.toggle('sp-removing', on);
+                flag('slop-removing', on && path);
+            };
+            ['pointerenter', 'focus'].forEach((t) => drop.addEventListener(t, () => hint(true)));
+            ['pointerleave', 'blur'].forEach((t) => drop.addEventListener(t, () => hint(false)));
+            drop.addEventListener('click', () => {
+                if (plain(get(path)).trim() && !armed()) {
+                    arm(true);
+                    setTimeout(() => { if (drop.isConnected && armed()) arm(false); }, 3000);
+                    return;
+                }
+                hint(false);
+                arm(false);
+                withUndo(`Removed "${where(path)}"`, () => remove(path));
+                render();
+            });
+            return drop;
+        }
+        // in the All tab, each list's removed texts until the next save, each with Restore, and a way to start an empty one
+        function listRows(key, box) {
+            [...listed()].filter((g) => g === key || g.startsWith(`${key}.`)).forEach((group) => {
+                const now = textKeys(nodeAt(text, group)).filter(isParagraph);
+                const was = textKeys(nodeAt(saved, group)).filter(isParagraph);
+                const fieldOf = (k) => [...box.querySelectorAll(':scope > .sp-field')].find((f) => f.dataset.path === `${group}.${k}`);
+                was.forEach((k, i) => {
+                    if (now.includes(k)) return;
+                    const before = was.slice(0, i).reverse().find((x) => now.includes(x)); // the nearest earlier one that's still there
+                    const name = /^p\d+$/.test(k) ? `Paragraph ${i + 1}` : human(k);
+                    const row = el('p', 'sp-gone', `${esc(name)} removed · `);
+                    const b = el('button', 'sp-link', 'Restore');
+                    b.type = 'button';
+                    b.addEventListener('click', () => {
+                        withUndo(`Restored "${name}"`, () => insert(group, before ?? null, k, JSON.parse(JSON.stringify(nodeAt(saved, `${group}.${k}`)))));
+                        render();
+                    });
+                    row.append(b);
+                    let at = before ? fieldOf(before) : null;
+                    while (at?.nextElementSibling?.classList.contains('sp-gone')) at = at.nextElementSibling;
+                    const first = now.length ? fieldOf(now[0]) : null;
+                    if (at) at.after(row); else if (first) first.before(row); else box.append(row);
+                });
+                if (now.length) return;
+                const start = el('button', 'sp-cat-add sp-start', '+ Paragraph');
+                start.type = 'button';
+                start.title = `Start "${where(group)}" again`;
+                start.addEventListener('click', () => addText(group, Object.keys(nodeAt(text, group) ?? {}).at(-1) ?? null)); // at the group's end
+                box.append(start);
+            });
+        }
+
         function render() {
+            FLAGS.forEach((name) => flag(name)); // the elements pointed at may be gone
             controls = [controls.find((c) => c.el === pageControl)];
             sets = repeats(entries());
             groupKeys().forEach((k) => { if (!state.known.has(k)) { state.known.add(k); state.open.add(k); } });
@@ -1747,15 +2148,18 @@ const Slop = (() => {
                     body.append(card);
                 });
             } else {
-                const only = state.tab === 'slop';
+                const tab = state.tab;
+                const keep = tab === 'slop' ? hasSlop : tab === 'hidden' ? attrOf : () => true;
+                if (tab === 'hidden') body.insertAdjacentHTML('beforeend', '<p class="sp-intro">Words the page has but doesn\'t show: alt text for when an image doesn\'t load, tooltips, labels for screen readers. Readers\' colors can\'t show them, so read them here.</p>');
                 let shown = 0;
                 groupKeys().forEach((key) => {
-                    const paths = (isText(text[key]) ? [key] : entries(text[key], [key]).map(([p]) => p)).filter((p) => !only || hasSlop(p));
-                    if (!paths.length) return;
+                    const paths = (isText(text[key]) ? [key] : entries(text[key], [key]).map(([p]) => p)).filter(keep);
+                    if (!paths.length && !(tab === 'all' && inList(key))) return; // an emptied list stays, to start again
                     shown += paths.length;
                     body.append(isText(text[key]) ? field(key) : groupView(key, paths));
                 });
-                if (only && !shown) body.insertAdjacentHTML('beforeend', '<p class="sp-empty">No slop left. Every word here is yours, approved, or someone else\'s.</p>');
+                if (tab === 'slop' && !shown) body.insertAdjacentHTML('beforeend', '<p class="sp-empty">No slop left. Every word here is yours, approved, or someone else\'s.</p>');
+                if (tab === 'hidden' && !shown) body.insertAdjacentHTML('beforeend', '<p class="sp-empty">No hidden text on this page. Mark an element\'s with <code>data-slop-attr="alt:group.key"</code>.</p>');
             }
             aside.classList.add('sp-still'); // new switches appear as they are, without sliding there
             numbers();
@@ -1782,18 +2186,20 @@ const Slop = (() => {
                 go.title = breakdown(m, cats);
             });
             const live = repeats(all);
-            const tabs = { all: all.length, slop: all.filter(([p]) => hasSlop(p)).length, repeats: live.length };
-            aside.querySelectorAll('.sp-tabs button').forEach((b) => { b.querySelector('span').textContent = tabs[b.dataset.tab]; });
+            const hidden = new Map(all.map(([p]) => [p, attrOf(p)]).filter(([, a]) => a));
+            const tabs = { all: all.length, slop: all.filter(([p]) => hasSlop(p)).length, repeats: live.length, hidden: hidden.size };
+            aside.querySelectorAll('.sp-tabs button').forEach((b) => {
+                b.querySelector('span').textContent = tabs[b.dataset.tab];
+                if (b.dataset.tab === 'hidden') b.hidden = !hidden.size && state.tab !== 'hidden'; // only on pages that have some
+            });
             body.querySelectorAll('.sp-field').forEach((f) => {
+                paintInk(f);
                 f.revert.hidden = !f.paths().some((p) => differs(p) && savedAt(p) !== undefined);
-                const tag = f.querySelector('.sp-unseen');
-                const shown = revealed && f.paths().includes(revealed.path);
-                tag.hidden = !shown && f.paths().some(onPage);
-                tag.disabled = shown || !revealerOf(f.paths()[0]);
-                tag.textContent = shown ? 'shown while editing' : tag.disabled ? 'not on the page' : 'not on the page · show it';
-                tag.title = shown ? 'The page normally hides this. It\'s shown while you edit it'
-                    : tag.disabled ? 'Not on the page right now: the page shows it only some of the time, or not at all. A page can say how to show it with Slop.reveal'
-                        : 'Show the page the way it looks with this text';
+                paintSeen(f);
+                const kind = f.paths().map((p) => hidden.get(p)).find(Boolean);
+                f.kind.hidden = !kind;
+                f.kind.textContent = KINDS[kind] ?? kind ?? '';
+                f.kind.title = kind ? `Not shown as words: the page's ${kind} attribute` : '';
             });
             paintSave();
             body.querySelectorAll('.sp-field:not(.sp-set)').forEach((f) => {
@@ -1811,17 +2217,46 @@ const Slop = (() => {
             paintMeters();
         }
         repaint = () => { if (!aside.hidden) render(); };
+        reseen = () => { if (!aside.hidden) body.querySelectorAll('.sp-field').forEach(paintSeen); };
+        // a text the page doesn't show right now is tagged, with a way to show it if the page says how
+        function paintSeen(f) {
+            const tag = f.querySelector('.sp-unseen');
+            const shown = revealed && f.paths().includes(revealed.path);
+            tag.hidden = !shown && f.paths().some(onPage);
+            tag.disabled = shown || !revealerOf(f.paths()[0]);
+            tag.textContent = shown ? 'shown while editing' : tag.disabled ? 'not on the page' : 'not on the page · show it';
+            tag.title = shown ? 'The page normally hides this. It\'s shown while you edit it'
+                : tag.disabled ? 'Not on the page right now: the page shows it only some of the time, or not at all. A page can say how to show it with Slop.reveal'
+                    : 'Show the page the way it looks with this text';
+        }
 
         // the page and the editor point at each other
-        function mark(on, paths = state.focus?.paths ?? [], scroll = false) {
+        function mark(on, paths = state.focus?.paths ?? [], scroll = false, tries = 0) {
             document.querySelectorAll('.slop-focus, .slop-copy').forEach((x) => x.classList.remove('slop-focus', 'slop-copy'));
             if (!on) return;
             paths.forEach((p, i) => elementsOf(p).forEach((x) => x.classList.add(i ? 'slop-copy' : 'slop-focus')));
             const target = paths.map((p) => elementsOf(p)[0]).find(Boolean);
-            if (!target || !scroll) return;
+            if (!scroll) return;
+            // a text the page only just revealed may not be drawn yet (React and the like draw on the next frame)
+            if (!target) {
+                if (tries < 10) requestAnimationFrame(() => { if (state.focus?.paths === paths) mark(true, paths, true, tries + 1); });
+                return;
+            }
+            // scroll whatever holds it (the window, or a panel of the page's that scrolls on its own) to bring it to
+            // the middle of what's visible, unless it's already well in view
+            const box = scroller(target);
             const r = target.getBoundingClientRect();
-            const bottom = innerWidth <= 900 ? aside.getBoundingClientRect().top : innerHeight;
-            if (r.top < 8 || r.bottom > bottom - 8) scrollBy({ top: r.top - (bottom - r.height) / 2, behavior: 'smooth' });
+            const top = box ? Math.max(box.getBoundingClientRect().top, 0) : 0;
+            const bottom = Math.min(box ? box.getBoundingClientRect().bottom : innerHeight, innerWidth <= 900 ? aside.getBoundingClientRect().top : innerHeight);
+            const pad = Math.min(120, (bottom - top) / 5); // room for a header that stays put
+            if (r.top < top + pad || r.bottom > bottom - 8) (box ?? window).scrollBy({ top: r.top - (top + bottom - r.height) / 2, behavior: 'smooth' });
+        }
+        // the nearest element around `el` that scrolls, or null for the window
+        function scroller(el) {
+            for (let p = el.parentElement; p && p !== document.body && p !== document.documentElement; p = p.parentElement) {
+                if (/(auto|scroll|overlay)/.test(getComputedStyle(p).overflowY) && p.scrollHeight > p.clientHeight) return p;
+            }
+            return null;
         }
         function focus(path, all, input, wrap) {
             const s = all ?? setOf(path);
@@ -1872,12 +2307,12 @@ const Slop = (() => {
             past.set(p, list.slice(-200));
         }
         const recall = (p, words) => past.get(p)?.findLast((v) => plain(v) === words);
-        function edit(paths, input, restoring) {
+        function edit(paths, input, restoring, at) {
             undo = null;
             const f = state.focus;
             [...paths, ...(f?.linked ?? [])].forEach((p) => {
                 remember(p);
-                set(p, applyEdit(get(p), input.value, restoring ? recall(p, input.value) : undefined));
+                set(p, applyEdit(get(p), input.value, restoring ? recall(p, input.value) : undefined, at));
                 remember(p);
             });
             grow(input);
@@ -1934,6 +2369,7 @@ const Slop = (() => {
                 store.set(LOCAL, JSON.stringify({ base: JSON.parse(original).version, text: JSON.parse(body) }));
                 saved = JSON.parse(body);
                 undo = null;
+                keepDraft();
                 savedStatus();
                 numbers();
                 return;
@@ -1948,6 +2384,7 @@ const Slop = (() => {
                 text.version = Number(out);
                 saved = { ...JSON.parse(body), version: text.version };
                 undo = null;
+                keepDraft();
                 savedStatus();
             } catch (e) {
                 status(`Couldn't save: ${e.message}`, 'error');
@@ -1960,10 +2397,12 @@ const Slop = (() => {
         function touched() {
             numbers();
             changed();
+            keepDraft();
             if (!stale && !undo) status(unsaved() ? 'Not saved yet' : 'No changes since the last save', unsaved() ? 'dirty' : '');
         }
         function reset() {
             store.drop(LOCAL);
+            session.drop(DRAFT);
             text = JSON.parse(original);
             saved = JSON.parse(original);
             undo = null;
@@ -1972,7 +2411,14 @@ const Slop = (() => {
             render();
             savedStatus();
         }
-        addEventListener('beforeunload', (e) => { if (busy || unsaved()) e.preventDefault(); });
+        addEventListener('beforeunload', (e) => { if (busy || unsaved()) { e.preventDefault(); e.returnValue = ''; } });
+        // a reload keeps what isn't saved, in this tab, still unsaved: a page in a frame (or a browser that skips the
+        // prompt) can't ask before it goes. Kept only while the page's version is the one it was based on
+        const DRAFT = `slop-draft:${location.pathname}`;
+        const keepDraft = () => {
+            if (unsaved() && !stale) session.set(DRAFT, JSON.stringify({ base: saved.version, text }));
+            else session.drop(DRAFT);
+        };
         addEventListener('keydown', (e) => {
             if ((e.metaKey || e.ctrlKey) && e.key === 's' && !aside.hidden) { e.preventDefault(); save(); }
             // ⌘Z outside a text undoes the last switch or mark (a text's own ⌘Z undoes its typing)
@@ -1990,11 +2436,12 @@ const Slop = (() => {
         // while the editor is open, a click on a text opens it in the editor
         document.addEventListener('click', (e) => {
             if (aside.hidden || aside.contains(e.target) || btn.contains(e.target)) return;
-            const target = e.target.closest('[data-slop]');
+            const target = e.target.closest('[data-slop], [data-slop-ref], [data-slop-more], [data-slop-attr]');
             if (!target) return;
             e.preventDefault();
             e.stopPropagation();
-            const path = target.dataset.slop;
+            const path = pathOf(target);
+            if (!path) return;
             const s = setOf(path);
             if (state.tab === 'repeats' && s) show('repeats', s.paths[0]);
             else show(state.tab === 'slop' && hasSlop(path) ? 'slop' : 'all', path);
@@ -2088,6 +2535,19 @@ const Slop = (() => {
         }));
         aside.querySelectorAll('.sp-tabs button').forEach((b) => b.addEventListener('click', () => { state.tab = b.dataset.tab; render(); }));
         savedStatus();
+        try {
+            const draft = JSON.parse(session.get(DRAFT));
+            if (draft?.base === saved.version && JSON.stringify(draft.text) !== JSON.stringify(text)) {
+                text = draft.text;
+                applyColors();
+                changed();
+                open(true);
+                status('Unsaved changes from before the reload', 'dirty', {
+                    label: 'Discard',
+                    run: () => { text = JSON.parse(JSON.stringify(saved)); session.drop(DRAFT); applyColors(); changed(); render(); savedStatus(); },
+                });
+            }
+        } catch { /* none */ }
         return { render: () => { if (!aside.hidden) render(); }, touched, open };
     }
 
@@ -2111,7 +2571,8 @@ const Slop = (() => {
     function start(options = {}) {
         Object.assign(config, options);
         fill();
-        document.querySelectorAll('[data-slop-meter]').forEach(buildMeter);
+        document.querySelectorAll('[data-slop-meter]').forEach((x) => { meters.push(buildMeter(x)); });
+        new MutationObserver((changes) => changes.forEach((c) => c.addedNodes.forEach(added))).observe(document.body, { childList: true, subtree: true });
         theme(true);
         const watch = new MutationObserver(theme);
         [document.documentElement, document.body].forEach((x) => watch.observe(x, { attributes: true, attributeFilter: ['class', 'data-theme', 'style'] }));
@@ -2131,7 +2592,7 @@ const Slop = (() => {
         fetch('/__slop').then((res) => (res.ok ? res.text() : '')).then((s) => { if (s === 'slop-editor') ed = editor('file'); else local(); }).catch(local);
     }
 
-    return { ...core, get, set, remove, entries, categories, html, words, fill, refresh, onChange, reveal, start, get text() { return text; } };
+    return { ...core, get, set, remove, entries, categories, html, words, paragraphs, fill, refresh, onChange, reveal, meter, start, get text() { return text; } };
 })();
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
