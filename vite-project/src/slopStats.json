@@ -1,5 +1,5 @@
 {
-    "updated": "2026-11-23",
+    "updated": "2026-11-24",
     "since": "2026-10-28",
     "projects": {
         "rhyme-xray": {
@@ -9,10 +9,10 @@
             "hours": 5
         },
         "algorhythms": {
-            "commits": 807,
-            "agents": 184,
-            "sessions": 67,
-            "hours": 136
+            "commits": 835,
+            "agents": 196,
+            "sessions": 79,
+            "hours": 146.1
         },
         "spotify-unwrapped": {
             "commits": 656,
@@ -40,15 +40,15 @@
         },
         "craft-prs": {
             "commits": 6,
-            "agents": 10,
-            "sessions": 8,
+            "agents": 11,
+            "sessions": 9,
             "hours": 2.3
         },
         "slop-zone": {
             "commits": null,
-            "agents": 8,
-            "sessions": 8,
-            "hours": 11.4
+            "agents": 11,
+            "sessions": 11,
+            "hours": 13.7
         },
         "trivia": {
             "commits": null,

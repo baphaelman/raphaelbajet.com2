@@ -1,5 +1,5 @@
 {
-    "version": 75,
+    "version": 77,
     "rupture": {
         "title": [
             {
@@ -31,10 +31,10 @@
                 "me": "On this page, text written by me (like this) will be in white; "
             },
             {
-                "ok": "Claude's, in purple"
+                "ok": "AI's, in purple, until I approve it and it turns green"
             },
             {
-                "me": " (yes I had it write that line)"
+                "me": " (I had it write that line)"
             }
         ],
         "overviewTitle": [
