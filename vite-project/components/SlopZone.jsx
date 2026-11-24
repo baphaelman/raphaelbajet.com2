@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import ExternalLink from '/components/ExternalLink.jsx';
 import Words from '/components/SlopWords.jsx';
-import Slop, { textAt, readable, keysOf, useSlop, SlopMeter } from '/components/slop.js';
+import Slop, { textAt, readable, keysOf, useSlop, SlopMeter, slopList } from '/components/slop.js';
 import slopStats from '/src/slopStats.json';
 
 // `npm run edit` (vite --mode edit): the slop editor, how much of the text is mine, and the parts still to write
@@ -324,21 +324,23 @@ const carries = (project, picked) => entries([project]).some(({ base }) => carri
 
 // "What is it?", "How did it do it?" (the agents' part) and "What did I do?" (mine). A part with nothing in it
 // is left out of the site. While running `npm run edit`, an empty paragraph shows as still to write, to fill in
-// from the editor
+// from the editor, and each part is a list there: the editor adds paragraphs to it and takes them out. A blank line
+// in a paragraph starts a new one on the page
 function Story({ base }) {
     return ['what', 'how', 'role'].map((part) => {
-        const paragraphs = keysOf(`${base}.${part}`, PARAGRAPH).map((key) => `${base}.${part}.${key}`);
+        const group = `${base}.${part}`;
+        const paragraphs = keysOf(group, PARAGRAPH).map((key) => `${group}.${key}`);
         const written = (path) => Slop.plain(Slop.get(path)).trim();
         const shown = EDITING ? paragraphs : paragraphs.filter(written);
-        if (!shown.length) return null;
+        if (!shown.length && !(EDITING && textAt(group))) return null;
         // a heading is an agent's until you write anything in its section: then it's yours, in that card alone
         const yours = Slop.share(paragraphs.map((path) => Slop.get(path))).fraction > 0;
         return (
-            <section className="slop-story" key={part}>
+            <section className="slop-story" key={part} {...slopList(group)}>
                 <h4><Words path={`headings.${part}`} approved={yours} /></h4>
-                {shown.map((path) => (
-                    <p key={path} className={written(path) ? undefined : 'slop-story-empty'}><Words path={path} links /></p>
-                ))}
+                {shown.map((path) => (written(path)
+                    ? Slop.paragraphs(path).map((html, i) => <p key={`${path}.${i}`} data-slop-ref={path} dangerouslySetInnerHTML={{ __html: html }} />)
+                    : <p key={path} className="slop-story-empty"><Words path={path} links /></p>))}
             </section>
         );
     });

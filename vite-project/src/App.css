@@ -1201,6 +1201,11 @@ html:has(.slop-meter[data-show="colors"]):not(.slop-on) :is(.rupture, .slop-zone
   color: var(--zone-text-muted);
 }
 
+/* the box is the border; the slop editor's own outline for an empty text would draw a second one */
+.slop-zone .slop-story .slop-story-empty .slop-empty {
+  outline: none;
+}
+
 /* the paragraph itself is empty until it's written in the slop editor */
 .slop-zone .slop-story .slop-story-empty [data-slop]:empty::before {
   content: "Not written yet";

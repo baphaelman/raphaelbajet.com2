@@ -23,3 +23,6 @@ export { SlopMeter } from 'slop-editor/react';
 
 // redraws after an edit in the editor
 export { useSlop };
+
+// a group the page draws as paragraphs, one by one: the editor can add and take out paragraphs there
+export { slopList } from 'slop-editor/react';
