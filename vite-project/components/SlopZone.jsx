@@ -347,9 +347,9 @@ function Story({ base }) {
 // [key, label, label for one]
 const STATS = [['commits', 'commits', 'commit'], ['agents', 'agents', 'agent'], ['sessions', 'sessions', 'session'], ['hours', 'agent hours', 'agent hours']];
 
-// the oldest transcript counted (2026-10-28 → Oct 28, 2026): Claude Code had already deleted the ones before it
-const STATS_SINCE = slopStats.since
-    && new Date(slopStats.since).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+// the day the numbers last changed (2026-11-23 → Nov 23, 2026), written by scripts/slop-stats.mjs
+const STATS_SINCE = slopStats.updated
+    && new Date(slopStats.updated).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 // a fact, so it shows as data in "Agents, sessions and hours since {since}" (headings.statsSince)
 Slop.vars.since = STATS_SINCE;
 
