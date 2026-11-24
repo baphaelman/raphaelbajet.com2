@@ -4,12 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "predev": "node scripts/slop-stats.mjs && node scripts/slop-play.mjs",
+    "predev": "node scripts/slop-stats.mjs",
     "dev": "vite",
     "slop-stats": "node scripts/slop-stats.mjs",
-    "slop-play": "node scripts/slop-play.mjs",
-    "edit": "node scripts/slop-stats.mjs && node scripts/slop-play.mjs && vite --mode edit --open /#slop-zone",
-    "prebuild": "node scripts/slop-play.mjs",
+    "edit": "node scripts/slop-stats.mjs && vite --mode edit --open /#slop-zone",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
@@ -20,7 +18,7 @@
     "react-modal": "^3.16.1",
     "react-pdf": "^9.1.1",
     "react-router-dom": "^6.26.2",
-    "slop-editor": "^0.3.0"
+    "slop-editor": "^0.3.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",

@@ -13,6 +13,10 @@ Every word the Slop Zone shows lives in `vite-project/src/slopText.json`, in the
 - Paragraphs are `p1`, `p2`… in `what`, `how` and `role`; an empty section is `{"p1": ""}`.
 - Never build UI for adding projects: Raphael adds them by asking an agent.
 
+## AI-rticles
+
+The interactive articles the Slop Zone opens are `vite-project/public/slop/play/<name>.html` (`comma-pump`, `single-cycles`). Those files are the articles: edit them there. Before working on one, read `vite-project/articles/CLAUDE.md` and `vite-project/articles/<name>/CLAUDE.md` (its notes, checks and tools). Edit their text with `npx slop-editor edit public/slop/play/<name>.html` from `vite-project/`.
+
 ## Changes to the slop editor itself
 
-The page runs `vite-project/vendor/slop-editor/slop.js`, a copy of the package's with changes not yet published. Make any change to the editor there, and log it in `vite-project/vendor/slop-editor/CHANGES.md`. Raphael ports those to the package (https://github.com/baphaelman/slop-editor) and syncs back, so keep each change self-contained and described well enough to port.
+The site runs the `slop-editor` package from npm: the zone gets its `slop.js` and `slop.css` inlined by `vite.config.js`, and the AI-rticles link `/slop/slop.js` and `/slop/slop.css`, which it serves from `node_modules`. Change the editor in its own repo (`~/Desktop/Coding/slopometer/`, https://github.com/baphaelman/slop-editor), release it, then `npm update slop-editor` here.
