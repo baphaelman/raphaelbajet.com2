@@ -506,7 +506,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
 <!-- Every word a reader sees, and who wrote it (see CLAUDE.md, "Text and authorship"). `slop-editor edit` (~/Desktop/Coding/slopometer/cli.mjs) saves the editor into it. -->
 <script type="application/json" id="slop-text">
 {
-  "version": 26,
+  "version": 27,
   "hero": {
     "eyebrow": [
       {
@@ -800,7 +800,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       {
         "data": "two"
       },
-      " corners, shown in color on this slide so you can watch them.",
+      " corners, `UFR` and `UBR`, the two beside `UR` (their names contain its letters), shown in color on this slide so you can watch them.",
       {
         "me": " Everything else stays fixed, which is how solvers accumulate solved pieces."
       }
@@ -843,7 +843,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       {
         "data": "T-perm"
       },
-      " · `UR` ↔ `UL` swapped, and two corners with them"
+      " · `UR` ↔ `UL` swapped, and `UFR` ↔ `UBR` with them"
     ],
     "caption3": "Setup undone · yellow-green is home in `DF`"
   },
@@ -1793,7 +1793,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
   // Each slide has n builds; → plays the next build, then moves on to the next slide.
   const V0 = {rx: 0.5, ry: -0.62}, V_HOME = {rx: 0.45, ry: -0.62};
   // buf: mark the buffer slot UR (on every cube and ring slide from "The buffer" on).
-  const DEF = {marks: null, drawTurn: false, peel: false, track: null, fly: false, glowCol: null, dimHome: null, heroDone: null, slotMark: null, cornerCol: 0, cornerSet: null, layer: 'cube', morph: 0, view: V0, spin: false, state: SOLVED, poses: null, labels: [], glow: [], focus: null, arrows: false, tags: [], caption: '', glowEdges: false, chartMode: 1, neutral: false, tri: null, via: null, showHidden: false, buf: false};
+  const DEF = {marks: null, drawTurn: false, peel: false, track: null, fly: false, glowCol: null, dimHome: null, heroDone: null, slotMark: null, cornerCol: 0, cornerSet: null, layer: 'cube', morph: 0, view: V0, spin: false, state: SOLVED, poses: null, labels: [], glow: [], focus: null, arrows: false, lines: [], tags: [], caption: '', glowEdges: false, chartMode: 1, neutral: false, tri: null, via: null, showHidden: false, buf: false};
   const SW_LAB = ['UR', 'DF', 'FL', 'UB'], BR_LAB = ['UR', 'UF', 'DR', 'BR'];
   const FLIP_AT = 1.3;
   const CUB_P = 5.2;
@@ -1828,9 +1828,10 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       tags: [{pos: 'UR', text: 'buffer'}], caption: Slop.html('buffer.caption')})},
     // The first swap of the solve, UR ↔ DF, as real face turns (OP_PATH), with the two corners it swaps (TP_CORNERS) in color. Entering, they color in,
     // then the setup D' L2 brings DF's edge to UL; b1 plays the T-perm (faster, PRES_TP); b2 undoes the setup.
-    tperm: {n: 3, f: b => ({state: [OP_SET, OP_TP, SWAPS[1]][b], cornerCol: TP_CORNERS, cornerSet: opCorners(b + 2), track: [PARTNER], buf: true,
+    tperm: {n: 3, f: b => ({state: [OP_SET, OP_TP, SWAPS[1]][b], view: {rx: 0.95, ry: V0.ry}, cornerCol: TP_CORNERS, cornerSet: opCorners(b + 2), track: [PARTNER], buf: true,
       labels: b < 2 ? ['UR', 'UL', 'DF'] : ['UR', 'DF'], focus: b < 2 ? ['UR', 'UL'] : ['UR', 'DF'],
-      tags: [[{pos: 'UL', text: 'from DF'}], [{pos: 'UL', text: 'swapped'}, {p3: [1.5, 1.5, 1.5], text: 'corner'}, {p3: [1.5, 1.5, -1.5], text: 'corner'}], [{pos: 'DF', text: 'home', tone: '--yes'}]][b],
+      lines: b === 1 ? [[[1.35, 0], [-1.35, 0]], [[0, 1.35], [0, -1.35]]] : [],
+      tags: [[{pos: 'UL', text: 'from DF'}], [{pos: 'UL', text: 'swapped'}], [{pos: 'DF', text: 'home', tone: '--yes'}]][b],
       caption: Slop.html('tperm.caption' + (b + 1))})},
     // Picks up after the T-perm slide's swap UR ↔ DF.
     swaps: {n: 2, f: b => ({state: SWAPS[b + 1], via: 'swaps', cornerSet: opCorners(4), track: [PARTNER], buf: true, labels: SW_LAB, arrows: 'buffer', glow: [SOLVE_DEMO[b + 1]],
@@ -1979,6 +1980,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
   const slotHalo = 'paint-order: stroke; stroke-width: 3.6px; stroke-linejoin: round';
   const slotName = n => [...n].map(f => `<tspan style="fill: ${FCOL[f]}; ${f === 'U' || f === 'D' ? 'stroke: #1b1e25; stroke-width: 2.6px' : 'stroke: var(--stage)'}">${f}</tspan>`).join('');
   const labA = new Array(12).fill(0), glowA = new Array(12).fill(0), trackA = new Array(12).fill(0), tagMap = new Map();
+  let linesA = 0, linesLast = []; // spec.lines: fade and last list
   let ovCur = {key: '', state: SOLVED, arrows: true, focus: null, neutral: false, tri: null, ring: null}, ovPrev = null, ovT0 = 0, ovDelay = 0, frameNo = 0;
   let turnD = 1; // drawTurn ("Scrambling" b0): how far its turn has played, 0..1; its arrows draw out with it, heads riding the tip
   let peeling = false; // the split ring's nodes peel off the cube's slots ("Scrambling"), not on the front page
@@ -2268,6 +2270,21 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       const op = labA[i] * v * (focus && !focus.has(i) ? 0.4 : 1);
       if (op < 0.03) continue;
       out += `<text x="${lps[i][0].toFixed(1)}" y="${lps[i][1].toFixed(1)}" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="13" font-weight="600" style="fill: var(--ink); ${halo}" opacity="${op.toFixed(2)}">${POS[i]}</text>`;
+    }
+    // Straight swap arrows (spec.lines): [[x, z], [x, z]] on the U face, one line with a flat head at each end, drawn in the face's plane and faded with the slide.
+    if (As.lines.length) linesLast = As.lines;
+    linesA += ((As.lines.length ? 1 : 0) - linesA) * b2;
+    if (linesA > 0.02 && has3D && m < 0.98) {
+      const P = (x, z) => proj(new THREE.Vector3(x, 1.52, z), 1), f1 = n => n.toFixed(1);
+      out += `<g opacity="${(linesA * (1 - m)).toFixed(2)}">`;
+      for (const [a, b] of linesLast) {
+        const dx = b[0] - a[0], dz = b[1] - a[1], l = Math.hypot(dx, dz), ux = dx / l, uz = dz / l, hl = 0.3, hw = 0.15;
+        const A = P(a[0], a[1]), B = P(b[0], b[1]), A2 = P(a[0] + ux * hl * 0.8, a[1] + uz * hl * 0.8), B2 = P(b[0] - ux * hl * 0.8, b[1] - uz * hl * 0.8);
+        const head = (t, sg) => { const q = [t[0] - sg * ux * hl, t[1] - sg * uz * hl]; return [P(t[0], t[1]), P(q[0] - uz * hw, q[1] + ux * hw), P(q[0] + uz * hw, q[1] - ux * hw)].map(v => f1(v[0]) + ',' + f1(v[1])).join(' '); };
+        const line = (c, w) => `<line x1="${f1(A2[0])}" y1="${f1(A2[1])}" x2="${f1(B2[0])}" y2="${f1(B2[1])}" style="stroke: ${c}" stroke-width="${w}" stroke-linecap="round"/>`;
+        out += line('var(--stage)', 7) + `<polygon points="${head(b, 1)}" style="fill: var(--c1); stroke: var(--stage)" stroke-width="2.5" stroke-linejoin="round"/><polygon points="${head(a, -1)}" style="fill: var(--c1); stroke: var(--stage)" stroke-width="2.5" stroke-linejoin="round"/>` + line('var(--c1)', 3.6);
+      }
+      out += '</g>';
     }
     for (const tg of As.tags) { const k = tg.text + (tg.pos || tg.p3.join()); const e = tagMap.get(k) || {a: 0}; e.d = tg; e.seen = frameNo; tagMap.set(k, e); }
     for (const [k, e] of tagMap) {
@@ -2651,7 +2668,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
     const RA = onCube && ovCur && ovCur.ring && now - ovCur.ring.t0 < ovCur.ring.end ? ovCur.ring : null;
     // While a slide's face turns play, the overlay is cleared (labels, tags, glows); it comes back when they land.
     const turning = onCube && anim && anim.path && !spec.split;
-    const As = turning ? Object.assign({}, spec, {glow: [], tags: [], labels: []}) : RA ? Object.assign({}, spec, {glow: [], tags: []}) : now - ovT0 >= ovDelay ? spec : annoPrev;
+    const As = turning ? Object.assign({}, spec, {glow: [], tags: [], lines: [], labels: []}) : RA ? Object.assign({}, spec, {glow: [], tags: []}) : now - ovT0 >= ovDelay ? spec : annoPrev;
 
     const tk = onCube && spec.tally ? JSON.stringify(spec.tally) : '';
     if (tk !== tallyKey) {
