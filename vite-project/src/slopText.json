@@ -1,5 +1,5 @@
 {
-    "version": 78,
+    "version": 79,
     "rupture": {
         "title": [
             {
@@ -76,7 +76,7 @@
         ],
         "when": [
             {
-                "data": "Nov 2026"
+                "data": "{when}"
             }
         ],
         "status": [
@@ -168,7 +168,7 @@
         ],
         "when": [
             {
-                "data": "Oct – Nov 2026"
+                "data": "{when}"
             }
         ],
         "status": [
@@ -249,7 +249,7 @@
         ],
         "when": [
             {
-                "data": "Nov 2026"
+                "data": "{when}"
             }
         ],
         "status": [
@@ -329,7 +329,7 @@
             ],
             "when": [
                 {
-                    "data": "Nov 2026"
+                    "data": "{when}"
                 }
             ],
             "tagline": [
@@ -382,7 +382,7 @@
             ],
             "when": [
                 {
-                    "data": "Nov 2026"
+                    "data": "{when}"
                 }
             ],
             "tagline": "Why every keyboard is slightly out of tune, on purpose",
@@ -421,7 +421,7 @@
             ],
             "when": [
                 {
-                    "data": "Nov 2026"
+                    "data": "{when}"
                 }
             ],
             "tagline": [
@@ -478,12 +478,12 @@
         ],
         "when": [
             {
-                "data": "Nov 2026"
+                "data": "{when}"
             }
         ],
         "status": [
             {
-                "ok": "4 PRs in review"
+                "ok": "{prs} in review"
             }
         ],
         "tagline": [
@@ -516,26 +516,16 @@
             }
         ],
         "caption": "All waiting on review.",
-        "pr1": [
+        "pr": [
             {
-                "data": "audio: hostile sweeps honour CRAFT_HOSTILE_DIVISOR"
+                "data": "{title}"
             }
         ],
-        "pr2": [
-            {
-                "data": "tests: the remaining hostile sweeps honour CRAFT_HOSTILE_DIVISOR"
-            }
-        ],
-        "pr3": [
-            {
-                "data": "docx: the mutated Standard-encryption sweep encrypts its seed once"
-            }
-        ],
-        "pr4": [
-            {
-                "data": "docx: the radar caps case uses just over each cap instead of 100 MB of XML"
-            }
-        ]
+        "prStates": {
+            "open": "Open",
+            "merged": "Merged",
+            "closed": "Closed"
+        }
     },
     "slop-editor": {
         "title": [
@@ -550,7 +540,7 @@
         ],
         "when": [
             {
-                "data": "Nov 2026"
+                "data": "{when}"
             }
         ],
         "status": [
@@ -558,7 +548,7 @@
                 "ok": "On npm "
             },
             {
-                "data": "v0.1.0 (Nov 23, 2026)"
+                "data": "v{version} ({released})"
             }
         ],
         "tagline": [

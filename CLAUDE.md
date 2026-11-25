@@ -11,6 +11,7 @@ Every word the Slop Zone shows lives in `vite-project/src/slopText.json`, in the
 - Write new text as an agent's, and keep it terse. Only words Raphael dictates word for word go in as `{"me": ...}`. Never reword Raphael's words without asking, and never approve text (`ok`) unless asked.
 - When editing the file, bump `version` and keep every `me` and `ok` piece word for word: the editor (`npm run edit`) may be open and saves the whole file.
 - Paragraphs are `p1`, `p2`… in `what`, `how` and `role`; an empty section is `{"p1": ""}`.
+- Facts that go out of date (a card's months, the slop editor's version, the Craft PRs and their count) are `{when}`, `{version}`, `{released}`, `{prs}`… placeholders, filled from `vite-project/src/slopStats.json`, which `scripts/slop-stats.mjs` writes (`/slop-update`). Never type them into the text.
 - Never build UI for adding projects: Raphael adds them by asking an agent.
 
 ## AI-rticles

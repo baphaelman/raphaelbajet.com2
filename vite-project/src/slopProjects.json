@@ -106,20 +106,6 @@
                 }
             ],
             "visual": "prs",
-            "prs": [
-                {
-                    "href": "https://github.com/storytold/craft-libs/pull/3008"
-                },
-                {
-                    "href": "https://github.com/storytold/craft-libs/pull/3012"
-                },
-                {
-                    "href": "https://github.com/storytold/craft-libs/pull/3014"
-                },
-                {
-                    "href": "https://github.com/storytold/craft-libs/pull/3016"
-                }
-            ],
             "thumb": "pr"
         },
         {

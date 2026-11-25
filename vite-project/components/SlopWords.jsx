@@ -33,18 +33,20 @@ function unlinked(value) {
 // A text from src/slopText.json, by its path, as it reads on the page: each author's words in a span of their own
 // (slop-ai, slop-me, slop-ok, slop-data), line breaks kept. data-slop lets the editor find it on the page and fill it
 // in again after an edit; data-slop-ref, where it's drawn differently from the text, lets it only find it. Where `links` is set, a link written [label](address) becomes a real one, in a new tab;
-// elsewhere (inside a button or another link) only its label shows. `approved` shows an agent's words as approved
-function Words({ path, links, approved }) {
+// elsewhere (inside a button or another link) only its label shows. `approved` shows an agent's words as approved.
+// `vars` fills this text's own {name}s (a card's dates and versions), ahead of Slop.vars
+function Words({ path, links, approved, vars }) {
     const value = Slop.get(path);
+    const local = vars && JSON.stringify(vars);
     if (approved) {
         Slop.html(path); // on the page, for the editor
-        return <span data-slop-ref={path} dangerouslySetInnerHTML={{ __html: Slop.render(Slop.unslop(value)) }} />;
+        return <span data-slop-ref={path} dangerouslySetInnerHTML={{ __html: Slop.render(Slop.unslop(value), vars) }} />;
     }
     if (!links && Slop.plain(value).match(LINK)) {
         Slop.html(path);
-        return <span data-slop-ref={path} dangerouslySetInnerHTML={{ __html: Slop.render(unlinked(value)) }} />;
+        return <span data-slop-ref={path} dangerouslySetInnerHTML={{ __html: Slop.render(unlinked(value), vars) }} />;
     }
-    return <span data-slop={path} dangerouslySetInnerHTML={{ __html: Slop.render(value) }} />;
+    return <span data-slop={path} data-slop-vars={local} dangerouslySetInnerHTML={{ __html: Slop.render(value, vars) }} />;
 }
 
 export default Words;

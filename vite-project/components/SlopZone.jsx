@@ -195,13 +195,13 @@ function Visual({ project }) {
             return <Shot entry={project} base={project.id} className="slop-shot" />;
         case 'video':
             return <Clip entry={project} base={project.id} />;
-        case 'prs':
+        case 'prs': // as /craft-fix last saw them (scripts/slop-stats.mjs): each title a fact, its state in prStates
             return (
                 <ul className="slop-prs">
-                    {project.prs.map((pr, i) => (
+                    {(slopStats.projects[project.id]?.prs ?? []).map((pr) => (
                         <li key={pr.href}>
-                            <span className="slop-pr-state">Open</span>
-                            <ExternalLink href={pr.href}><Words path={`${project.id}.pr${i + 1}`} /></ExternalLink>
+                            <span className="slop-pr-state"><Words path={`${project.id}.prStates.${pr.state}`} /></span>
+                            <ExternalLink href={pr.href}><Words path={`${project.id}.pr`} vars={{ title: pr.title }} /></ExternalLink>
                         </li>
                     ))}
                 </ul>
@@ -349,11 +349,30 @@ function Story({ base }) {
 // [key, label, label for one]
 const STATS = [['commits', 'commits', 'commit'], ['agents', 'agents', 'agent'], ['sessions', 'sessions', 'session'], ['hours', 'agent hours', 'agent hours']];
 
-// the day the numbers last changed (2026-11-23 → Nov 23, 2026), written by scripts/slop-stats.mjs
-const STATS_SINCE = slopStats.updated
-    && new Date(slopStats.updated).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
-// a fact, so it shows as data in "Agents, sessions and hours since {since}" (headings.statsSince)
+// 2026-11-23 → Nov 23, 2026; 2026-11 → Nov 2026
+const asDay = (date) => date && new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+const asMonth = (month) => new Date(`${month}-01`).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
+
+// the day the numbers last changed, written by scripts/slop-stats.mjs
+const STATS_SINCE = asDay(slopStats.updated);
+// a fact, so it shows as data in "Data since {since}" (headings.statsSince); each card fills in its own (facts)
 Slop.vars.since = STATS_SINCE;
+
+// A card's {name}s, all facts from scripts/slop-stats.mjs: {when} (Nov 2026, or Oct – Nov 2026), {since} (the day
+// its numbers last changed), and the slop editor's {version} and {released}, and the Craft PRs' {prs} (4 PRs, open)
+function facts(id) {
+    const counts = slopStats.projects[id];
+    if (!counts) return undefined;
+    const open = counts.prs?.filter((pr) => pr.state === 'open').length;
+    return Object.fromEntries(Object.entries({
+        when: counts.from && (counts.from === counts.to ? asMonth(counts.from)
+            : `${counts.from.slice(0, 4) === counts.to.slice(0, 4) ? asMonth(counts.from).split(' ')[0] : asMonth(counts.from)} – ${asMonth(counts.to)}`),
+        since: asDay(counts.updated),
+        version: counts.version,
+        released: asDay(counts.released),
+        prs: counts.prs && `${open} PR${open === 1 ? '' : 's'}`,
+    }).filter(([, value]) => value != null));
+}
 
 // What went into a project, counted from git and Claude Code's transcripts by scripts/slop-stats.mjs (which runs
 // before `npm run dev`): numbers, so nobody's words. Commits are all of git's; the rest only go back to STATS_SINCE
@@ -370,7 +389,7 @@ function Stats({ id }) {
                     </div>
                 ))}
             </dl>
-            {STATS_SINCE && <p className="slop-card-stats-since"><Words path="headings.statsSince" /></p>}
+            {STATS_SINCE && <p className="slop-card-stats-since"><Words path="headings.statsSince" vars={facts(id)} /></p>}
         </>
     );
 }
@@ -428,6 +447,10 @@ function SlopDemo({ base }) {
     );
 }
 
+// the PRs' caption ("All waiting on review.") holds only while every PR is open with no review from a person
+const captioned = (project) => project.visual !== 'prs'
+    || (slopStats.projects[project.id]?.prs ?? []).every((pr) => pr.state === 'open' && !pr.reviewed);
+
 function ProjectCard({ project, lit, picked }) {
     const base = project.id;
     return (
@@ -440,7 +463,7 @@ function ProjectCard({ project, lit, picked }) {
             <header className="slop-card-head">
                 <div>
                     <h3><span className="slop-card-tab" aria-hidden="true" /><Words path={`${base}.title`} /></h3>
-                    <p className="slop-card-sub"><Words path={`${base}.when`} /> · <Words path={`${base}.status`} /></p>
+                    <p className="slop-card-sub"><Words path={`${base}.when`} vars={facts(project.id)} /> · <Words path={`${base}.status`} vars={facts(project.id)} /></p>
                     <Labels base={base} picked={picked} />
                 </div>
                 {project.links.length > 0 && <CardLinks links={project.links} base={base} />}
@@ -454,7 +477,7 @@ function ProjectCard({ project, lit, picked }) {
                 </div>
                 <figure className={`slop-card-visual slop-visual-${project.visual}`}>
                     <Visual project={project} />
-                    {Slop.plain(textAt(`${base}.caption`) ?? '') && <figcaption><Words path={`${base}.caption`} links /></figcaption>}
+                    {Slop.plain(textAt(`${base}.caption`) ?? '') && captioned(project) && <figcaption><Words path={`${base}.caption`} links /></figcaption>}
                 </figure>
             </div>
         </article>
@@ -502,7 +525,7 @@ function EntryCard({ item, base, color, lit, picked }) {
                             </button>
                             <span className="slop-entry-chevron" aria-hidden="true" />
                         </h3>
-                        <p className="slop-card-sub"><Words path={`${base}.when`} /></p>
+                        <p className="slop-card-sub"><Words path={`${base}.when`} vars={facts(item.id)} /></p>
                         <Labels base={base} picked={picked} />
                     </header>
                     <p className="slop-card-lede"><Words path={`${base}.tagline`} /></p>
