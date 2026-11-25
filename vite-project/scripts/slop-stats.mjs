@@ -11,14 +11,17 @@ import { createInterface } from 'node:readline';
 import { execFileSync } from 'node:child_process';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const TRANSCRIPTS = join(homedir(), '.claude/projects');
 const CODING = join(homedir(), 'Desktop/Coding');
 const STATS = new URL('../src/slopStats.json', import.meta.url);
 const SESSIONS = new URL('./slopSessions.json', import.meta.url);
+const SITE = fileURLToPath(new URL('..', import.meta.url));
 
-// Each project: what in a session's tool calls points at it, and where its commits are. Othello and Single Cycles
-// aren't in git. Craft is someone else's repo, so only my commits count
+// Each project: what in a session's tool calls points at it, and where its commits are. Othello isn't in git. The
+// AI-rticles (`site`) are in this repo since 2026-11-24 (public/slop/play and articles/); The Comma Pump's earlier
+// commits are in its old repo. Craft is someone else's repo, so only my commits count
 const PROJECTS = {
     'rhyme-xray': { paths: [/rhyme-xray/], repo: join(CODING, 'rhyme-xray-v2') },
     algorhythms: { paths: [/\/algorhythms\b/, /baphaelman\/algorhythms/], repo: join(homedir(), 'algorhythms') },
@@ -27,11 +30,11 @@ const PROJECTS = {
         repo: join(CODING, 'Spotify (Un)Wrapped'),
     },
     'paper-othello': { paths: [/games\/othello/, /othello\//] },
-    'comma-pump': { paths: [/tuning-explainer/, /tuning\.html/], repo: join(CODING, 'AIrticles/tuning-explainer') },
-    'single-cycles': { paths: [/single-cycles/, /singleCycles/] },
+    'comma-pump': { paths: [/tuning-explainer/, /tuning\.html/, /slop\/play\/comma-pump/, /articles\/comma-pump/], repo: join(CODING, 'AIrticles-archived/tuning-explainer'), site: 'comma-pump' },
+    'single-cycles': { paths: [/single-cycles/, /singleCycles/], site: 'single-cycles' },
     'craft-prs': { paths: [/craft-libs/, /Coding\/oss\b/], repo: join(CODING, 'oss/craft-libs'), author: '@rapss-MacBook' },
     // not in the zone, but their sessions shouldn't land in a project that is
-    'slop-zone': { paths: [/raphaelbajet\.com/] },
+    'slop-zone': { paths: [/raphaelbajet\.com(?![\w./-]*\/(?:slop\/play|articles)\/)/] }, // the AI-rticles in it are theirs
     trivia: { paths: [/\/trivia\b/] },
 };
 
@@ -138,10 +141,12 @@ async function countSessions(known) {
     return sessions;
 }
 
+const count = (repo, args) => Number(execFileSync('git', ['-C', repo, 'rev-list', '--count', ...args], { encoding: 'utf8' }).trim());
 function commits(project) {
-    if (!project.repo || !existsSync(project.repo)) return undefined;
-    const args = project.author ? ['--all', `--author=${project.author}`] : ['HEAD'];
-    return Number(execFileSync('git', ['-C', project.repo, 'rev-list', '--count', ...args], { encoding: 'utf8' }).trim());
+    const here = project.repo && existsSync(project.repo);
+    if (!here && !project.site) return undefined;
+    const own = here ? count(project.repo, project.author ? ['--all', `--author=${project.author}`] : ['HEAD']) : 0;
+    return own + (project.site ? count(SITE, ['HEAD', '--', `public/slop/play/${project.site}.html`, `articles/${project.site}`]) : 0);
 }
 
 const before = readJson(STATS, { projects: {} });
@@ -151,7 +156,7 @@ const agents = Object.values(sessions).flatMap((session) => session.agents);
 Object.entries(PROJECTS).forEach(([id, project]) => {
     const its = agents.filter((agent) => agent.project === id);
     projects[id] = {
-        commits: project.repo ? commits(project) ?? before.projects[id]?.commits ?? null : null, // a repo that isn't on this machine keeps its last count
+        commits: project.repo || project.site ? commits(project) ?? before.projects[id]?.commits ?? null : null, // a repo that isn't on this machine keeps its last count
         agents: its.length,
         sessions: Object.values(sessions).filter((session) => session.project === id).length,
         hours: Math.round(its.reduce((sum, agent) => sum + agent.hours, 0) * 10) / 10,
