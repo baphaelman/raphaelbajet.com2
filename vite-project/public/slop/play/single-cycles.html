@@ -502,20 +502,68 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
 <!-- Every word a reader sees, and who wrote it (see CLAUDE.md, "Text and authorship"). `slop-editor edit` (~/Desktop/Coding/slopometer/cli.mjs) saves the editor into it. -->
 <script type="application/json" id="slop-text">
 {
-  "version": 4,
+  "version": 15,
   "hero": {
-    "eyebrow": "Combinatorics · blindfolded cubing",
-    "title": "Single Cycles",
-    "dek": "Scramble a Rubik's Cube. How often can a blindfolded solver fix every edge in one unbroken chain of swaps?",
-    "note": [
-      "Look closer and both are made of *e*: they're {eOver12} and {sqrtEOver12}",
+    "eyebrow": [
       {
-        "me": " "
-      },
-      "!"
+        "ok": "Combinatorics · blindfolded cubing"
+      }
     ],
-    "hint": "Press [[→]] to step through like slides, or scroll. Drag the cube to turn it.",
-    "caption": "A solved cube, and the same cube as a ring"
+    "title": [
+      {
+        "me": "Single Cycles"
+      }
+    ],
+    "dek": [
+      {
+        "me": "How often does a "
+      },
+      {
+        "data": "Rubik's Cube"
+      },
+      {
+        "me": " solver get lucky, and "
+      },
+      {
+        "ok": "fix every edge in one unbroken chain of swaps?"
+      }
+    ],
+    "note": [
+      {
+        "me": "≈ "
+      },
+      {
+        "data": "{eOver12}"
+      },
+      {
+        "ok": " and "
+      },
+      {
+        "data": "{sqrtEOver12}"
+      },
+      {
+        "me": " respectively"
+      },
+      {
+        "ok": "!"
+      }
+    ],
+    "hint": [
+      {
+        "ok": "Press [[→]] to step through like slides, or scroll"
+      }
+    ],
+    "caption": [
+      {
+        "ok": "A solved cube, and the same cube "
+      },
+      {
+        "me": "flattened "
+      },
+      {
+        "ok": "as a ring"
+      }
+    ]
   },
   "pieces": {
     "title": [
@@ -528,14 +576,43 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       {
         "me": " Rubik's"
       },
-      " cube has 26 pieces: 6 centers, 8 corners",
+      " cube has ",
+      {
+        "data": "26"
+      },
+      " pieces: ",
+      {
+        "data": "6"
+      },
+      " centers, ",
+      {
+        "data": "8"
+      },
+      " corners",
       {
         "me": ","
       },
-      " and 12 edges. The centers never move relative to each other, so they fix each face's color."
+      " and ",
+      {
+        "data": "12"
+      },
+      " edges. The centers never move relative to each other, so they fix each face's color."
     ],
     "p2": "This article is about the edges.",
-    "caption": "12 edges · 6 centers · 8 corners"
+    "caption": [
+      {
+        "data": "12"
+      },
+      " edges · ",
+      {
+        "data": "6"
+      },
+      " centers · ",
+      {
+        "data": "8"
+      },
+      " corners"
+    ]
   },
   "homes": {
     "title": [
@@ -581,34 +658,101 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       {
         "me": "displaces edges from their homes"
       },
-      ". In this one, seven edges have moved and five are ",
+      ". In this one, ",
+      {
+        "data": "seven"
+      },
+      " edges have moved and ",
+      {
+        "data": "five"
+      },
+      " are ",
       {
         "me": "solved"
       },
       "."
     ],
     "p2": "Each piece still knows where it belongs from its colors. The yellow-green edge belongs in `DF` wherever it is.",
-    "caption": "Scrambled · seven edges have left home"
+    "caption": [
+      "Scrambled · ",
+      {
+        "data": "seven"
+      },
+      " edges have left home"
+    ]
   },
   "buffer": {
     "title": "The buffer",
-    "p1": "The beginner method for blindfolded solving is [Old Pochmann](https://www.speedcubereview.com/blind-solving-algorithms.html). One slot, `UR`, is the *buffer*.",
+    "p1": [
+      "The beginner method for blindfolded solving is ",
+      {
+        "data": "[Old Pochmann](https://www.speedcubereview.com/blind-solving-algorithms.html)"
+      },
+      ". One slot, `UR`, is the *buffer*."
+    ],
     "p2": "You look at the piece in the buffer, work out where it belongs, and swap it there using one memorized algorithm. Here the buffer holds the yellow-green edge, so the first swap is with `DF`.",
     "caption": "The buffer holds yellow-green, which belongs in DF"
   },
   "tperm": {
     "title": "One swap, up close",
     "p1": [
-      "The swap is an algorithm called the *T-perm*: fourteen face turns that swap whatever is in `UR` with whatever is in `UL`. It also swaps two corners, shown in color on this slide so you can watch them.",
+      "The swap is an algorithm called the ",
+      {
+        "data": "*T-perm*"
+      },
+      ": ",
+      {
+        "data": "fourteen"
+      },
+      " face turns that swap whatever is in `UR` with whatever is in `UL`. It also swaps ",
+      {
+        "data": "two"
+      },
+      " corners, shown in color on this slide so you can watch them.",
       {
         "me": " Everything else stays fixed, which is how solvers accumulate solved pieces."
       }
     ],
-    "p2": "Our first swap is with `DF`, so a solver first makes two setup turns, `D' L2`, that bring the edge in `DF` up to `UL` without touching the buffer. Then the T-perm, then the setup turns undone. Every swap drags the same two corners along, but Old Pochmann fixes the corners in a separate pass afterwards (with one extra algorithm if the number of edge swaps was odd).",
+    "p2": [
+      "Our first swap is with `DF`, so a solver first makes ",
+      {
+        "data": "two"
+      },
+      " setup turns, `D' L2`, that bring the edge in `DF` up to `UL` without touching the buffer. Then the ",
+      {
+        "data": "T-perm"
+      },
+      ", then the setup turns undone. Every swap drags the same ",
+      {
+        "data": "two"
+      },
+      " corners along, but ",
+      {
+        "data": "Old Pochmann"
+      },
+      " fixes the corners in a separate pass afterwards (with one extra algorithm if the number of edge swaps was odd)."
+    ],
     "p3": "So for our purposes, the buffer can be swapped with any edge at will, and the corners can be ignored.",
-    "hint": "press → to play the T-perm, then again to undo the setup",
-    "caption1": "Setup D' L2 · DF's edge is now in UL, ready to swap",
-    "caption2": "T-perm · UR ↔ UL swapped, and two corners with them",
+    "hint": [
+      "press → to play the ",
+      {
+        "data": "T-perm"
+      },
+      ", then again to undo the setup"
+    ],
+    "caption1": [
+      "Setup ",
+      {
+        "data": "D' L2"
+      },
+      " · DF's edge is now in UL, ready to swap"
+    ],
+    "caption2": [
+      {
+        "data": "T-perm"
+      },
+      " · UR ↔ UL swapped, and two corners with them"
+    ],
     "caption3": "Setup undone · yellow-green is home in DF"
   },
   "swaps": {
@@ -622,37 +766,135 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
   },
   "closed": {
     "title": "The loop closes",
-    "p1": "After three swaps, the buffer's own white-red piece arrives back in `UR`. Four edges were solved in three swaps. A loop like this is called a *cycle*.",
+    "p1": [
+      "After ",
+      {
+        "data": "three"
+      },
+      " swaps, the buffer's own white-red piece arrives back in `UR`. ",
+      {
+        "data": "Four"
+      },
+      " edges were solved in ",
+      {
+        "data": "three"
+      },
+      " swaps. A loop like this is called a *cycle*."
+    ],
     "p2": "But `UF`, `DR` and `BR` are still wrong. They form a cycle of their own, and the buffer isn't in it. Swapping the buffer with itself does nothing, so the method is stuck.",
     "caption": "UB solved · loop closed · UF, DR and BR still wrong"
   },
   "break": {
     "title": "A cycle break",
     "p1": "To get unstuck, you deliberately swap the solved buffer piece into the other cycle, then follow that cycle until the buffer piece comes back. Solvers call this a *cycle break*.",
-    "p2": "These three edges took four swaps. Had they been part of the buffer's cycle, they would have taken three. Each break costs an extra swap and an extra thing to memorize.",
+    "p2": [
+      "These ",
+      {
+        "data": "three"
+      },
+      " edges took ",
+      {
+        "data": "four"
+      },
+      " swaps. Had they been part of the buffer's cycle, they would have taken ",
+      {
+        "data": "three"
+      },
+      ". Each break costs an extra swap and an extra thing to memorize."
+    ],
     "hint": "press → to make the break, then again to finish it",
     "caption1": "Next: break into the other cycle",
     "breaking": "Cycle break: swapping UR ↔ UF",
     "caption2": "White-red parked in UF · the buffer is now in that cycle",
     "finishing": "Finishing the break: UR ↔ DR, BR, UF",
-    "caption3": "Every edge solved · 3 edges took 4 swaps"
+    "caption3": [
+      "Every edge solved · ",
+      {
+        "data": "3"
+      },
+      " edges took ",
+      {
+        "data": "4"
+      },
+      " swaps"
+    ]
   },
   "rewind": {
     "title": "Every scramble is a set of cycles",
     "p1": "Finish the solve, then rewind it swap by swap back to the scramble, and draw an arrow from every misplaced piece to its home. Follow the arrows from any piece and you always come back to where you started. So the arrows always split into closed loops.",
-    "p2": "This scramble has two: four edges through the buffer, and three without it.",
+    "p2": [
+      "This scramble has ",
+      {
+        "data": "two"
+      },
+      ": ",
+      {
+        "data": "four"
+      },
+      " edges through the buffer, and ",
+      {
+        "data": "three"
+      },
+      " without it."
+    ],
     "rewinding": "Rewinding the solve, swap by swap",
-    "caption": "Rewound · two cycles: 4 edges with the buffer, 3 without"
+    "caption": [
+      "Rewound · ",
+      {
+        "data": "two"
+      },
+      " cycles: ",
+      {
+        "data": "4"
+      },
+      " edges with the buffer, ",
+      {
+        "data": "3"
+      },
+      " without"
+    ]
   },
   "ring": {
     "title": "Flatten it",
-    "p1": "For counting, the cube's shape doesn't matter, only which slot points to which. So peel the twelve slots off the cube and lay them in a ring, keeping the arrows.",
+    "p1": [
+      "For counting, the cube's shape doesn't matter, only which slot points to which. So peel the ",
+      {
+        "data": "twelve"
+      },
+      " slots off the cube and lay them in a ring, keeping the arrows."
+    ],
     "question": "The question",
     "p2": "Call a scramble a **single cycle** when one loop covers every edge that's out of place. Then the solve needs no cycle break.",
-    "p3": "Ours has two loops, so it doesn't count. Press → to see one that does: a single loop through eight edges, with the other four home. On a random scramble, how often does this happen?",
-    "caption1": "Same slots, same arrows, laid out in a ring · two cycles",
+    "p3": [
+      "Ours has ",
+      {
+        "data": "two"
+      },
+      " loops, so it doesn't count. Press → to see one that does: a single loop through ",
+      {
+        "data": "eight"
+      },
+      " edges, with the other ",
+      {
+        "data": "four"
+      },
+      " home. On a random scramble, how often does this happen?"
+    ],
+    "caption1": [
+      "Same slots, same arrows, laid out in a ring · ",
+      {
+        "data": "two"
+      },
+      " cycles"
+    ],
     "moving": "Moving the pieces to a new scramble",
-    "caption2": "One cycle through 8 edges · no cycle break"
+    "caption2": [
+      "One cycle through ",
+      {
+        "data": "8"
+      },
+      " edges · no cycle break"
+    ]
   },
   "flips": {
     "title": "First, a wrinkle: flips",
@@ -674,21 +916,101 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       },
       " makes counting easy: a fixed length means a fixed number of arrows to follow out of `UR`, and every other edge simply has to be home."
     ],
-    "p3": "A neat fact helps: **the buffer's cycle is equally likely to have any length from 1 to 12.** Follow the arrows out of `UR`. The first can point to any of the 12 homes, and only one of them, UR's own, closes the loop at once. Each later arrow has one home fewer to choose from, and the chances cancel down to {oneTwelfth} for every length.",
+    "p3": [
+      "A neat fact helps: **the buffer's cycle is equally likely to have any length from 1 to 12.** Follow the arrows out of `UR`. The first can point to any of the ",
+      {
+        "data": "12"
+      },
+      " homes, and only one of them, UR's own, closes the loop at once. Each later arrow has one home fewer to choose from, and the chances cancel down to {oneTwelfth} for every length."
+    ],
     "p4": "The strip at the bottom is sampling random scrambles live. Every bar settles at {oneTwelfth}.",
     "hint": "press → to follow each arrow",
     "stageTitle": "Following the arrows out of UR",
-    "fan1": "**Arrow 1** leaves UR. All 12 homes are free: **1** (UR's own) closes the loop at length 1; the other **11** move on.",
-    "fan2": "**Arrow 2** leaves DF. DF's home is taken, so 11 are free: **1** goes back to UR (length 2); **10** move on.",
-    "fan3": "**Arrow 3** leaves FL. 10 homes are free: **1** goes back to UR (length 3); **9** move on.",
-    "fan4": "Multiply along a row: each “moves on” numerator cancels the next denominator, so every length comes out at **1/12**. This loop closed on arrow 4.",
+    "fan1": [
+      "**Arrow 1** leaves UR. All ",
+      {
+        "data": "12"
+      },
+      " homes are free: ",
+      {
+        "data": "**1**"
+      },
+      " (UR's own) closes the loop at length ",
+      {
+        "data": "1"
+      },
+      "; the other ",
+      {
+        "data": "**11**"
+      },
+      " move on."
+    ],
+    "fan2": [
+      "**Arrow 2** leaves DF. DF's home is taken, so ",
+      {
+        "data": "11"
+      },
+      " are free: ",
+      {
+        "data": "**1**"
+      },
+      " goes back to UR (length ",
+      {
+        "data": "2"
+      },
+      "); ",
+      {
+        "data": "**10**"
+      },
+      " move on."
+    ],
+    "fan3": [
+      "**Arrow 3** leaves FL. ",
+      {
+        "data": "10"
+      },
+      " homes are free: ",
+      {
+        "data": "**1**"
+      },
+      " goes back to UR (length ",
+      {
+        "data": "3"
+      },
+      "); ",
+      {
+        "data": "**9**"
+      },
+      " move on."
+    ],
+    "fan4": [
+      "Multiply along a row: each “moves on” numerator cancels the next denominator, so every length comes out at ",
+      {
+        "data": "**1/12**"
+      },
+      ". This loop closed on arrow ",
+      {
+        "data": "4"
+      },
+      "."
+    ],
     "tableRest": "Same pattern, one more arrow each time",
     "histHead": "Check it on real scrambles: length of the buffer's cycle"
   },
   "cuber": {
     "title": "The answers",
     "p1": "If the buffer's cycle has length {k}, the other {jIs12MinusK} edges must all be home, with chance {oneOverJFact}. The ring steps through a few lengths. Dropping {kIs1}, the solved cube:",
-    "p2": "That sum is the series for {e}. It's the chance of **no cycle break**, about 2 scrambles in 9.",
+    "p2": [
+      "That sum is the series for {e}. It's the chance of **no cycle break**, about ",
+      {
+        "data": "2"
+      },
+      " scrambles in ",
+      {
+        "data": "9"
+      },
+      "."
+    ],
     "p3": "A flipped edge sitting at home doesn't cause a break, but it does need a separate flip algorithm. Requiring that there are none adds {twoToJ} to each term, which gives the series for {sqrtE}:",
     "p4": "That's the chance the edges are just one clean cycle from the buffer, with no break and no flip algorithm.",
     "caption1": "Buffer's cycle: {k} edges · the last edge can only be home",
@@ -698,7 +1020,13 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
     "eyebrow": "My first attempt",
     "title": "Where I first went wrong",
     "p1": "When I first wrote this up, I answered a slightly different question: how often do the edges form a single cycle *anywhere*, with the solved cube counted too?",
-    "p2": "That isn't what a solver needs. A single cycle that skips `UR`, like this one, still needs a cycle break, and nobody is handed a solved cube to solve. Claude pointed this out while building this page; the answers above are the corrected ones.",
+    "p2": [
+      "That isn't what a solver needs. A single cycle that skips `UR`, like this one, still needs a cycle break, and nobody is handed a solved cube to solve. ",
+      {
+        "data": "Claude"
+      },
+      " pointed this out while building this page; the answers above are the corrected ones."
+    ],
     "p3": "The original counting is still a nice piece of combinatorics, so here it is.",
     "caption": "One cycle, but UR isn't in it · my first attempt counted it; a solver needs a break"
   },
@@ -714,33 +1042,190 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
   "term": {
     "title": "First answer",
     "p1": "Divide by {twelveFact} and most of the factorials cancel:",
-    "p2": "Every edge left out of the cycle has to happen to be home, which {twelveMinusKFact} makes unlikely fast: {oneTwelfth} for 12 edges, {oneEleventh} for 11 (the edge left out can be any of the 12), under 2% by 9. Add every length, plus a lone {oneOverTwelveFact} for the solved cube:",
+    "p2": [
+      "Every edge left out of the cycle has to happen to be home, which {twelveMinusKFact} makes unlikely fast: {oneTwelfth} for ",
+      {
+        "data": "12"
+      },
+      " edges, {oneEleventh} for ",
+      {
+        "data": "11"
+      },
+      " (the edge left out can be any of the ",
+      {
+        "data": "12"
+      },
+      "), under ",
+      {
+        "data": "2%"
+      },
+      " by ",
+      {
+        "data": "9"
+      },
+      ". Add every length, plus a lone {oneOverTwelveFact} for the solved cube:"
+    ],
     "stageTitle": "Chance that the edges form one cycle of length k"
   },
   "flipcount": {
     "title": "Full: adding flips back",
-    "p1": "With flips, there are {twelveFactTimes2to11} edge states: the first 11 edges can each be flipped or not, and the 12th is forced to keep the count even.",
-    "p2": "Edges outside the cycle must be home *and* unflipped. Edges inside can be flipped in any even-sized pattern: choose freely for {kMinus1} of them and the last is forced. That's {twoToKMinus1} patterns. The cube is cycling through all 8 for this 4-edge cycle."
+    "p1": [
+      "With flips, there are {twelveFactTimes2to11} edge states: the first ",
+      {
+        "data": "11"
+      },
+      " edges can each be flipped or not, and the ",
+      {
+        "data": "12th"
+      },
+      " is forced to keep the count even."
+    ],
+    "p2": [
+      "Edges outside the cycle must be home *and* unflipped. Edges inside can be flipped in any even-sized pattern: choose freely for {kMinus1} of them and the last is forced. That's {twoToKMinus1} patterns. The cube is cycling through all ",
+      {
+        "data": "8"
+      },
+      " for this ",
+      {
+        "data": "4"
+      },
+      "-edge cycle."
+    ]
   },
   "full": {
     "title": "First answer: counting flips",
     "p1": "Dividing by {twoTo11} as well, each term picks up one more factor:",
-    "p2": "Each edge left out of the cycle now has to be home and unflipped, a further 1-in-2 chance. The 12-edge cycle stays at {oneTwelfth}, but the 11-edge cycle halves and shorter ones shrink faster.",
-    "p3": "Those were my original answers: a cycle anywhere, with the solved cube counted. They're within a couple of points of the real ones, 22.65% and 13.74%, but they answer a question no solver asks."
+    "p2": [
+      "Each edge left out of the cycle now has to be home and unflipped, a further ",
+      {
+        "data": "1-in-2"
+      },
+      " chance. The ",
+      {
+        "data": "12"
+      },
+      "-edge cycle stays at {oneTwelfth}, but the ",
+      {
+        "data": "11"
+      },
+      "-edge cycle halves and shorter ones shrink faster."
+    ],
+    "p3": [
+      "Those were my original answers: a cycle anywhere, with the solved cube counted. They're within a couple of points of the real ones, ",
+      {
+        "data": "22.65%"
+      },
+      " and ",
+      {
+        "data": "13.74%"
+      },
+      ", but they answer a question no solver asks."
+    ]
   },
   "lab": {
     "title": "Check all four",
-    "p1": "The stage is generating random edge states, each a uniformly random permutation with a random even set of flips, and sorting them under all four definitions: the two real answers and the two from my first attempt. The bars settle onto the exact answers well before the run stops at a million.",
+    "p1": [
+      "The stage is generating random edge states, each a uniformly random permutation with a random even set of flips, and sorting them under all four definitions: the two real answers and the two from my first attempt. The bars settle onto the exact answers well before the run stops at ",
+      {
+        "data": "a million"
+      },
+      "."
+    ],
     "note": "The original counting and verification code is on [GitHub](https://github.com/baphaelman/one-cycles).",
     "stageTitle": "Live simulation",
-    "stageHint": "Bars run from 0 to 30%. The dark tick marks the exact answer."
+    "stageHint": [
+      "Bars run from ",
+      {
+        "data": "0 to 30%"
+      },
+      ". The dark tick marks the exact answer."
+    ]
   },
   "after": {
     "title": "All four numbers",
     "countsTitle": "Counts by cycle length",
     "note": "Notation: {nChooseK} is “n choose k”, the number of ways to pick k items from n. Slots are named with the standard face letters U, D, F, B, L, R. Colors follow the common scheme with white on top and green in front."
   },
-  "_show": "colors"
+  "_show": "colors",
+  "_categories": {
+    "data": {
+      "about": "names (old pochmann, T-pem) should be here, as well as math stuff (e/12, the percentages). The stuff like '26 pieces', the 26 should be data, but pieces is not."
+    }
+  },
+  "found": {
+    "on": "2026-11-24",
+    "before": {
+      "hero.note": [
+        "Look closer and both are made of *e*: they're {eOver12} and {sqrtEOver12}",
+        {
+          "me": " "
+        },
+        "!"
+      ],
+      "hero.dek": "Scramble a Rubik's Cube. How often can a blindfolded solver fix every edge in one unbroken chain of swaps?",
+      "pieces.p1": [
+        "A",
+        {
+          "me": " Rubik's"
+        },
+        " cube has 26 pieces: 6 centers, 8 corners",
+        {
+          "me": ","
+        },
+        " and 12 edges. The centers never move relative to each other, so they fix each face's color."
+      ],
+      "pieces.caption": "12 edges · 6 centers · 8 corners",
+      "scramble.p1": [
+        "A scramble ",
+        {
+          "me": "displaces edges from their homes"
+        },
+        ". In this one, seven edges have moved and five are ",
+        {
+          "me": "solved"
+        },
+        "."
+      ],
+      "scramble.caption": "Scrambled · seven edges have left home",
+      "buffer.p1": "The beginner method for blindfolded solving is [Old Pochmann](https://www.speedcubereview.com/blind-solving-algorithms.html). One slot, `UR`, is the *buffer*.",
+      "tperm.p1": [
+        "The swap is an algorithm called the *T-perm*: fourteen face turns that swap whatever is in `UR` with whatever is in `UL`. It also swaps two corners, shown in color on this slide so you can watch them.",
+        {
+          "me": " Everything else stays fixed, which is how solvers accumulate solved pieces."
+        }
+      ],
+      "tperm.p2": "Our first swap is with `DF`, so a solver first makes two setup turns, `D' L2`, that bring the edge in `DF` up to `UL` without touching the buffer. Then the T-perm, then the setup turns undone. Every swap drags the same two corners along, but Old Pochmann fixes the corners in a separate pass afterwards (with one extra algorithm if the number of edge swaps was odd).",
+      "tperm.hint": "press → to play the T-perm, then again to undo the setup",
+      "tperm.caption1": "Setup D' L2 · DF's edge is now in UL, ready to swap",
+      "tperm.caption2": "T-perm · UR ↔ UL swapped, and two corners with them",
+      "closed.p1": "After three swaps, the buffer's own white-red piece arrives back in `UR`. Four edges were solved in three swaps. A loop like this is called a *cycle*.",
+      "break.p2": "These three edges took four swaps. Had they been part of the buffer's cycle, they would have taken three. Each break costs an extra swap and an extra thing to memorize.",
+      "break.caption3": "Every edge solved · 3 edges took 4 swaps",
+      "rewind.p2": "This scramble has two: four edges through the buffer, and three without it.",
+      "rewind.caption": "Rewound · two cycles: 4 edges with the buffer, 3 without",
+      "ring.p1": "For counting, the cube's shape doesn't matter, only which slot points to which. So peel the twelve slots off the cube and lay them in a ring, keeping the arrows.",
+      "ring.p3": "Ours has two loops, so it doesn't count. Press → to see one that does: a single loop through eight edges, with the other four home. On a random scramble, how often does this happen?",
+      "ring.caption1": "Same slots, same arrows, laid out in a ring · two cycles",
+      "ring.caption2": "One cycle through 8 edges · no cycle break",
+      "uniform.p3": "A neat fact helps: **the buffer's cycle is equally likely to have any length from 1 to 12.** Follow the arrows out of `UR`. The first can point to any of the 12 homes, and only one of them, UR's own, closes the loop at once. Each later arrow has one home fewer to choose from, and the chances cancel down to {oneTwelfth} for every length.",
+      "uniform.fan1": "**Arrow 1** leaves UR. All 12 homes are free: **1** (UR's own) closes the loop at length 1; the other **11** move on.",
+      "uniform.fan2": "**Arrow 2** leaves DF. DF's home is taken, so 11 are free: **1** goes back to UR (length 2); **10** move on.",
+      "uniform.fan3": "**Arrow 3** leaves FL. 10 homes are free: **1** goes back to UR (length 3); **9** move on.",
+      "uniform.fan4": "Multiply along a row: each “moves on” numerator cancels the next denominator, so every length comes out at **1/12**. This loop closed on arrow 4.",
+      "cuber.p2": "That sum is the series for {e}. It's the chance of **no cycle break**, about 2 scrambles in 9.",
+      "term.p2": "Every edge left out of the cycle has to happen to be home, which {twelveMinusKFact} makes unlikely fast: {oneTwelfth} for 12 edges, {oneEleventh} for 11 (the edge left out can be any of the 12), under 2% by 9. Add every length, plus a lone {oneOverTwelveFact} for the solved cube:",
+      "flipcount.p1": "With flips, there are {twelveFactTimes2to11} edge states: the first 11 edges can each be flipped or not, and the 12th is forced to keep the count even.",
+      "flipcount.p2": "Edges outside the cycle must be home *and* unflipped. Edges inside can be flipped in any even-sized pattern: choose freely for {kMinus1} of them and the last is forced. That's {twoToKMinus1} patterns. The cube is cycling through all 8 for this 4-edge cycle.",
+      "full.p2": "Each edge left out of the cycle now has to be home and unflipped, a further 1-in-2 chance. The 12-edge cycle stays at {oneTwelfth}, but the 11-edge cycle halves and shorter ones shrink faster.",
+      "full.p3": "Those were my original answers: a cycle anywhere, with the solved cube counted. They're within a couple of points of the real ones, 22.65% and 13.74%, but they answer a question no solver asks.",
+      "lab.p1": "The stage is generating random edge states, each a uniformly random permutation with a random even set of flips, and sorting them under all four definitions: the two real answers and the two from my first attempt. The bars settle onto the exact answers well before the run stops at a million.",
+      "lab.stageHint": "Bars run from 0 to 30%. The dark tick marks the exact answer.",
+      "attempt.p2": "That isn't what a solver needs. A single cycle that skips `UR`, like this one, still needs a cycle break, and nobody is handed a solved cube to solve. Claude pointed this out while building this page; the answers above are the corrected ones.",
+      "hero": {
+        "note": ""
+      }
+    }
+  }
 }
 </script>
 <script src="/slop/slop.js"></script>
