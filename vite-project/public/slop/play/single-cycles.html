@@ -353,10 +353,19 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       <h2 data-slop="scramble.title"></h2>
       <p data-slop="scramble.p1"></p>
       <p data-slop="scramble.p3"></p>
-      <p data-slop="scramble.p4" data-from="1"></p>
-      <p data-slop="scramble.p5" data-from="3"></p>
-      <p data-slop="scramble.p2" data-from="7"></p>
-      <p class="hint scrub" data-slop="scramble.hint"></p>
+    </div></section>
+
+    <section class="step" data-scene="flatten"><div class="card" data-slop-list="flatten">
+      <h2 data-slop="flatten.title"></h2>
+      <p data-slop="flatten.p1"></p>
+      <p data-slop="flatten.p2"></p>
+    </div></section>
+
+    <section class="step" data-scene="chain"><div class="card" data-slop-list="chain">
+      <h2 data-slop="chain.title"></h2>
+      <p data-slop="chain.p1"></p>
+      <p data-slop="chain.p2" data-from="6"></p>
+      <p class="hint scrub" data-slop="chain.hint"></p>
     </div></section>
 
     <section class="step" data-scene="buffer"><div class="card" data-slop-list="buffer">
@@ -506,7 +515,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
 <!-- Every word a reader sees, and who wrote it (see CLAUDE.md, "Text and authorship"). `slop-editor edit` (~/Desktop/Coding/slopometer/cli.mjs) saves the editor into it. -->
 <script type="application/json" id="slop-text">
 {
-  "version": 27,
+  "version": 29,
   "hero": {
     "eyebrow": [
       {
@@ -675,7 +684,6 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       },
       "."
     ],
-    "p2": "Each piece still knows where it belongs from its colors. The yellow-green edge belongs in `DF` wherever it is.",
     "p3": [
       "Every turn moves four edges round a cycle. Draw an arrow from each moved piece to its home: after the first turn, ",
       {
@@ -687,16 +695,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       },
       "."
     ],
-    "p4": [
-      "Cycles are easier to follow flat, so peel the ",
-      {
-        "data": "twelve"
-      },
-      " slots off the cube into a ring beside it, keeping the arrows."
-    ],
-    "p5": "Each turn chains its own cycle onto the ones already there: two cycles can join into one, and one can split in two.",
-    "hint": "press → for each turn",
-    "caption1": [
+    "caption": [
       {
         "data": "R"
       },
@@ -705,23 +704,60 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
         "data": "four"
       },
       " edges"
-    ],
-    "caption2": "Same slots, same arrows, laid out in a ring",
-    "caption3": [
+    ]
+  },
+  "flatten": {
+    "title": "Flatten it",
+    "p1": [
       {
-        "data": "F2"
+        "me": "Each edge can be swapped with any other, so whether they live on a cube or are simply dots that can be switched is a case of perspective."
+      }
+    ],
+    "p2": [
+      "Cycles are easier to follow flat, so peel the ",
+      {
+        "data": "twelve"
       },
-      " · a half turn is two swaps: the cycle grows to ",
+      " slots off the cube into a ring beside it, keeping the arrows."
+    ],
+    "caption": "Same slots, same arrows, laid out in a ring"
+  },
+  "chain": {
+    "title": "Turn by turn",
+    "p1": "Each turn chains its own cycle onto the ones already there: two cycles can join into one, and one can split in two.",
+    "p2": "Each piece still knows where it belongs from its colors. The yellow-green edge belongs in `DF` wherever it is.",
+    "hint": "press → for each turn",
+    "caption1": [
+      {
+        "data": "F"
+      },
+      " shares `FR` with ",
+      {
+        "data": "R"
+      },
+      "'s cycle: the two cycles of ",
+      {
+        "data": "four"
+      },
+      " join into one of ",
+      {
+        "data": "7"
+      }
+    ],
+    "caption2": [
+      {
+        "data": "F"
+      },
+      " again · the cycle splits: ",
       {
         "data": "5"
       },
-      ", and a ",
+      " and ",
       {
         "data": "2"
-      },
-      "-cycle appears"
+      }
     ],
-    "caption4": [
+    "caption3": [
       {
         "data": "D"
       },
@@ -730,7 +766,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
         "data": "9"
       }
     ],
-    "caption5": [
+    "caption4": [
       {
         "data": "L'"
       },
@@ -743,7 +779,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
         "data": "5"
       }
     ],
-    "caption6": [
+    "caption5": [
       {
         "data": "R'"
       },
@@ -752,13 +788,13 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
         "data": "9"
       }
     ],
-    "caption7": [
+    "caption6": [
       {
         "data": "U' L"
       },
       " · split, then joined again"
     ],
-    "caption8": [
+    "caption7": [
       {
         "data": "D'"
       },
@@ -1473,7 +1509,9 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
   // The opening slides' cube is one line of real face turns: solved → the scramble ("A scramble", "The buffer") → setup D' L2 brings
   // DF's edge to UL → the T-perm → setup undone, which is exactly the first Old Pochmann swap UR ↔ DF (SWAPS[1], where "Swap, swap,
   // swap" picks up). Any two of those five states are joined by a stretch of this one path, so ←/→ mid-way just turns back.
-  const DEMO_MOVES = "R F2 D L' R' U' L D'".split(' '); // an edge-only meet-in-the-middle search; the corners land anywhere
+  // An edge-only meet-in-the-middle search found R F2 D L' R' U' L D'; F2 is played as F F, so every turn is one 4-cycle ("Turn by turn").
+  // The corners land anywhere.
+  const DEMO_MOVES = "R F F D L' R' U' L D'".split(' ');
   const OP_SETUP = ["D'", 'L2'];
   const OP_MOVES = DEMO_MOVES.concat(OP_SETUP, TPERM, OP_SETUP.slice().reverse().map(invMove));
   const OP_AT = [0, DEMO_MOVES.length, DEMO_MOVES.length + 2, DEMO_MOVES.length + 2 + TPERM.length, OP_MOVES.length]; // solved, scramble, set up, T-permed, swapped
@@ -1488,9 +1526,9 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
   const PRES_SC = 12;
   const OP_PATH = makePath(SOLVED, OP_MOVES, 'present', opCap, OP_MOVES.map((_, k) => k < OP_AT[1] ? PRES_SC : k >= OP_AT[2] && k < OP_AT[3] ? PRES_TP : PRES));
   const [, , OP_SET, OP_TP] = OP_AT.map(i => OP_PATH.states[i]);
-  // "Scrambling" builds: the states (indices into OP_PATH) after R | flattened | F2 | D | L' | R' | U' L | D'. The cycles after each:
-  // 4 → 5+2 → 9 → 6+5 (split) → 9 (joined) → 6+5 → 9 → 4+3 (DEMO). No turn here flips an edge.
-  const SC_AT = [1, 1, 2, 3, 4, 5, 7, 8], SC = SC_AT.map(i => OP_PATH.states[i]);
+  // "Scrambling" / "Turn by turn": the states (indices into OP_PATH) after R | F | F | D | L' | R' | U' L | D'. The cycles after each:
+  // 4 → 7 (joined) → 5+2 (split) → 9 → 6+5 → 9 → 6+5 → 9 → 4+3 (DEMO). Only the F turns flip edges, and the second F flips them back.
+  const SC_AT = [1, 2, 3, 4, 5, 6, 8, 9], SC = SC_AT.map(i => OP_PATH.states[i]);
   const opCorners = i => OP_MOVES.slice(0, OP_AT[i]); // where the corners physically are at each of the five states
   // The two corner pieces the T-perm swaps: the ones sitting in UFR and UBR once the setup is done (indices into the corner cubies,
   // created x, y, z ∈ {−1, 1} in that loop order). The T-perm slide colors only these.
@@ -1503,10 +1541,15 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
   const PARTNER = POS[DEMO.p[IDX.DF]];
   if (key(OP_PATH.states[OP_AT[1]]) !== key(DEMO)) console.warn('DEMO_MOVES do not reach DEMO');
   if (key(OP_PATH.states[OP_AT[4]]) !== key(SWAPS[1])) console.warn('setup + T-perm + undo is not the swap UR ↔ DF');
-  const OP_STOPS = [...new Set(OP_AT.concat(SC_AT))];
+  const OP_STOPS = [...new Set(OP_AT.concat(SC_AT))], SHADOW_LEAD = 1.5;
   OP_STOPS.forEach(a => {
     if (OP_PATH.states.filter(x => key(x) === key(OP_PATH.states[a])).length !== 1) console.warn('OP_PATH revisits state', a);
-    OP_STOPS.forEach(b => { if (a !== b) TURNS[key(OP_PATH.states[a]) + '>' + key(OP_PATH.states[b])] = {path: OP_PATH, from: a, to: b, lead: a === OP_AT[1] && b === OP_AT[2] ? 0.9 : 0}; });
+    OP_STOPS.forEach(b => {
+      if (a === b) return;
+      // "Turn by turn" b0–b2, forward: the ring shows the old cycles, fades them to shadows, then turns (SHADOW_LEAD) and traces over them.
+      const sh = SC_AT.slice(0, 3).includes(a) && SC_AT[SC_AT.indexOf(a) + 1] === b;
+      TURNS[key(OP_PATH.states[a]) + '>' + key(OP_PATH.states[b])] = {path: OP_PATH, from: a, to: b, lead: sh ? SHADOW_LEAD : a === OP_AT[1] && b === OP_AT[2] ? 0.9 : 0, shadow: sh, first: sh && a === SC_AT[0]};
+    });
   });
   // The moves (and captions) that take path P from state index a to b, in either direction.
   function pathSegment(P, a, b) {
@@ -1819,10 +1862,14 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
         tags: show.map(k => ({p3: PIECE[k].tag, text: k, tone: PIECE[k].ink}))});
     }},
     homes: {n: 1, f: () => ({view: V_HOME, track: NAMES_MARK, labels: 'all', caption: Slop.html('homes.caption')})},
-    // One build per turn (SC_AT). b0: R on the cube, its arrows drawing out with the turn (drawTurn). b1: the slots peel off the cube
-    // into a ring beside it (split + peel). From b2 the ring follows each turn, then traces the new cycles (makeRingTurns).
-    scramble: {n: SC.length, f: b => ({state: SC[b], cornerSet: OP_MOVES.slice(0, SC_AT[b]), arrows: true, drawTurn: !b, split: b > 0, peel: true,
-      labels: b ? [] : ['UR', 'FR', 'DR', 'BR'], caption: Slop.html('scramble.caption' + (b + 1))})},
+    // "Scrambling": R on the cube, its arrows drawing out with the turn (drawTurn). "Flatten it": the slots peel off the cube into a ring
+    // beside it (split + peel). "Turn by turn": one build per turn (SC_AT); the ring follows each turn, then traces the new cycles
+    // (makeRingTurns; the first three show the old cycles, fade them to shadows, and trace the new ones over them).
+    scramble: {n: 1, f: () => ({state: SC[0], cornerSet: OP_MOVES.slice(0, SC_AT[0]), arrows: true, drawTurn: true, peel: true,
+      labels: ['UR', 'FR', 'DR', 'BR'], caption: Slop.html('scramble.caption')})},
+    flatten: {n: 1, f: () => ({state: SC[0], cornerSet: OP_MOVES.slice(0, SC_AT[0]), arrows: true, split: true, peel: true, caption: Slop.html('flatten.caption')})},
+    chain: {n: SC.length - 1, f: b => ({state: SC[b + 1], cornerSet: OP_MOVES.slice(0, SC_AT[b + 1]), arrows: true, split: true, peel: true,
+      caption: Slop.html('chain.caption' + (b + 1))})},
     // Tilts slowly up and down (16 s) so the yellow bottom shows too.
     buffer: {n: 1, f: (b, el) => ({state: DEMO, cornerSet: opCorners(1), track: [PARTNER], buf: true, view: {rx: reduce ? V0.rx : 0.02 + 0.48 * Math.cos(2 * Math.PI * el / 16), ry: V0.ry}, labels: ['UR', 'DF'], focus: ['UR', 'DF'], arrows: [['UR', 'DF']],
       tags: [{pos: 'UR', text: 'buffer'}], caption: Slop.html('buffer.caption')})},
@@ -1942,7 +1989,10 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
   let W = 1, H = 1;
   // Front page: the cube shrinks to one side and its ring sits beside it (below it on tall stages).
   let splitK = 0, camD = 10;
+  let peeling = false; // "Flatten it" on: the split ring's nodes peel off the cube's slots, and the ring is the main picture (not on the front page)
   function splitGeo() {
+    // From "Flatten it" on (peeling): the ring is the main picture, the cube small in the top-left corner.
+    if (peeling) return {cx: Math.min(W, H) * 0.2, cy: Math.min(W, H) * 0.2, cs: 0.3, rx: W * 0.56, ry: H * 0.56, RR: Math.min(W * 0.32, H * 0.3)};
     if (W / H >= 1) return {cx: W * 0.27, cy: H * 0.48, cs: 0.44, rx: W * 0.73, ry: H * 0.48, RR: Math.min(W * 0.17, H * 0.16)};
     return {cx: W / 2, cy: H * 0.3, cs: 0.56, rx: W / 2, ry: H * 0.635, RR: Math.min(W * 0.3, H * 0.15)};
   }
@@ -1983,7 +2033,6 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
   let linesA = 0, linesLast = []; // spec.lines: fade and last list
   let ovCur = {key: '', state: SOLVED, arrows: true, focus: null, neutral: false, tri: null, ring: null}, ovPrev = null, ovT0 = 0, ovDelay = 0, frameNo = 0;
   let turnD = 1; // drawTurn ("Scrambling" b0): how far its turn has played, 0..1; its arrows draw out with it, heads riding the tip
-  let peeling = false; // the split ring's nodes peel off the cube's slots ("Scrambling"), not on the front page
   const ovKey = sp => (sp.morph ? key(sp.state) : sp.state.p.join()) + '|' + JSON.stringify(sp.arrows) + '|' + JSON.stringify(sp.focus) + '|' + sp.neutral;
 
   // Arrow curves for [from, to, color] triples. Each bows to its left; ta/tb are the angles at which it leaves A and reaches B.
@@ -2083,7 +2132,17 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       const B = turnState(s, mv), dur = d[fwd ? tp.from + k : tp.from - 1 - k], t1 = t;
       stages.push(ringStage(s, B, () => ({t0: t1, dur, ez: sine}))); s = B; t += dur;
     });
-    return ringTail(A, s, t0, stages, t + 0.2, false, true);
+    const R = ringTail(A, s, t0, stages, t + 0.2, false, true);
+    if (tp.shadow) {
+      // The turn's own 4-cycle shows dimmed beside the old cycles' shadows (moveArr; mv[a] = the slot a's piece came from), and the
+      // shadows fade out once the new cycles are traced. The first time, the trace is slow and lights up the two arrows each new one
+      // follows: the turn's arrow out of a, then the old arrow out of mv[a].
+      const mvS = turnState(SOLVED, seg.moves[0]);
+      Object.assign(R, {shadow: true, moveArr: arrowsOf(mvS).map(([a, b]) => [a, b, 'm']), mv: mvS.p, first: !!tp.first});
+      if (tp.first) { R.per = 0.75; R.end = R.drawStart + R.per * Math.max(...R.orders.map(o => o.nodes.length - 1)) + 0.25; }
+      R.end += 0.8;
+    }
+    return R;
   }
   const stageAt = (R, t) => { let st = R.stages[0]; for (const x of R.stages) if (x.start <= t) st = x; return st; };
   // A traveling ring piece at progress u from slot i to slot j: straight across, rising toward you (bigger, with a shadow)
@@ -2135,18 +2194,30 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       if (L.arrows === true) arr = arrowsOf(src);
       else if (L.arrows === 'buffer') arr = arrowsOf(src, true);
       else if (Array.isArray(L.arrows)) arr = L.arrows.map(([a, b]) => [IDX[a], IDX[b], 1]);
-      const drawK = !R ? (L.drawTurn ? () => turnD : null) : t < R.drawStart ? (R.drawOnly ? () => 0 : n => 1 - ss((t - n * 0.03) / R.tRet))
+      // shadow: the old cycles stay whole (no retract), fade to a faint shadow before the turn, and fade out after the new trace.
+      const drawK = !R ? (L.drawTurn ? () => turnD : null) : t < R.drawStart ? (R.drawOnly ? () => 0 : R.shadow ? () => 1 : n => 1 - ss((t - n * 0.03) / R.tRet))
         : n => ss((t - R.drawStart - R.step[n] * R.per) / R.per);
+      const SHADOW = 0.2, MOVE_DIM = 0.45, fadeOut = R ? 1 - ss((t - R.end + 0.7) / 0.6) : 0;
+      const shadowA = !R || !R.shadow ? 0 : t < R.drawStart ? lerp(1, SHADOW, ss((t - 0.6) / 0.6)) : SHADOW * fadeOut;
+      const moveA = !R || !R.moveArr ? 0 : t < R.drawStart ? MOVE_DIM * ss((t - 0.9) / 0.5) : MOVE_DIM * fadeOut;
+      const boostSh = new Array(12).fill(0), boostMv = new Array(12).fill(0); // first time: the arrows the new one being drawn follows
+      if (R && R.first && t >= R.drawStart) arr.forEach(([a], n) => {
+        const b = clamp(1 - Math.abs((t - R.drawStart - R.step[n] * R.per) / R.per - 0.5) / 0.7);
+        boostSh[R.mv[a]] = Math.max(boostSh[R.mv[a]], b); if (R.mv[a] !== a) boostMv[a] = Math.max(boostMv[a], b);
+      });
+      const colV = c => c === 'm' ? 'var(--ink-2)' : `var(--c${c})`;
       const HL = lerp(13, 12, m), HW = lerp(5.6, 5.2, m), sw = lerp(3, 2.4, m), f1 = v => v.toFixed(1);
       const Lp = (p, q, u) => [lerp(p[0], q[0], u), lerp(p[1], q[1], u)];
       let lines = '', heads = '';
-      arrowGeo(arr, G).forEach((g, n) => {
-        const k = drawK ? drawK(n) : 1;
+      const shadowArr = shadowA > 0.01 ? arrowsOf(R.A) : [], moveArr = moveA > 0.01 ? R.moveArr : [], nSh = shadowArr.length, nBg = nSh + moveArr.length;
+      // Separate geometry, so a new arrow that matches an old one lies exactly on its shadow.
+      arrowGeo(shadowArr, G).concat(arrowGeo(moveArr, G), arrowGeo(R && R.shadow && t < R.drawStart ? [] : arr, G)).forEach((g, n) => {
+        const sh = n < nSh, mvA = !sh && n < nBg, k = n < nBg ? 1 : drawK ? drawK(n - nBg) : 1;
         if (k < 0.01) return;
         let {P0, c1, c2, P3} = g;
         if (k < 0.999) { const q1 = Lp(P0, c1, k), q2 = Lp(c1, c2, k), q3 = Lp(c2, P3, k), r1 = Lp(q1, q2, k); [c1, c2, P3] = [q1, r1, Lp(r1, Lp(q2, q3, k), k)]; }
-        const op = lerp(0.25 + 0.75 * Math.min(vis[g.a], vis[g.b]), 1, m) * (focus && !(focus.has(g.a) && focus.has(g.b)) ? 0.25 : 1);
-        lines += `<path d="M${f1(P0[0])} ${f1(P0[1])}C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(P3[0])} ${f1(P3[1])}" style="fill: none; stroke: var(--c${g.col})" stroke-width="${sw}" stroke-linecap="round" opacity="${op.toFixed(2)}"/>`;
+        const op = lerp(0.25 + 0.75 * Math.min(vis[g.a], vis[g.b]), 1, m) * (focus && !(focus.has(g.a) && focus.has(g.b)) ? 0.25 : 1) * (sh ? shadowA + (1 - shadowA) * 0.85 * boostSh[g.a] : mvA ? moveA + (1 - moveA) * 0.85 * boostMv[g.a] : 1);
+        lines += `<path d="M${f1(P0[0])} ${f1(P0[1])}C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(P3[0])} ${f1(P3[1])}" style="fill: none; stroke: ${colV(g.col)}" stroke-width="${sw}" stroke-linecap="round" opacity="${op.toFixed(2)}"/>`;
         // The head sits halfway along the full curve, pointing along it; it grows in as the line passes.
         // drawTurn: it rides the tip of the line (its point at the line's end) until it reaches that spot, stays there, and the line draws on without it.
         let hs = k >= 0.999 ? 1 : ss((k - g.th + 0.08) / 0.16), hx = g.hx, hy = g.hy, ang = g.ang;
@@ -2158,7 +2229,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
           hs = ss(k / 0.12);
         }
         if (hs < 0.01) return;
-        heads += `<path d="M${HL / 2} 0L${-HL / 2} ${HW}L${-HL / 2} ${-HW}Z" transform="translate(${f1(hx)} ${f1(hy)}) rotate(${f1(ang * 180 / Math.PI)}) scale(${hs.toFixed(3)})" style="fill: var(--c${g.col}); stroke: var(--stage)" stroke-width="1.2" stroke-linejoin="round" opacity="${op.toFixed(2)}"/>`;
+        heads += `<path d="M${HL / 2} 0L${-HL / 2} ${HW}L${-HL / 2} ${-HW}Z" transform="translate(${f1(hx)} ${f1(hy)}) rotate(${f1(ang * 180 / Math.PI)}) scale(${hs.toFixed(3)})" style="fill: ${colV(g.col)}; stroke: var(--stage)" stroke-width="1.2" stroke-linejoin="round" opacity="${op.toFixed(2)}"/>`;
       });
       out += lines + heads;
       if (R) for (const o of R.orders) o.nodes.forEach((sl, q) => { // a ripple on each slot as its cycle's trace reaches it
@@ -2222,9 +2293,8 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
     else if (Array.isArray(spec.slotMark)) spec.slotMark.forEach(n => { wantMark[IDX[n]] = 1; });
     for (let i = 0; i < 12; i++) { markA[i] += (wantMark[i] - markA[i]) * b2; if (markA[i] > 0.02) out += drawSlotMarks(G, [i], markA[i]); }
     let G2 = null; // the front page's ring, beside the cube
-    if (spec.peel) peeling = true; else if (spec.split) peeling = false;
     if (splitK > 0.01) {
-      const g = splitGeo(), NR2 = clamp(g.RR * 0.13, 7, 13), p2 = [];
+      const g = splitGeo(), NR2 = peeling ? clamp(Math.min(W, H) * 0.042, 11, 19) : clamp(g.RR * 0.13, 7, 13), p2 = [];
       for (let i = 0; i < 12; i++) { const a = (-90 + i * 30) * Math.PI / 180; p2.push([g.rx + g.RR * Math.cos(a), g.ry + g.RR * Math.sin(a)]); }
       // Peeling: each node leaves its slot on the cube and slides out to its place on the ring as the split opens (and back as it closes).
       if (peeling && has3D) { const k = ss(splitK); for (let i = 0; i < 12; i++) p2[i] = [lerp(pts[i][0], p2[i][0], k), lerp(pts[i][1], p2[i][1], k)]; }
@@ -2526,7 +2596,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
   };
   Object.entries({
     'pieces.caption1': 0, 'pieces.caption2': 1, 'homes.caption': 0, 'buffer.caption': 0,
-    'scramble.caption1': 0, 'scramble.caption2': 1, 'scramble.caption3': 2, 'scramble.caption4': 3, 'scramble.caption5': 4, 'scramble.caption6': 5, 'scramble.caption7': 6, 'scramble.caption8': 7,
+    'scramble.caption': 0, 'flatten.caption': 0, 'chain.caption1': 0, 'chain.caption2': 1, 'chain.caption3': 2, 'chain.caption4': 3, 'chain.caption5': 4, 'chain.caption6': 5, 'chain.caption7': 6,
     'tperm.caption1': 0, 'tperm.caption2': 1, 'tperm.caption3': 2, 'swaps.caption1': 0, 'swaps.caption2': 1,
     'closed.caption': 0, 'break.caption1': 0, 'break.caption2': 1, 'break.caption3': 2,
     'ring.caption1': 0, 'ring.caption2': 1, 'flips.caption2': 0, 'flips.caption3': 1,
@@ -2616,6 +2686,8 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
     if (onCube && !holding) {
       if (mt !== mTo) { mFrom = cur.m; mTo = mt; mT0 = now; }
       cur.m = reduce ? mTo : lerp(mFrom, mTo, ease(clamp((now - mT0) / 1.1)));
+      // The layout switches to the corner cube while the split is closed; the front page takes its own back at once.
+      if (spec.peel && !peeling && splitK < 0.01) { peeling = true; applySplit(); } else if (spec.split && !spec.peel && peeling) { peeling = false; applySplit(); }
       const sk = spec.split ? 1 : 0, nk = snap || reduce || frameNo < 3 ? sk : splitK + (sk - splitK) * (1 - Math.exp(-dt * 3.5));
       if (Math.abs(nk - splitK) > 1e-4 || (nk !== splitK)) { splitK = Math.abs(nk - sk) < 1e-3 ? sk : nk; applySplit(); }
       if (spec.spin && !reduce) spinOff = wrapPi(spinOff + dt * 0.35); else spinOff *= reduce ? 0 : 0.96;

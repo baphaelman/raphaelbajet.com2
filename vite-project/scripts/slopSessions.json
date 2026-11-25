@@ -2736,11 +2736,11 @@
     "04967627-e193-45f4-80ad-d763e8567b21": {
         "project": "algorhythms",
         "started": "2026-11-22",
-        "bytes": 27465685,
+        "bytes": 27506533,
         "agents": [
             {
                 "project": "algorhythms",
-                "hours": 30.993
+                "hours": 31.103
             }
         ]
     },
@@ -4609,11 +4609,11 @@
     "4b84fe60-4732-4c3c-aa6e-a1df9579149b": {
         "project": "single-cycles",
         "started": "2026-11-25",
-        "bytes": 6492346,
+        "bytes": 6552810,
         "agents": [
             {
                 "project": "single-cycles",
-                "hours": 0.91
+                "hours": 0.915
             }
         ]
     },
@@ -4741,11 +4741,11 @@
     "d8c28881-ee1e-4d64-b558-84cf47035875": {
         "project": "single-cycles",
         "started": "2026-11-25",
-        "bytes": 7575029,
+        "bytes": 7583807,
         "agents": [
             {
                 "project": "single-cycles",
-                "hours": 0.791
+                "hours": 0.794
             }
         ]
     }

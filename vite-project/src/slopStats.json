@@ -15,7 +15,7 @@
             "commits": 959,
             "agents": 229,
             "sessions": 111,
-            "hours": 185.3,
+            "hours": 185.4,
             "from": "2026-11",
             "to": "2026-11",
             "updated": "2026-11-25"
@@ -48,7 +48,7 @@
             "updated": "2026-11-24"
         },
         "single-cycles": {
-            "commits": 7,
+            "commits": 8,
             "agents": 12,
             "sessions": 11,
             "hours": 12.7,
