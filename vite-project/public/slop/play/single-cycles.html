@@ -61,6 +61,9 @@ p:last-child { margin-bottom: 0; }
 a { color: var(--accent-ink); text-underline-offset: 3px; }
 a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .pos { font-family: var(--f-mono); font-size: 0.8em; font-weight: 600; padding: 0 0.32em; border-radius: 4px; background: var(--rule); white-space: nowrap; }
+.pos.mark { color: var(--c5); } /* slots outlined on the stage in the same pink; the Slop-o-meter's colors win while on */
+.kw { color: var(--kw); } /* "The Cube": piece words in their stage outline's color */
+:where(.slop-on) .kw:not(:where(.slop-off) .kw) { color: inherit; } /* the Slop-o-meter's colors win while on */
 .eyebrow { font-family: var(--f-mono); font-size: 0.76rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 10px; }
 math { font-family: var(--f-math); font-size: 1.08em; }
 math.sq { margin-right: -0.22em; } /* Chrome pads the right of an inline radical */
@@ -84,6 +87,9 @@ kbd { font-family: var(--f-mono); font-size: 0.78rem; font-weight: 600; color: v
 /* Only the current slide's text shows; the others fade out as you leave them. */
 .step .card { opacity: 0; visibility: hidden; transition: opacity .45s ease, visibility 0s linear .45s; }
 .step.cur .card { opacity: 1; visibility: visible; transition: opacity .55s ease .1s, visibility 0s; }
+/* Text for a later build (data-from="b") fades in when the slide reaches that build. */
+.card [data-from] { opacity: 0; transform: translateY(6px); transition: opacity .5s ease, transform .5s ease; }
+.card [data-from].in { opacity: 1; transform: none; }
 .qbox { margin-top: 1.4rem; padding-top: 1rem; border-top: 1px solid var(--rule); }
 .scrub { display: inline-flex; align-items: center; gap: 8px; margin-top: 4px; }
 .scrub::before { content: ""; width: 18px; height: 1px; background: var(--ink-3); }
@@ -334,7 +340,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
     <section class="step" data-scene="pieces"><div class="card" data-slop-list="pieces">
       <h2 data-slop="pieces.title"></h2>
       <p data-slop="pieces.p1"></p>
-      <p data-slop="pieces.p2"></p>
+      <p data-slop="pieces.p3" data-from="1"></p>
     </div></section>
 
     <section class="step" data-scene="homes"><div class="card" data-slop-list="homes">
@@ -346,7 +352,11 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
     <section class="step" data-scene="scramble"><div class="card" data-slop-list="scramble">
       <h2 data-slop="scramble.title"></h2>
       <p data-slop="scramble.p1"></p>
-      <p data-slop="scramble.p2"></p>
+      <p data-slop="scramble.p3"></p>
+      <p data-slop="scramble.p4" data-from="1"></p>
+      <p data-slop="scramble.p5" data-from="3"></p>
+      <p data-slop="scramble.p2" data-from="7"></p>
+      <p class="hint scrub" data-slop="scramble.hint"></p>
     </div></section>
 
     <section class="step" data-scene="buffer"><div class="card" data-slop-list="buffer">
@@ -381,12 +391,6 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       <p data-slop="break.p1"></p>
       <p data-slop="break.p2"></p>
       <p class="hint scrub" data-slop="break.hint"></p>
-    </div></section>
-
-    <section class="step" data-scene="rewind"><div class="card" data-slop-list="rewind">
-      <h2 data-slop="rewind.title"></h2>
-      <p data-slop="rewind.p1"></p>
-      <p data-slop="rewind.p2"></p>
     </div></section>
 
     <section class="step tall" data-scene="ring"><div class="card">
@@ -502,7 +506,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
 <!-- Every word a reader sees, and who wrote it (see CLAUDE.md, "Text and authorship"). `slop-editor edit` (~/Desktop/Coding/slopometer/cli.mjs) saves the editor into it. -->
 <script type="application/json" id="slop-text">
 {
-  "version": 15,
+  "version": 26,
   "hero": {
     "eyebrow": [
       {
@@ -574,9 +578,12 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
     "p1": [
       "A",
       {
-        "me": " Rubik's"
+        "me": " "
       },
-      " cube has ",
+      {
+        "data": "Rubik's cube"
+      },
+      " has ",
       {
         "data": "26"
       },
@@ -596,23 +603,19 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       {
         "data": "12"
       },
-      " edges. The centers never move relative to each other, so they fix each face's color."
+      " edges."
     ],
-    "p2": "This article is about the edges.",
-    "caption": [
+    "p3": [
       {
-        "data": "12"
-      },
-      " edges · ",
+        "me": "The centers are static, so any move just shuffles the other pieces around.\n\nIn this article we focus on the edges."
+      }
+    ],
+    "caption1": [
       {
-        "data": "6"
-      },
-      " centers · ",
-      {
-        "data": "8"
-      },
-      " corners"
-    ]
+        "data": "12 edges · 6 centers · 8 corners"
+      }
+    ],
+    "caption2": "The edges: what this article follows"
   },
   "homes": {
     "title": [
@@ -633,7 +636,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       {
         "me": " (green) faces"
       },
-      ". `DB` is between Down and Back",
+      ". `DR` is between Down and Right",
       {
         "me": ", etc"
       },
@@ -673,12 +676,101 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       "."
     ],
     "p2": "Each piece still knows where it belongs from its colors. The yellow-green edge belongs in `DF` wherever it is.",
-    "caption": [
-      "Scrambled · ",
+    "p3": [
+      "Every turn moves four edges round a cycle. Draw an arrow from each moved piece to its home: after the first turn, ",
       {
-        "data": "seven"
+        "data": "R"
       },
-      " edges have left home"
+      ", the arrows make one cycle of ",
+      {
+        "data": "four"
+      },
+      "."
+    ],
+    "p4": [
+      "Cycles are easier to follow flat, so peel the ",
+      {
+        "data": "twelve"
+      },
+      " slots off the cube into a ring beside it, keeping the arrows."
+    ],
+    "p5": "Each turn chains its own cycle onto the ones already there: two cycles can join into one, and one can split in two.",
+    "hint": "press → for each turn",
+    "caption1": [
+      {
+        "data": "R"
+      },
+      " · one cycle of ",
+      {
+        "data": "four"
+      },
+      " edges"
+    ],
+    "caption2": "Same slots, same arrows, laid out in a ring",
+    "caption3": [
+      {
+        "data": "F2"
+      },
+      " · a half turn is two swaps: the cycle grows to ",
+      {
+        "data": "5"
+      },
+      ", and a ",
+      {
+        "data": "2"
+      },
+      "-cycle appears"
+    ],
+    "caption4": [
+      {
+        "data": "D"
+      },
+      " · the two cycles join into one of ",
+      {
+        "data": "9"
+      }
+    ],
+    "caption5": [
+      {
+        "data": "L'"
+      },
+      " · the cycle splits in two: ",
+      {
+        "data": "6"
+      },
+      " and ",
+      {
+        "data": "5"
+      }
+    ],
+    "caption6": [
+      {
+        "data": "R'"
+      },
+      " · joined again: ",
+      {
+        "data": "9"
+      }
+    ],
+    "caption7": [
+      {
+        "data": "U' L"
+      },
+      " · split, then joined again"
+    ],
+    "caption8": [
+      {
+        "data": "D'"
+      },
+      " · split into this scramble's two cycles: ",
+      {
+        "data": "4"
+      },
+      " and ",
+      {
+        "data": "3"
+      },
+      " edges"
     ]
   },
   "buffer": {
@@ -691,7 +783,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       ". One slot, `UR`, is the *buffer*."
     ],
     "p2": "You look at the piece in the buffer, work out where it belongs, and swap it there using one memorized algorithm. Here the buffer holds the yellow-green edge, so the first swap is with `DF`.",
-    "caption": "The buffer holds yellow-green, which belongs in DF"
+    "caption": "The buffer holds yellow-green, which belongs in `DF`"
   },
   "tperm": {
     "title": "One swap, up close",
@@ -745,24 +837,24 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       {
         "data": "D' L2"
       },
-      " · DF's edge is now in UL, ready to swap"
+      " · `DF`'s edge is now in `UL`, ready to swap"
     ],
     "caption2": [
       {
         "data": "T-perm"
       },
-      " · UR ↔ UL swapped, and two corners with them"
+      " · `UR` ↔ `UL` swapped, and two corners with them"
     ],
-    "caption3": "Setup undone · yellow-green is home in DF"
+    "caption3": "Setup undone · yellow-green is home in `DF`"
   },
   "swaps": {
     "title": "Swap, swap, swap",
     "p1": "Each swap sends one piece home and brings a new piece into the buffer. The swap with `DF` brought in the piece that belongs in `FL`, so you repeat with whatever arrives: `FL`, then `UB`.",
-    "p2": "The arrows point from each piece to its home. They form a loop, and every swap removes one arrow.",
+    "p2": "The arrows are the buffer's cycle. Each swap splits one edge off it, solved, so the cycle loses an arrow each time.",
     "hint": "press → once for each swap",
-    "swapping": "Swapping UR ↔ {slot}",
-    "caption1": "DF solved · next: swap UR ↔ FL",
-    "caption2": "FL solved · next: swap UR ↔ UB"
+    "swapping": "Swapping `UR` ↔ {slot}",
+    "caption1": "`DF` solved · next: swap `UR` ↔ `FL`",
+    "caption2": "`FL` solved · next: swap `UR` ↔ `UB`"
   },
   "closed": {
     "title": "The loop closes",
@@ -779,14 +871,14 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       {
         "data": "three"
       },
-      " swaps. A loop like this is called a *cycle*."
+      " swaps. The buffer's cycle is done."
     ],
     "p2": "But `UF`, `DR` and `BR` are still wrong. They form a cycle of their own, and the buffer isn't in it. Swapping the buffer with itself does nothing, so the method is stuck.",
-    "caption": "UB solved · loop closed · UF, DR and BR still wrong"
+    "caption": "`UB` solved · loop closed · `UF`, `DR` and `BR` still wrong"
   },
   "break": {
     "title": "A cycle break",
-    "p1": "To get unstuck, you deliberately swap the solved buffer piece into the other cycle, then follow that cycle until the buffer piece comes back. Solvers call this a *cycle break*.",
+    "p1": "To get unstuck, you deliberately swap the solved buffer piece into the other cycle. That swap joins the two cycles into one, which you follow until the buffer piece comes back. Solvers call this a *cycle break*.",
     "p2": [
       "These ",
       {
@@ -804,9 +896,9 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
     ],
     "hint": "press → to make the break, then again to finish it",
     "caption1": "Next: break into the other cycle",
-    "breaking": "Cycle break: swapping UR ↔ UF",
-    "caption2": "White-red parked in UF · the buffer is now in that cycle",
-    "finishing": "Finishing the break: UR ↔ DR, BR, UF",
+    "breaking": "Cycle break: swapping `UR` ↔ `UF`",
+    "caption2": "White-red parked in `UF` · the buffer is now in that cycle",
+    "finishing": "Finishing the break: `UR` ↔ `DR`, `BR`, `UF`",
     "caption3": [
       "Every edge solved · ",
       {
@@ -819,50 +911,9 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       " swaps"
     ]
   },
-  "rewind": {
-    "title": "Every scramble is a set of cycles",
-    "p1": "Finish the solve, then rewind it swap by swap back to the scramble, and draw an arrow from every misplaced piece to its home. Follow the arrows from any piece and you always come back to where you started. So the arrows always split into closed loops.",
-    "p2": [
-      "This scramble has ",
-      {
-        "data": "two"
-      },
-      ": ",
-      {
-        "data": "four"
-      },
-      " edges through the buffer, and ",
-      {
-        "data": "three"
-      },
-      " without it."
-    ],
-    "rewinding": "Rewinding the solve, swap by swap",
-    "caption": [
-      "Rewound · ",
-      {
-        "data": "two"
-      },
-      " cycles: ",
-      {
-        "data": "4"
-      },
-      " edges with the buffer, ",
-      {
-        "data": "3"
-      },
-      " without"
-    ]
-  },
   "ring": {
-    "title": "Flatten it",
-    "p1": [
-      "For counting, the cube's shape doesn't matter, only which slot points to which. So peel the ",
-      {
-        "data": "twelve"
-      },
-      " slots off the cube and lay them in a ring, keeping the arrows."
-    ],
+    "title": "Back to the ring",
+    "p1": "For counting, the cube's shape doesn't matter, only which slot points to which. So from here on the slots stay flat. Here is our scramble again.",
     "question": "The question",
     "p2": "Call a scramble a **single cycle** when one loop covers every edge that's out of place. Then the solve needs no cycle break.",
     "p3": [
@@ -881,7 +932,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       " home. On a random scramble, how often does this happen?"
     ],
     "caption1": [
-      "Same slots, same arrows, laid out in a ring · ",
+      "Our scramble, flat · ",
       {
         "data": "two"
       },
@@ -921,13 +972,13 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       {
         "data": "12"
       },
-      " homes, and only one of them, UR's own, closes the loop at once. Each later arrow has one home fewer to choose from, and the chances cancel down to {oneTwelfth} for every length."
+      " homes, and only one of them, `UR`'s own, closes the loop at once. Each later arrow has one home fewer to choose from, and the chances cancel down to {oneTwelfth} for every length."
     ],
     "p4": "The strip at the bottom is sampling random scrambles live. Every bar settles at {oneTwelfth}.",
     "hint": "press → to follow each arrow",
-    "stageTitle": "Following the arrows out of UR",
+    "stageTitle": "Following the arrows out of `UR`",
     "fan1": [
-      "**Arrow 1** leaves UR. All ",
+      "**Arrow 1** leaves `UR`. All ",
       {
         "data": "12"
       },
@@ -935,7 +986,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       {
         "data": "**1**"
       },
-      " (UR's own) closes the loop at length ",
+      " (`UR`'s own) closes the loop at length ",
       {
         "data": "1"
       },
@@ -946,7 +997,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       " move on."
     ],
     "fan2": [
-      "**Arrow 2** leaves DF. DF's home is taken, so ",
+      "**Arrow 2** leaves `DF`. `DF`'s home is taken, so ",
       {
         "data": "11"
       },
@@ -954,7 +1005,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       {
         "data": "**1**"
       },
-      " goes back to UR (length ",
+      " goes back to `UR` (length ",
       {
         "data": "2"
       },
@@ -965,7 +1016,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       " move on."
     ],
     "fan3": [
-      "**Arrow 3** leaves FL. ",
+      "**Arrow 3** leaves `FL`. ",
       {
         "data": "10"
       },
@@ -973,7 +1024,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       {
         "data": "**1**"
       },
-      " goes back to UR (length ",
+      " goes back to `UR` (length ",
       {
         "data": "3"
       },
@@ -1028,7 +1079,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       " pointed this out while building this page; the answers above are the corrected ones."
     ],
     "p3": "The original counting is still a nice piece of combinatorics, so here it is.",
-    "caption": "One cycle, but UR isn't in it · my first attempt counted it; a solver needs a break"
+    "caption": "One cycle, but `UR` isn't in it · my first attempt counted it; a solver needs a break"
   },
   "count": {
     "title": "Counting cycles anywhere",
@@ -1036,8 +1087,8 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
     "p2": "The trick is the same as before: **sort single cycles by their length** {k} and count each length separately. It's a choice, not something the cube imposes, and it's what makes the count manageable. With {k} fixed, a single cycle is just two independent choices.",
     "p3": "A single cycle of length {k} takes two choices. **Which edges:** {twelveChooseK} ways, with the rest at home. **What order:** start at one edge and follow the arrows. The other {kMinus1} edges appear in some order, giving {kMinus1Fact} cycles.",
     "p4": "Three edges make exactly {threeMinus1Fact} cycles: the same triangle, traveled one way or the other.",
-    "caption1": "Cycle 1 of 2 · UF → FL → DF → UF",
-    "caption2": "Cycle 2 of 2 · UF → DF → FL → UF · same lines, reversed"
+    "caption1": "Cycle 1 of 2 · `UF` → `FL` → `DF` → `UF`",
+    "caption2": "Cycle 2 of 2 · `UF` → `DF` → `FL` → `UF` · same lines, reversed"
   },
   "term": {
     "title": "First answer",
@@ -1223,6 +1274,9 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       "attempt.p2": "That isn't what a solver needs. A single cycle that skips `UR`, like this one, still needs a cycle break, and nobody is handed a solved cube to solve. Claude pointed this out while building this page; the answers above are the corrected ones.",
       "hero": {
         "note": ""
+      },
+      "pieces": {
+        "caption": ""
       }
     }
   }
@@ -1260,6 +1314,34 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
   };
   for (const k in MATH) Slop.vars[k] = {html: MATH[k]};
   Slop.start({code: 'pos'});
+  // "Names": the two slots its text names (UF, DR) are outlined on the stage (track), and their chips take the same pink.
+  // The Slop-o-meter's colors replace it while they're on (they color the words inside the chip).
+  const NAMES_MARK = ['UF', 'DR'];
+  // "The Cube": the piece kinds' words in its first paragraph take the colors their pieces are outlined in on the stage.
+  // ink: the words' and tags' color; mark: the outline's ('--cN', or glow/line colors); one: the piece outlined at rest; all: every piece of the
+  // kind (outlined while hovered); tag: where its tag points. Cells are cubie positions on the solved cube.
+  const CELLS = []; for (const x of [-1, 0, 1]) for (const y of [-1, 0, 1]) for (const z of [-1, 0, 1]) CELLS.push([x, y, z]);
+  const cellsWith = n => CELLS.filter(v => v.filter(Boolean).length === n);
+  const PIECE = {
+    center: {ink: '--c5', mark: '--c5', one: [0, 0, 1], all: cellsWith(1), tag: [0, 0, 1.5]},
+    edge: {ink: '--c4', mark: {glow: '#ffc21a', line: '#ffd84d'}, one: [1, 0, 1], all: cellsWith(2), tag: [1.5, 0, 1]}, // the buffer's yellow
+    corner: {ink: '--c1', mark: '--c1', one: [1, 1, 1], all: cellsWith(3), tag: [1, 1.5, 1]},
+  };
+  let textKind = null, cubeKind = null; // the piece kind hovered in the card's text, or on the cube
+  const hoverKind = () => textKind || cubeKind;
+  document.addEventListener('mouseover', e => { const k = e.target.closest && e.target.closest('.kw'); textKind = k ? k.dataset.kind : null; });
+  const markChips = () => {
+    document.querySelectorAll('[data-scene="homes"] .pos').forEach(el => el.classList.toggle('mark', NAMES_MARK.includes(el.textContent.trim())));
+    const p = document.querySelector('[data-slop="pieces.p1"]'), walk = p && document.createTreeWalker(p, NodeFilter.SHOW_TEXT), nodes = [];
+    while (walk && walk.nextNode()) if (!walk.currentNode.parentElement.closest('.kw')) nodes.push(walk.currentNode);
+    for (const t of nodes) {
+      if (!/\b(centers|edges|corners)\b/.test(t.data)) continue;
+      const span = document.createElement('span');
+      span.innerHTML = t.data.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/\b(centers|edges|corners)\b/g, w => `<span class="kw" data-kind="${w.slice(0, -1)}" style="--kw: var(${PIECE[w.slice(0, -1)].ink})">${w}</span>`);
+      t.replaceWith(...span.childNodes);
+    }
+  };
+  markChips();
 
   // ---------------- basics ----------------
   const POS = ['UR','UF','UL','UB','FR','FL','BL','BR','DR','DF','DL','DB']; // ring order; 0 = buffer
@@ -1402,8 +1484,13 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
     if (k < t) return (back ? 'Undoing the T-perm · ' : 'T-perm · ') + show(TPERM, k - d - 2);
     return (back ? 'Redoing the setup · ' : 'Undoing the setup · ') + show(OP_SETUP.slice().reverse().map(invMove), k - t);
   };
-  const OP_PATH = makePath(SOLVED, OP_MOVES, 'present', opCap, OP_MOVES.map((_, k) => k >= OP_AT[2] && k < OP_AT[3] ? PRES_TP : PRES));
+  // The scramble's own turns are slower (PRES_SC), so the ring beside the cube can follow each one ("Scrambling").
+  const PRES_SC = 12;
+  const OP_PATH = makePath(SOLVED, OP_MOVES, 'present', opCap, OP_MOVES.map((_, k) => k < OP_AT[1] ? PRES_SC : k >= OP_AT[2] && k < OP_AT[3] ? PRES_TP : PRES));
   const [, , OP_SET, OP_TP] = OP_AT.map(i => OP_PATH.states[i]);
+  // "Scrambling" builds: the states (indices into OP_PATH) after R | flattened | F2 | D | L' | R' | U' L | D'. The cycles after each:
+  // 4 → 5+2 → 9 → 6+5 (split) → 9 (joined) → 6+5 → 9 → 4+3 (DEMO). No turn here flips an edge.
+  const SC_AT = [1, 1, 2, 3, 4, 5, 7, 8], SC = SC_AT.map(i => OP_PATH.states[i]);
   const opCorners = i => OP_MOVES.slice(0, OP_AT[i]); // where the corners physically are at each of the five states
   // The two corner pieces the T-perm swaps: the ones sitting in UFR and UBR once the setup is done (indices into the corner cubies,
   // created x, y, z ∈ {−1, 1} in that loop order). The T-perm slide colors only these.
@@ -1416,9 +1503,10 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
   const PARTNER = POS[DEMO.p[IDX.DF]];
   if (key(OP_PATH.states[OP_AT[1]]) !== key(DEMO)) console.warn('DEMO_MOVES do not reach DEMO');
   if (key(OP_PATH.states[OP_AT[4]]) !== key(SWAPS[1])) console.warn('setup + T-perm + undo is not the swap UR ↔ DF');
-  OP_AT.forEach((a, ia) => {
-    if (OP_PATH.states.filter(x => key(x) === key(OP_PATH.states[a])).length !== 1) console.warn('OP_PATH revisits state', ia);
-    OP_AT.forEach((b, ib) => { if (a !== b) TURNS[key(OP_PATH.states[a]) + '>' + key(OP_PATH.states[b])] = {path: OP_PATH, from: a, to: b, lead: ia === 1 && ib === 2 ? 0.9 : 0}; });
+  const OP_STOPS = [...new Set(OP_AT.concat(SC_AT))];
+  OP_STOPS.forEach(a => {
+    if (OP_PATH.states.filter(x => key(x) === key(OP_PATH.states[a])).length !== 1) console.warn('OP_PATH revisits state', a);
+    OP_STOPS.forEach(b => { if (a !== b) TURNS[key(OP_PATH.states[a]) + '>' + key(OP_PATH.states[b])] = {path: OP_PATH, from: a, to: b, lead: a === OP_AT[1] && b === OP_AT[2] ? 0.9 : 0}; });
   });
   // The moves (and captions) that take path P from state index a to b, in either direction.
   function pathSegment(P, a, b) {
@@ -1458,11 +1546,8 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
   const rev = st => st.slice().reverse();
   for (let i = 0; i < 3; i++) addPath([{st: [SWAPS[i], SWAPS[i + 1]], dur: 0.85, cap: () => Slop.html('swaps.swapping', {slot: SOLVE_DEMO[i]})}], [{st: [SWAPS[i + 1], SWAPS[i]], dur: 0.5}]);
   addPath([{st: BREAK.slice(0, 2), dur: 0.85, cap: () => Slop.html('break.breaking')}], [{st: rev(BREAK.slice(0, 2)), dur: 0.5}]);
-  // "A cycle break" b2 finishes the break; the next press rewinds the solve, a little faster in the middle.
+  // "A cycle break" b2 finishes the break.
   addPath([{st: BREAK.slice(1), dur: 0.6, cap: () => Slop.html('break.finishing')}], [{st: rev(BREAK.slice(1)), dur: 0.3}]);
-  const REWIND = seqFrom(SOLVED, SOLVE_DEMO.slice().reverse());
-  addPath(REWIND.slice(1).map((st, i) => ({st: [REWIND[i], st], dur: 0.5 - 0.14 * Math.sin(Math.PI * i / (REWIND.length - 2)), cap: () => Slop.html('rewind.rewinding')})),
-          [{st: rev(REWIND), dur: 0.15}]);
 
   // ---------------- 3D cube ----------------
   const stageEl = document.getElementById('stage-inner');
@@ -1708,7 +1793,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
   // Each slide has n builds; → plays the next build, then moves on to the next slide.
   const V0 = {rx: 0.5, ry: -0.62}, V_HOME = {rx: 0.45, ry: -0.62};
   // buf: mark the buffer slot UR (on every cube and ring slide from "The buffer" on).
-  const DEF = {track: null, fly: false, glowCol: null, dimHome: null, heroDone: null, slotMark: null, cornerCol: 0, cornerSet: null, layer: 'cube', morph: 0, view: V0, spin: false, state: SOLVED, poses: null, labels: [], glow: [], focus: null, arrows: false, tags: [], caption: '', glowEdges: false, chartMode: 1, neutral: false, tri: null, via: null, showHidden: false, buf: false};
+  const DEF = {marks: null, drawTurn: false, peel: false, track: null, fly: false, glowCol: null, dimHome: null, heroDone: null, slotMark: null, cornerCol: 0, cornerSet: null, layer: 'cube', morph: 0, view: V0, spin: false, state: SOLVED, poses: null, labels: [], glow: [], focus: null, arrows: false, tags: [], caption: '', glowEdges: false, chartMode: 1, neutral: false, tri: null, via: null, showHidden: false, buf: false};
   const SW_LAB = ['UR', 'DF', 'FL', 'UB'], BR_LAB = ['UR', 'UF', 'DR', 'BR'];
   const FLIP_AT = 1.3;
   const CUB_P = 5.2;
@@ -1724,10 +1809,20 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       return Object.assign(base, {state: HERO_SEQ[q], dimHome: settled ? HERO_SEQ[q] : null, heroDone: settled ? idx : null, tally: {c: TALLY.c.slice(), n: TALLY.n, now: settled ? HERO_INFO[q].n : 0},
         caption: settled ? `Scramble ${idx + 1}: ${HERO_INFO[q].text}` : `Scrambling: ${HERO_MOVES[q].length} face turns`});
     }},
-    pieces: {n: 1, f: () => ({view: V_HOME, slotMark: 'near3', caption: Slop.html('pieces.caption'),
-      tags: [{p3: [0, 0, 1.5], text: 'center'}, {p3: [1.5, 0, 1], text: 'edge'}, {p3: [1, 1.5, 1], text: 'corner', tone: '--ink-3'}]})},
-    homes: {n: 1, f: () => ({view: V_HOME, labels: 'all', caption: Slop.html('homes.caption')})},
-    scramble: {n: 1, f: () => ({state: DEMO, cornerSet: opCorners(1), labels: 'all', caption: Slop.html('scramble.caption')})},
+    // b0: one center, edge and corner, each outlined and tagged in its own color (PIECE, as in the card's text). Hovering a kind's word in the
+    // card, or a piece on the cube, outlines every piece of that kind instead, and only that kind. b1: the three edge slots nearest the camera.
+    pieces: {n: 2, f: b => {
+      const base = {view: V_HOME, caption: Slop.html('pieces.caption' + (b + 1))}, hk = hoverKind();
+      if (b) return Object.assign(base, {slotMark: 'near3'});
+      const show = hk ? [hk] : Object.keys(PIECE);
+      return Object.assign(base, {marks: show.flatMap(k => (hk ? PIECE[k].all : [PIECE[k].one]).map(cell => ({cell, col: PIECE[k].mark}))),
+        tags: show.map(k => ({p3: PIECE[k].tag, text: k, tone: PIECE[k].ink}))});
+    }},
+    homes: {n: 1, f: () => ({view: V_HOME, track: NAMES_MARK, labels: 'all', caption: Slop.html('homes.caption')})},
+    // One build per turn (SC_AT). b0: R on the cube, its arrows drawing out with the turn (drawTurn). b1: the slots peel off the cube
+    // into a ring beside it (split + peel). From b2 the ring follows each turn, then traces the new cycles (makeRingTurns).
+    scramble: {n: SC.length, f: b => ({state: SC[b], cornerSet: OP_MOVES.slice(0, SC_AT[b]), arrows: true, drawTurn: !b, split: b > 0, peel: true,
+      labels: b ? [] : ['UR', 'FR', 'DR', 'BR'], caption: Slop.html('scramble.caption' + (b + 1))})},
     // Tilts slowly up and down (16 s) so the yellow bottom shows too.
     buffer: {n: 1, f: (b, el) => ({state: DEMO, cornerSet: opCorners(1), track: [PARTNER], buf: true, view: {rx: reduce ? V0.rx : 0.02 + 0.48 * Math.cos(2 * Math.PI * el / 16), ry: V0.ry}, labels: ['UR', 'DF'], focus: ['UR', 'DF'], arrows: [['UR', 'DF']],
       tags: [{pos: 'UR', text: 'buffer'}], caption: Slop.html('buffer.caption')})},
@@ -1745,7 +1840,6 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       tags: [{pos: 'UR', text: 'home', tone: '--yes'}], caption: Slop.html('closed.caption')})},
     break: {n: 3, f: b => ({state: [BREAK[0], BREAK[1], BREAK[4]][b], via: 'swaps', cornerSet: opCorners(4), buf: true, labels: BR_LAB, arrows: true, glow: b ? [] : ['UF', 'DR', 'BR'],
       caption: Slop.html('break.caption' + (b + 1))})},
-    rewind: {n: 1, f: () => ({state: DEMO, via: 'swaps', cornerSet: opCorners(4), buf: true, labels: 'all', arrows: true, caption: Slop.html('rewind.caption')})},
     ring: {n: 2, f: b => ({state: b ? ONE8 : DEMO, buf: true, morph: 1, labels: 'all', arrows: true, glow: b ? [] : ['UF', 'DR', 'BR'],
       caption: Slop.html(b ? 'ring.caption2' : 'ring.caption1')})},
     // b0: a solved cube fades in, then UF flips (FLIP_AT) and the "impossible" tag appears once it lands.
@@ -1821,6 +1915,14 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
     }
     return out;
   }
+  // The outer faces of the cubie at integer position v (a corner, edge or center of the solved cube), as quads.
+  const cellQuads = v => [0, 1, 2].filter(a => v[a]).map(a => {
+    const [b, z] = [0, 1, 2].filter(x => x !== a), pt = (vb, vz) => { const p = new THREE.Vector3(); p.setComponent(a, 1.5 * v[a]); p.setComponent(b, vb); p.setComponent(z, vz); return p; };
+    const n = new THREE.Vector3(); n.setComponent(a, v[a]);
+    return {n, c: [pt(v[b] - 0.5, v[z] - 0.5), pt(v[b] - 0.5, v[z] + 0.5), pt(v[b] + 0.5, v[z] + 0.5), pt(v[b] + 0.5, v[z] - 0.5)]};
+  });
+  // spec.marks: outlines in a color, [{edge: home name (follows the piece through turns) | cell: [x, y, z] (stays put), col: '--cN'}].
+  const markMap = new Map();
   let bufA = 0;
   // Yellow marks on slots: the slot's outer faces on the cube, a ring round the node when flat.
   function drawSlotMarks(G, slots, alpha) {
@@ -1878,6 +1980,8 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
   const slotName = n => [...n].map(f => `<tspan style="fill: ${FCOL[f]}; ${f === 'U' || f === 'D' ? 'stroke: #1b1e25; stroke-width: 2.6px' : 'stroke: var(--stage)'}">${f}</tspan>`).join('');
   const labA = new Array(12).fill(0), glowA = new Array(12).fill(0), trackA = new Array(12).fill(0), tagMap = new Map();
   let ovCur = {key: '', state: SOLVED, arrows: true, focus: null, neutral: false, tri: null, ring: null}, ovPrev = null, ovT0 = 0, ovDelay = 0, frameNo = 0;
+  let turnD = 1; // drawTurn ("Scrambling" b0): how far its turn has played, 0..1; its arrows draw out with it, heads riding the tip
+  let peeling = false; // the split ring's nodes peel off the cube's slots ("Scrambling"), not on the front page
   const ovKey = sp => (sp.morph ? key(sp.state) : sp.state.p.join()) + '|' + JSON.stringify(sp.arrows) + '|' + JSON.stringify(sp.focus) + '|' + sp.neutral;
 
   // Arrow curves for [from, to, color] triples. Each bows to its left; ta/tb are the angles at which it leaves A and reaches B.
@@ -1968,6 +2072,17 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
     const dur = Math.min(total, Math.max(0.35, total * 0.5)), stag = n > 1 ? (total - dur) / (n - 1) : 0;
     return ringTail(A, B, t0, [ringStage(A, B, (i, j, k) => ({t0: k * stag, dur}))], total + 0.15, false, true);
   }
+  // "Scrambling": the ring follows each turn of a TURNS entry in step with the cube (same hold, same per-turn times), then traces
+  // the new cycles.
+  function makeRingTurns(A, tp, t0) {
+    const seg = pathSegment(tp.path, tp.from, tp.to), d = turnTiming(tp.path).durs, fwd = tp.to > tp.from, sine = u => (1 - Math.cos(Math.PI * u)) / 2;
+    let t = Math.max(UI_CLEAR, tp.lead || 0), s = A; const stages = [];
+    seg.moves.forEach((mv, k) => {
+      const B = turnState(s, mv), dur = d[fwd ? tp.from + k : tp.from - 1 - k], t1 = t;
+      stages.push(ringStage(s, B, () => ({t0: t1, dur, ez: sine}))); s = B; t += dur;
+    });
+    return ringTail(A, s, t0, stages, t + 0.2, false, true);
+  }
   const stageAt = (R, t) => { let st = R.stages[0]; for (const x of R.stages) if (x.start <= t) st = x; return st; };
   // A traveling ring piece at progress u from slot i to slot j: straight across, rising toward you (bigger, with a shadow)
   // and bowing a little aside, like a cube piece passing over the others.
@@ -2018,7 +2133,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       if (L.arrows === true) arr = arrowsOf(src);
       else if (L.arrows === 'buffer') arr = arrowsOf(src, true);
       else if (Array.isArray(L.arrows)) arr = L.arrows.map(([a, b]) => [IDX[a], IDX[b], 1]);
-      const drawK = !R ? null : t < R.drawStart ? (R.drawOnly ? () => 0 : n => 1 - ss((t - n * 0.03) / R.tRet))
+      const drawK = !R ? (L.drawTurn ? () => turnD : null) : t < R.drawStart ? (R.drawOnly ? () => 0 : n => 1 - ss((t - n * 0.03) / R.tRet))
         : n => ss((t - R.drawStart - R.step[n] * R.per) / R.per);
       const HL = lerp(13, 12, m), HW = lerp(5.6, 5.2, m), sw = lerp(3, 2.4, m), f1 = v => v.toFixed(1);
       const Lp = (p, q, u) => [lerp(p[0], q[0], u), lerp(p[1], q[1], u)];
@@ -2031,9 +2146,17 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
         const op = lerp(0.25 + 0.75 * Math.min(vis[g.a], vis[g.b]), 1, m) * (focus && !(focus.has(g.a) && focus.has(g.b)) ? 0.25 : 1);
         lines += `<path d="M${f1(P0[0])} ${f1(P0[1])}C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(P3[0])} ${f1(P3[1])}" style="fill: none; stroke: var(--c${g.col})" stroke-width="${sw}" stroke-linecap="round" opacity="${op.toFixed(2)}"/>`;
         // The head sits halfway along the full curve, pointing along it; it grows in as the line passes.
-        const hs = k >= 0.999 ? 1 : ss((k - g.th + 0.08) / 0.16);
+        // drawTurn: it rides the tip of the line (its point at the line's end) until it reaches that spot, stays there, and the line draws on without it.
+        let hs = k >= 0.999 ? 1 : ss((k - g.th + 0.08) / 0.16), hx = g.hx, hy = g.hy, ang = g.ang;
+        if (L.drawTurn) {
+          const Q = g, bz = (u, i) => { const o = 1 - u; return o * o * o * Q.P0[i] + 3 * o * o * u * Q.c1[i] + 3 * o * u * u * Q.c2[i] + u * u * u * Q.P3[i]; };
+          let len = 0; for (let s = 1; s <= 16; s++) len += Math.hypot(bz(s / 16, 0) - bz((s - 1) / 16, 0), bz(s / 16, 1) - bz((s - 1) / 16, 1));
+          const u = Math.max(0, Math.min(k - HL / 2 / (len || 1), g.th)), e = 0.01; // the head's center: half a head behind the tip
+          hx = bz(u, 0); hy = bz(u, 1); ang = Math.atan2(bz(Math.min(1, u + e), 1) - bz(Math.max(0, u - e), 1), bz(Math.min(1, u + e), 0) - bz(Math.max(0, u - e), 0));
+          hs = ss(k / 0.12);
+        }
         if (hs < 0.01) return;
-        heads += `<path d="M${HL / 2} 0L${-HL / 2} ${HW}L${-HL / 2} ${-HW}Z" transform="translate(${f1(g.hx)} ${f1(g.hy)}) rotate(${f1(g.ang * 180 / Math.PI)}) scale(${hs.toFixed(3)})" style="fill: var(--c${g.col}); stroke: var(--stage)" stroke-width="1.2" stroke-linejoin="round" opacity="${op.toFixed(2)}"/>`;
+        heads += `<path d="M${HL / 2} 0L${-HL / 2} ${HW}L${-HL / 2} ${-HW}Z" transform="translate(${f1(hx)} ${f1(hy)}) rotate(${f1(ang * 180 / Math.PI)}) scale(${hs.toFixed(3)})" style="fill: var(--c${g.col}); stroke: var(--stage)" stroke-width="1.2" stroke-linejoin="round" opacity="${op.toFixed(2)}"/>`;
       });
       out += lines + heads;
       if (R) for (const o of R.orders) o.nodes.forEach((sl, q) => { // a ripple on each slot as its cycle's trace reaches it
@@ -2097,9 +2220,12 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
     else if (Array.isArray(spec.slotMark)) spec.slotMark.forEach(n => { wantMark[IDX[n]] = 1; });
     for (let i = 0; i < 12; i++) { markA[i] += (wantMark[i] - markA[i]) * b2; if (markA[i] > 0.02) out += drawSlotMarks(G, [i], markA[i]); }
     let G2 = null; // the front page's ring, beside the cube
+    if (spec.peel) peeling = true; else if (spec.split) peeling = false;
     if (splitK > 0.01) {
       const g = splitGeo(), NR2 = clamp(g.RR * 0.13, 7, 13), p2 = [];
       for (let i = 0; i < 12; i++) { const a = (-90 + i * 30) * Math.PI / 180; p2.push([g.rx + g.RR * Math.cos(a), g.ry + g.RR * Math.sin(a)]); }
+      // Peeling: each node leaves its slot on the cube and slides out to its place on the ring as the split opens (and back as it closes).
+      if (peeling && has3D) { const k = ss(splitK); for (let i = 0; i < 12; i++) p2[i] = [lerp(pts[i][0], p2[i][0], k), lerp(pts[i][1], p2[i][1], k)]; }
       G2 = {pts: p2, vis: new Array(12).fill(1), m: 1, cx: g.rx, cy: g.ry, NR: NR2, RR: g.RR, now};
       out += `<circle cx="${g.rx}" cy="${g.ry}" r="${g.RR}" style="fill: none; stroke: var(--rule)" stroke-dasharray="2 6" opacity="${splitK.toFixed(3)}"/>` + drawBuffer(G2, bufA * splitK) +
         p2.map(([x, y], k) => { const a = (-90 + k * 30) * Math.PI / 180, rl = g.RR + NR2 + 11;
@@ -2117,6 +2243,14 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       if (trackA[h] < 0.02 || !has3D || m > 0.98) continue;
       const atBuf = ss((edges[h].g.position.distanceTo(POSE[0][h][0].position) - 0.35) / 0.9); // 0 at UR: highlights never overlap
       if (atBuf > 0.02) out += drawQuads(pieceQuads(h), MARK_PINK, trackA[h] * (1 - m) * atBuf);
+    }
+    for (const mk of spec.marks || []) { const k = (mk.edge || mk.cell.join()) + mk.col, e = markMap.get(k) || {a: 0}; e.d = mk; e.seen = frameNo; markMap.set(k, e); }
+    for (const [k, e] of markMap) {
+      e.a += ((e.seen === frameNo ? 1 : 0) - e.a) * b2;
+      if (e.a < 0.02 && e.seen !== frameNo) { markMap.delete(k); continue; }
+      if (!has3D || m > 0.98) continue;
+      const col = typeof e.d.col === 'string' ? {glow: `var(${e.d.col})`, line: `var(${e.d.col})`} : e.d.col;
+      out += drawQuads(e.d.edge ? pieceQuads(IDX[e.d.edge]) : cellQuads(e.d.cell), col, e.a * (1 - m));
     }
     const gset = new Set(As.glow.map(n => IDX[n])), gcol = {};
     if (As.arrows === true) arrowsOf(As.state).forEach(([a, , c]) => { gcol[a] = c; }); // a glow takes its cycle's color
@@ -2285,6 +2419,20 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
     dragOff.x = clamp(drag.ox + (e.clientY - drag.y) * 0.008, -0.9, 0.9);
     lastDrag = performance.now() / 1000;
   });
+  // "The Cube": the piece kind under the pointer (cubeKind), for its hover outlines. A drag keeps the kind it started on until it ends.
+  const ray = has3D ? new THREE.Raycaster() : null, kindOf = new Map();
+  if (has3D) { edges.forEach(e => kindOf.set(e.g, 'edge')); cubies.forEach((c, i) => kindOf.set(c.g, i < 8 ? 'corner' : 'center')); }
+  const pickKind = e => {
+    if (!has3D || active !== 'pieces') { cubeKind = null; return; }
+    const r = canvas.getBoundingClientRect();
+    ray.setFromCamera(new THREE.Vector2((e.clientX - r.left) / r.width * 2 - 1, 1 - (e.clientY - r.top) / r.height * 2), camera);
+    let o = (ray.intersectObject(spin, true)[0] || {}).object; while (o && !kindOf.has(o)) o = o.parent;
+    cubeKind = o ? kindOf.get(o) : null;
+  };
+  stageEl.addEventListener('pointerdown', pickKind);
+  stageEl.addEventListener('pointermove', e => { if (!drag) pickKind(e); });
+  stageEl.addEventListener('pointerleave', () => { if (!drag) cubeKind = null; });
+  window.addEventListener('pointerup', e => { if (drag && !stageEl.contains(e.target)) cubeKind = null; });
   window.addEventListener('pointerup', () => { drag = null; });
   window.addEventListener('pointercancel', () => { drag = null; });
 
@@ -2353,16 +2501,17 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
 
   // The editor (slop-editor edit) shows a caption that's on screen only at one slide and build: it glides there, and
   // back to where the reader was when it's done with it. Captions shown only mid-move (swaps.swapping,
-  // break.breaking, break.finishing, rewind.rewinding, ring.moving) or for a moment (flips.caption1) have none.
+  // break.breaking, break.finishing, ring.moving) or for a moment (flips.caption1) have none.
   const showAt = (scene, b) => () => {
     const from = curStop(), i = stepEls.findIndex(el => el.dataset.scene === scene);
     goStop(stops.findIndex(x => x.i === i && x.b === b));
     return () => goStop(from);
   };
   Object.entries({
-    'pieces.caption': 0, 'homes.caption': 0, 'scramble.caption': 0, 'buffer.caption': 0,
+    'pieces.caption1': 0, 'pieces.caption2': 1, 'homes.caption': 0, 'buffer.caption': 0,
+    'scramble.caption1': 0, 'scramble.caption2': 1, 'scramble.caption3': 2, 'scramble.caption4': 3, 'scramble.caption5': 4, 'scramble.caption6': 5, 'scramble.caption7': 6, 'scramble.caption8': 7,
     'tperm.caption1': 0, 'tperm.caption2': 1, 'tperm.caption3': 2, 'swaps.caption1': 0, 'swaps.caption2': 1,
-    'closed.caption': 0, 'break.caption1': 0, 'break.caption2': 1, 'break.caption3': 2, 'rewind.caption': 0,
+    'closed.caption': 0, 'break.caption1': 0, 'break.caption2': 1, 'break.caption3': 2,
     'ring.caption1': 0, 'ring.caption2': 1, 'flips.caption2': 0, 'flips.caption3': 1,
     'uniform.fan1': 0, 'uniform.fan2': 1, 'uniform.fan3': 2, 'uniform.fan4': 3,
     'count.caption1': 0, 'count.caption2': 0, 'cuber.caption1': 0, 'cuber.caption2': 0, 'attempt.caption': 0,
@@ -2378,7 +2527,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
   // After an edit in the editor (slop-editor edit): segment titles come from the headings; the fan note and caption redraw.
   Slop.onChange(() => {
     stepEls.forEach((s, i) => { const h = s.querySelector('h1, h2'), t = h ? h.textContent : ''; segEls[i].setAttribute('aria-label', `Go to slide ${i + 1}: ${t}`); segEls[i].title = t; });
-    curFan = null; curCap = null;
+    curFan = null; curCap = null; markChips();
   });
   const cur = {rx: V0.rx, ry: V0.ry, m: has3D ? 0 : 1};
   let mFrom = cur.m, mTo = cur.m, mT0 = 0;
@@ -2413,6 +2562,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       curSlide = sk;
       segEls.forEach((b, i) => { b.classList.toggle('done', i < activeIdx); b.classList.toggle('cur', i === activeIdx); });
       stepEls.forEach((el, i) => el.classList.toggle('cur', i === activeIdx));
+      stepEls[activeIdx].querySelectorAll('[data-from]').forEach(el => el.classList.toggle('in', activeBuild >= +el.dataset.from));
       const ch = chapStart.filter(x => x <= activeIdx).length - 1;
       chapBtns.forEach((b, c) => b.setAttribute('aria-current', String(c === ch)));
       slideNo.innerHTML = `<span><b>${activeIdx + 1}</b> / ${stepEls.length}</span>`;
@@ -2452,8 +2602,6 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       const sk = spec.split ? 1 : 0, nk = snap || reduce || frameNo < 3 ? sk : splitK + (sk - splitK) * (1 - Math.exp(-dt * 3.5));
       if (Math.abs(nk - splitK) > 1e-4 || (nk !== splitK)) { splitK = Math.abs(nk - sk) < 1e-3 ? sk : nk; applySplit(); }
       if (spec.spin && !reduce) spinOff = wrapPi(spinOff + dt * 0.35); else spinOff *= reduce ? 0 : 0.96;
-      cur.rx += (spec.view.rx - cur.rx) * a;
-      cur.ry += wrapPi(spec.view.ry + spinOff - cur.ry) * a;
       if (has3D) {
         if (snap) setCubies(spec.cornerSet || 'home'); // corners follow every face turn physically; they're only reset when the cube snaps
         if (snap || (mTo === 1 && cur.m > 0.8)) { // cube out of sight: go straight to the target
@@ -2475,20 +2623,25 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
           if (Pz) setPoses(Pz); else followTo(posesOf(spec.state), dt);
         }
       }
+      turnD = spec.drawTurn && anim && anim.path === OP_PATH ? clamp(animPos(now)) : 1; // after the transition has started, so its first frame isn't read as turned
+      cur.rx += (spec.view.rx - cur.rx) * a;
+      cur.ry += wrapPi(spec.view.ry + spinOff - cur.ry) * a;
       prevState = spec.state; prevVia = spec.via;
       const ok = ovKey(spec);
       if (snap) {
         ovPrev = null; ovT0 = now; ovDelay = -1; annoPrev = spec;
         const ring = !reduce && mt === 1 && flat(spec) ? makeRingAnim(spec.state, spec.state, now, true) : null; // the ring fades back in: trace its cycles
-        ovCur = {key: ok, state: spec.state, arrows: spec.arrows, focus: spec.focus, neutral: spec.neutral, tri: spec.tri, ring};
+        ovCur = {key: ok, state: spec.state, arrows: spec.arrows, focus: spec.focus, neutral: spec.neutral, tri: spec.tri, ring, drawTurn: spec.drawTurn};
       } else if (!ovCur || ok !== ovCur.key) {
         // On the flat ring a change of scramble is choreographed (makeRingAnim) instead of cross-faded.
         const ring = !reduce && flat(ovCur) && flat(spec) && key(spec.state) !== key(ovCur.state) && (spec.split || (cur.m > 0.99 && mTo === 1))
-          ? (spec.split && TURNS[key(ovCur.state) + '>' + key(spec.state)] ? makeRingSpread(ovCur.state, TURNS[key(ovCur.state) + '>' + key(spec.state)], now)
+          ? (spec.split && TURNS[key(ovCur.state) + '>' + key(spec.state)] ? (spec.peel ? makeRingTurns : makeRingSpread)(ovCur.state, TURNS[key(ovCur.state) + '>' + key(spec.state)], now)
             : makeRingAnim(ovCur.state, spec.state, now)) : null;
-        ovPrev = ring ? null : ovCur; ovT0 = now; annoPrev = lastSpec || spec;
-        ovDelay = ring ? -1 : (!spec.poses && anim && cur.m < 0.5) ? Math.max(0, animLeft(now) - 0.3) : 0;
-        ovCur = {key: ok, state: spec.state, arrows: spec.arrows, focus: spec.focus, neutral: spec.neutral, tri: spec.tri, ring};
+        // drawTurn: the arrows draw with the turn itself (turnD): no cross-fade, no waiting for the pieces.
+        const live = !!spec.drawTurn;
+        ovPrev = ring || live ? null : ovCur; ovT0 = now; annoPrev = lastSpec || spec;
+        ovDelay = ring || live ? -1 : (!spec.poses && anim && cur.m < 0.5) ? Math.max(0, animLeft(now) - 0.3) : 0;
+        ovCur = {key: ok, state: spec.state, arrows: spec.arrows, focus: spec.focus, neutral: spec.neutral, tri: spec.tri, ring, drawTurn: spec.drawTurn};
       }
       ovCur.triVal = spec.tri || 0;
     }
