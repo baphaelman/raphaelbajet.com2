@@ -2,7 +2,8 @@
 // and agent hours that went into it (from Claude Code's transcripts in ~/.claude/projects), the months it was worked
 // on (`from`, `to`: its commits and sessions), and the day any of that last changed (`updated`). The slop editor also
 // gets its latest version on npm, and the Craft PRs their state, from ~/Desktop/Coding/oss/craft-prs.json (which
-// /craft-fix rewrites every run). It runs before `npm run dev`, or on its own with `npm run slop-stats` (or /slop-update).
+// /craft-fix rewrites every run). It runs before every commit
+// (.githooks/pre-commit) and `npm run dev`, or on its own with `npm run slop-stats`.
 //
 // Claude Code deletes transcripts after a while (30 days unless `cleanupPeriodDays` says otherwise), so every session
 // counted is kept in scripts/slopSessions.json and stays counted once its transcript is gone. Only new transcripts,

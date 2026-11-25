@@ -1,0 +1,10 @@
+#!/bin/sh
+# Every commit carries the Slop Zone's facts as of now (vite-project/scripts/slop-stats.mjs): the site is static, so a
+# deploy shows what was last committed. If the script fails, the commit goes through with the old facts.
+# Turned on with `git config core.hooksPath .githooks`.
+cd "$(git rev-parse --show-toplevel)/vite-project" || exit 0
+if node scripts/slop-stats.mjs >/dev/null 2>&1; then
+    git add src/slopStats.json scripts/slopSessions.json
+else
+    echo "slop-stats failed: committing the Slop Zone's old facts" >&2
+fi

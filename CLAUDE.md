@@ -11,7 +11,8 @@ Every word the Slop Zone shows lives in `vite-project/src/slopText.json`, in the
 - Write new text as an agent's, and keep it terse. Only words Raphael dictates word for word go in as `{"me": ...}`. Never reword Raphael's words without asking, and never approve text (`ok`) unless asked.
 - When editing the file, bump `version` and keep every `me` and `ok` piece word for word: the editor (`npm run edit`) may be open and saves the whole file.
 - Paragraphs are `p1`, `p2`… in `what`, `how` and `role`; an empty section is `{"p1": ""}`.
-- Facts that go out of date (a card's months, the slop editor's version, the Craft PRs and their count) are `{when}`, `{version}`, `{released}`, `{prs}`… placeholders, filled from `vite-project/src/slopStats.json`, which `scripts/slop-stats.mjs` writes (`/slop-update`). Never type them into the text.
+- Facts that go out of date (a card's months, the slop editor's version, the Craft PRs and their count) are `{when}`, `{version}`, `{released}`, `{prs}`… placeholders, filled from `vite-project/src/slopStats.json`, which `scripts/slop-stats.mjs` writes before every commit (`.githooks/pre-commit`; turn it on in a fresh clone with `git config core.hooksPath .githooks`). Never type them into the text.
+- Adding a project: give it an entry in `PROJECTS` in `vite-project/scripts/slop-stats.mjs` (its paths and repo, like the others), its `when` as `[{"data": "{when}"}]`, then run `SLOP_RESCAN=1 npm run slop-stats` from `vite-project/`.
 - Never build UI for adding projects: Raphael adds them by asking an agent.
 
 ## AI-rticles

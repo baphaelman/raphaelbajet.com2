@@ -4178,11 +4178,11 @@
     "03ca2967-aba8-4662-b2d9-539df41dae1d": {
         "project": "algorhythms",
         "started": "2026-11-24",
-        "bytes": 10595649,
+        "bytes": 10616559,
         "agents": [
             {
                 "project": "algorhythms",
-                "hours": 0.862
+                "hours": 0.978
             }
         ]
     },
@@ -4310,11 +4310,11 @@
     "151e4320-d910-4f69-81e4-ab8717bb1128": {
         "project": "rhyme-xray",
         "started": "2026-11-24",
-        "bytes": 2165870,
+        "bytes": 2239623,
         "agents": [
             {
                 "project": "rhyme-xray",
-                "hours": 0.47
+                "hours": 0.544
             },
             {
                 "project": "rhyme-xray",
@@ -4325,11 +4325,11 @@
     "2e8543c8-bc37-4cef-8796-291e260d0c62": {
         "project": "slop-zone",
         "started": "2026-11-24",
-        "bytes": 1535135,
+        "bytes": 1646570,
         "agents": [
             {
                 "project": "slop-zone",
-                "hours": 0.135
+                "hours": 0.177
             }
         ]
     },
@@ -4391,11 +4391,11 @@
     "bdb71f2c-4182-42fe-8c5b-0e18278ff7ff": {
         "project": "single-cycles",
         "started": "2026-11-24",
-        "bytes": 537459,
+        "bytes": 634479,
         "agents": [
             {
                 "project": "single-cycles",
-                "hours": 0.047
+                "hours": 0.116
             }
         ]
     },
