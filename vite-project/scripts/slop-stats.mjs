@@ -39,6 +39,7 @@ const PROJECTS = {
     'paper-othello': { paths: [/games\/othello/, /othello\//] },
     'comma-pump': { paths: [/tuning-explainer/, /tuning\.html/, /slop\/play\/comma-pump/, /articles\/comma-pump/], repo: join(CODING, 'AIrticles-archived/tuning-explainer'), site: 'comma-pump' },
     'single-cycles': { paths: [/single-cycles/, /singleCycles/], site: 'single-cycles' },
+    'everything-rhymes': { paths: [/everything-rhymes/], site: 'everything-rhymes' },
     'craft-prs': { paths: [/craft-libs/, /Coding\/oss\b/], repo: join(CODING, 'oss/craft-libs'), author: '@rapss-MacBook' },
     'slop-editor': { paths: [/Coding\/slop-editor\b/, /Coding\/slopometer\b/], repo: join(CODING, 'slop-editor') },
     // not in the zone, but their sessions shouldn't land in a project that is

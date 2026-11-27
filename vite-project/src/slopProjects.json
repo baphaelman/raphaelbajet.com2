@@ -94,6 +94,17 @@
                     "href": "/slop/play/single-cycles.html",
                     "image": "/slop/single-cycles.jpg",
                     "imageLight": "/slop/single-cycles-light.jpg"
+                },
+                {
+                    "id": "everything-rhymes",
+                    "links": [
+                        {
+                            "href": "https://baphaelman.github.io/rhyme-xray/"
+                        }
+                    ],
+                    "href": "/slop/play/everything-rhymes.html",
+                    "image": "/slop/everything-rhymes.jpg",
+                    "imageLight": "/slop/everything-rhymes-light.jpg"
                 }
             ]
         },
