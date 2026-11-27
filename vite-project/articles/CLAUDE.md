@@ -1,6 +1,6 @@
 # AI-rticles
 
-Interactive explainers the Slop Zone opens, at `/slop/play/<name>.html`. Each article is one HTML file in `public/slop/play/` (`comma-pump.html`, `single-cycles.html`): CSS, markup and inline JS, no build step. That file is the article itself: edit it there, and commit it for the live site. Its notes, checks and tools are in `articles/<name>/` (CLAUDE.md, README.md, `tools/`); read that CLAUDE.md before working on an article. Drafts that aren't on the site yet are here too (`spare-tokens/`).
+Interactive explainers the Slop Zone opens, at `/slop/play/<name>.html`. Each article is one HTML file in `public/slop/play/` (`comma-pump.html`, `single-cycles.html`, `everything-rhymes.html`): CSS, markup and inline JS, no build step (Everything Rhymes' numbers are computed by its tools and written into the page). That file is the article itself: edit it there, and commit it for the live site. Its notes, checks and tools are in `articles/<name>/` (CLAUDE.md, README.md, `tools/`); read that CLAUDE.md before working on an article. Drafts that aren't on the site yet are here too (`spare-tokens/`).
 
 Moved here from `~/Desktop/Coding/AIrticles` on 2026-11-24 (`comma-pump` was `tuning-explainer/tuning.html`). The old folder is archived as `~/Desktop/Coding/AIrticles-archived`, with The Comma Pump's earlier git history.
 

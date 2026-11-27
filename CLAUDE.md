@@ -17,7 +17,7 @@ Every word the Slop Zone shows lives in `vite-project/src/slopText.json`, in the
 
 ## AI-rticles
 
-The interactive articles the Slop Zone opens are `vite-project/public/slop/play/<name>.html` (`comma-pump`, `single-cycles`). Those files are the articles: edit them there. Before working on one, read `vite-project/articles/CLAUDE.md` and `vite-project/articles/<name>/CLAUDE.md` (its notes, checks and tools). Edit their text with `npx slop-editor edit public/slop/play/<name>.html` from `vite-project/`.
+The interactive articles the Slop Zone opens are `vite-project/public/slop/play/<name>.html` (`comma-pump`, `single-cycles`, `everything-rhymes`). Those files are the articles: edit them there. Before working on one, read `vite-project/articles/CLAUDE.md` and `vite-project/articles/<name>/CLAUDE.md` (its notes, checks and tools). Edit their text with `npx slop-editor edit public/slop/play/<name>.html` from `vite-project/`.
 
 ## Changes to the slop editor itself
 

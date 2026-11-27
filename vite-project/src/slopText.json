@@ -1,5 +1,5 @@
 {
-    "version": 79,
+    "version": 81,
     "rupture": {
         "title": [
             {
@@ -463,6 +463,33 @@
                 }
             ],
             "imageAlt": "A 3D cube beside a ring of its twelve edges"
+        },
+        "everything-rhymes": {
+            "title": [
+                {
+                    "data": "Everything Rhymes"
+                }
+            ],
+            "when": [
+                {
+                    "data": "{when}"
+                }
+            ],
+            "tagline": "Rap's rhymes, tested against chance",
+            "label1": "Music",
+            "label2": "Data",
+            "what": {
+                "p1": "Rhyme X-ray on 325 rap #1s, and on random copies of each. Random words get almost as much color. What chance can't fake sits at the end of the bar, where perfect rhymes have given way to looser ones since 1989."
+            },
+            "how": {
+                "p1": "The X-ray's engine runs in the page and in Node, on the same code, and the end-rhyme trend is checked against MCFlow's hand-marked rhymes. Lyrics come from LRCLIB and are never stored; only the numbers are."
+            },
+            "role": {
+                "p1": ""
+            },
+            "link1": "Rhyme X-ray",
+            "open": "Read",
+            "imageAlt": "MF DOOM's couplet with its rhymes colored by Rhyme X-ray"
         }
     },
     "craft-prs": {

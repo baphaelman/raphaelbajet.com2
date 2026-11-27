@@ -1,2 +1,4 @@
 shots/
 __pycache__/
+# lyrics and run results (everything-rhymes): fetched or computed, never committed
+cache/
