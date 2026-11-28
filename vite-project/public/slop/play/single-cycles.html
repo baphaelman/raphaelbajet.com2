@@ -515,7 +515,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
 <!-- Every word a reader sees, and who wrote it (see CLAUDE.md, "Text and authorship"). `slop-editor edit` (~/Desktop/Coding/slopometer/cli.mjs) saves the editor into it. -->
 <script type="application/json" id="slop-text">
 {
-  "version": 29,
+  "version": 37,
   "hero": {
     "eyebrow": [
       {
@@ -585,38 +585,52 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       }
     ],
     "p1": [
-      "A",
+      {
+        "ok": "A"
+      },
       {
         "me": " "
       },
       {
         "data": "Rubik's cube"
       },
-      " has ",
+      {
+        "ok": " has "
+      },
       {
         "data": "26"
       },
-      " pieces: ",
+      {
+        "ok": " pieces: "
+      },
       {
         "data": "6"
       },
-      " centers, ",
+      {
+        "ok": " centers, "
+      },
       {
         "data": "8"
       },
-      " corners",
+      {
+        "ok": " corners"
+      },
       {
         "me": ","
       },
-      " and ",
+      {
+        "ok": " and "
+      },
       {
         "data": "12"
       },
-      " edges."
+      {
+        "ok": " edges."
+      }
     ],
     "p3": [
       {
-        "me": "The centers are static, so any move just shuffles the other pieces around.\n\nIn this article we focus on the edges."
+        "me": "This article is about the edges."
       }
     ],
     "caption1": [
@@ -633,23 +647,30 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       }
     ],
     "p1": [
-      "On a solved cube, each edge ",
+      {
+        "ok": "On a solved cube, each edge "
+      },
       {
         "me": "belongs"
       },
-      " in one particular slot: its *home*. Slots are named by the two faces they touch",
+      {
+        "ok": " in one particular slot: its *home*. Slots are named by the two faces they touch"
+      },
       {
         "me": ", so `UF` , the white-green edge, belongs between the Up (white)"
       },
-      " and Front",
       {
-        "me": " (green) faces"
+        "ok": " and Front"
       },
-      ". `DR` is between Down and Right",
       {
-        "me": ", etc"
+        "me": " (green) faces."
       },
-      "."
+      {
+        "ok": " `DR` is between Down and Right"
+      },
+      {
+        "me": ", etc."
+      }
     ],
     "p2": [
       {
@@ -707,20 +728,30 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
     ]
   },
   "flatten": {
-    "title": "Flatten it",
+    "title": [
+      {
+        "me": "Leaving the Cube"
+      }
+    ],
     "p1": [
       {
-        "me": "Each edge can be swapped with any other, so whether they live on a cube or are simply dots that can be switched is a case of perspective."
+        "me": "Each edge can be swapped with any other, so whether they live on a cube or are simply dots that can be swapped is a case of perspective."
       }
     ],
     "p2": [
-      "Cycles are easier to follow flat, so peel the ",
       {
-        "data": "twelve"
-      },
-      " slots off the cube into a ring beside it, keeping the arrows."
+        "me": "The second makes cycles a lot easier to track:"
+      }
     ],
-    "caption": "Same slots, same arrows, laid out in a ring"
+    "caption": [
+      {
+        "me": "The same"
+      },
+      " ",
+      {
+        "me": "arrows pointing to the same slots, without the cube"
+      }
+    ]
   },
   "chain": {
     "title": "Turn by turn",

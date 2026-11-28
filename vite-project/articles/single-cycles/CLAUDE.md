@@ -2,7 +2,7 @@
 
 A scroll- and arrow-key-driven explainer: how often does a scrambled Rubik's Cube need no cycle break in a blindfolded (Old Pochmann) edge solve? It began as a rebuild of the user's site article (`components/Articles/ArticleOne.jsx`) and has since diverged a lot (it now leads with the corrected "cuber's" answer). Not ported back to the React site.
 
-- **Live pages:** the site, at `/slop/play/single-cycles.html` (opened from the Slop Zone; it's live once committed to master), and https://claude.ai/artifact/5Lin65kjYuha9nyuLvbxs8 (private Artifact owned by the user, republished on 2026-11-23, version 38, with `capabilities: {}`).
+- **Live pages:** the site, at `/slop/play/single-cycles.html` (opened from the Slop Zone; it's live once committed to master), and https://claude.ai/artifact/5Lin65kjYuha9nyuLvbxs8 (private Artifact owned by the user, republished on 2026-11-25, version 39, with `capabilities: {}`).
 - **Source of truth:** `public/slop/play/single-cycles.html` (one file: CSS, markup, inline JS; three.js r128 from cdnjs). No build step. It lived in `~/Desktop/Coding/AIrticles/single-cycles` until 2026-11-24. The file starts at `<title>`; browsers and the Artifact host wrap it in the doctype/head skeleton. This folder holds its notes and tools; run the tools from here.
 
 ## Publishing (read this first)
