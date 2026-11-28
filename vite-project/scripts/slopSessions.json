@@ -4752,22 +4752,22 @@
     "93f72ff8-68ff-4283-9df7-4d72ac405bce": {
         "project": "algorhythms",
         "started": "2026-11-27",
-        "bytes": 1018693,
+        "bytes": 2685605,
         "agents": [
             {
                 "project": "algorhythms",
-                "hours": 0.036
+                "hours": 1.367
             }
         ]
     },
     "444a383e-d719-46d8-bf30-5477924a0e11": {
         "project": "algorhythms",
         "started": "2026-11-27",
-        "bytes": 1231940,
+        "bytes": 3452047,
         "agents": [
             {
                 "project": "algorhythms",
-                "hours": 0.045
+                "hours": 0.813
             }
         ]
     },
@@ -4796,11 +4796,19 @@
     "dad59c7f-82a4-4df5-951f-39221018434b": {
         "project": "rhyme-xray",
         "started": "2026-11-27",
-        "bytes": 7136310,
+        "bytes": 8971251,
         "agents": [
             {
                 "project": "rhyme-xray",
-                "hours": 0.779
+                "hours": 2.019
+            },
+            {
+                "project": "rhyme-xray",
+                "hours": 0.006
+            },
+            {
+                "project": "rhyme-xray",
+                "hours": 0.008
             },
             {
                 "project": "rhyme-xray",
@@ -4849,11 +4857,11 @@
     "4d11168f-a697-4368-bdbb-4c0b84baef88": {
         "project": "algorhythms",
         "started": "2026-11-27",
-        "bytes": 1587539,
+        "bytes": 5264745,
         "agents": [
             {
                 "project": "algorhythms",
-                "hours": 0.606
+                "hours": 7.743
             }
         ]
     },
@@ -4865,6 +4873,197 @@
             {
                 "project": "algorhythms",
                 "hours": 0.344
+            }
+        ]
+    },
+    "31d67150-2b47-4338-9cd7-11e213f37590": {
+        "project": "algorhythms",
+        "started": "2026-11-27",
+        "bytes": 4515550,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.847
+            }
+        ]
+    },
+    "b47bb070-846c-4a0c-a727-d216dd4fc743": {
+        "project": "algorhythms",
+        "started": "2026-11-27",
+        "bytes": 1915667,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.296
+            }
+        ]
+    },
+    "a5b138ee-4e9e-4cfb-b7d3-dbec2b7414f6": {
+        "project": "algorhythms",
+        "started": "2026-11-27",
+        "bytes": 2127855,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.454
+            }
+        ]
+    },
+    "4f483418-7e2d-43c1-a8b2-23544cb9ecd9": {
+        "project": "algorhythms",
+        "started": "2026-11-27",
+        "bytes": 4280104,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.787
+            }
+        ]
+    },
+    "9478f2c4-eff5-4b78-956c-db48df84eda3": {
+        "project": "algorhythms",
+        "started": "2026-11-27",
+        "bytes": 839397,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.057
+            }
+        ]
+    },
+    "cfd9dc28-c1d2-45d7-ab6c-a3d0144ba567": {
+        "project": "algorhythms",
+        "started": "2026-11-27",
+        "bytes": 4162617,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.807
+            }
+        ]
+    },
+    "9b6cfac0-2f6c-4361-b660-3358c90655fc": {
+        "project": "algorhythms",
+        "started": "2026-11-27",
+        "bytes": 2805442,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.397
+            }
+        ]
+    },
+    "60f0900a-f7a5-44a9-b1ba-bd5aee3cd636": {
+        "project": "algorhythms",
+        "started": "2026-11-27",
+        "bytes": 2446221,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.515
+            }
+        ]
+    },
+    "2d7159af-162f-4784-bba8-7453bacf5c49": {
+        "project": "algorhythms",
+        "started": "2026-11-27",
+        "bytes": 3136228,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.552
+            }
+        ]
+    },
+    "9c8b7110-f143-468e-8f84-aff1f9fa0bdc": {
+        "project": "algorhythms",
+        "started": "2026-11-27",
+        "bytes": 3242980,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.512
+            }
+        ]
+    },
+    "3efd9799-7031-4be6-9839-d262c69908ca": {
+        "project": "algorhythms",
+        "started": "2026-11-27",
+        "bytes": 3169937,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 1.099
+            }
+        ]
+    },
+    "fb40d2cc-c493-41b5-911d-2b8173431268": {
+        "project": "craft-prs",
+        "started": "2026-11-27",
+        "bytes": 1091796,
+        "agents": [
+            {
+                "project": "craft-prs",
+                "hours": 0.484
+            }
+        ]
+    },
+    "4cacd144-ae5a-4cea-8373-5236fcf5d859": {
+        "project": "slop-zone",
+        "started": "2026-11-27",
+        "bytes": 462341,
+        "agents": [
+            {
+                "project": "slop-zone",
+                "hours": 0.03
+            }
+        ]
+    },
+    "2e850ebe-ce58-482c-a972-de3c0d8989f8": {
+        "project": "slop-editor",
+        "started": "2026-11-27",
+        "bytes": 589632,
+        "agents": [
+            {
+                "project": "slop-editor",
+                "hours": 0.101
+            }
+        ]
+    },
+    "89658c10-a561-4407-bbb1-7bce7d3eefe5": {
+        "project": "slop-editor",
+        "started": "2026-11-27",
+        "bytes": 13568397,
+        "agents": [
+            {
+                "project": "slop-editor",
+                "hours": 1.376
+            }
+        ]
+    },
+    "96e83994-d57c-4e18-a585-aff9173893e9": {
+        "project": "slop-editor",
+        "started": "2026-11-27",
+        "bytes": 20547390,
+        "agents": [
+            {
+                "project": "slop-editor",
+                "hours": 2.128
+            }
+        ]
+    },
+    "02360fdb-3b3f-44d8-8844-fc0c64c7ff42": {
+        "project": "algorhythms",
+        "started": "2026-11-27",
+        "bytes": 12696703,
+        "agents": [
+            {
+                "project": "algorhythms",
+                "hours": 0.568
+            },
+            {
+                "project": "algorhythms",
+                "hours": 0.006
             }
         ]
     }
