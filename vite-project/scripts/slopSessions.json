@@ -5000,22 +5000,22 @@
     "fb40d2cc-c493-41b5-911d-2b8173431268": {
         "project": "craft-prs",
         "started": "2026-11-27",
-        "bytes": 1091796,
+        "bytes": 1261071,
         "agents": [
             {
                 "project": "craft-prs",
-                "hours": 0.484
+                "hours": 0.528
             }
         ]
     },
     "4cacd144-ae5a-4cea-8373-5236fcf5d859": {
         "project": "slop-zone",
         "started": "2026-11-27",
-        "bytes": 462341,
+        "bytes": 505632,
         "agents": [
             {
                 "project": "slop-zone",
-                "hours": 0.03
+                "hours": 0.036
             }
         ]
     },
@@ -5064,6 +5064,50 @@
             {
                 "project": "algorhythms",
                 "hours": 0.006
+            }
+        ]
+    },
+    "ea087049-12b9-454f-b379-7d81cc037d93": {
+        "project": "craft-prs",
+        "started": "2026-11-28",
+        "bytes": 682146,
+        "agents": [
+            {
+                "project": "craft-prs",
+                "hours": 0.049
+            }
+        ]
+    },
+    "0fbff3ea-58b4-4e1e-ae60-7175daf404e3": {
+        "project": "single-cycles",
+        "started": "2026-11-28",
+        "bytes": 7613319,
+        "agents": [
+            {
+                "project": "single-cycles",
+                "hours": 0.688
+            }
+        ]
+    },
+    "1a3b871e-4560-4c9c-85e9-573a032b285e": {
+        "project": "single-cycles",
+        "started": "2026-11-28",
+        "bytes": 464177,
+        "agents": [
+            {
+                "project": "single-cycles",
+                "hours": 0.265
+            }
+        ]
+    },
+    "c47c2882-2c92-4bba-b5bd-bd09d7710c23": {
+        "project": "single-cycles",
+        "started": "2026-11-28",
+        "bytes": 776238,
+        "agents": [
+            {
+                "project": "single-cycles",
+                "hours": 0.063
             }
         ]
     }
