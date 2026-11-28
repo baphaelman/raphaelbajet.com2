@@ -1,5 +1,5 @@
 {
-    "updated": "2026-11-27",
+    "updated": "2026-11-28",
     "since": "2026-10-28",
     "projects": {
         "rhyme-xray": {
@@ -49,12 +49,12 @@
         },
         "single-cycles": {
             "commits": 10,
-            "agents": 12,
-            "sessions": 11,
-            "hours": 12.8,
+            "agents": 15,
+            "sessions": 14,
+            "hours": 13.8,
             "from": "2026-11",
             "to": "2026-11",
-            "updated": "2026-11-27"
+            "updated": "2026-11-28"
         },
         "everything-rhymes": {
             "commits": 1,
@@ -66,9 +66,9 @@
             "updated": "2026-11-27"
         },
         "craft-prs": {
-            "commits": 6,
-            "agents": 14,
-            "sessions": 12,
+            "commits": 7,
+            "agents": 15,
+            "sessions": 13,
             "hours": 2.9,
             "from": "2026-11",
             "to": "2026-11",
@@ -96,9 +96,15 @@
                     "title": "docx: the radar caps case uses just over each cap instead of 100 MB of XML",
                     "state": "closed",
                     "reviewed": false
+                },
+                {
+                    "href": "https://github.com/storytold/craft-libs/pull/4015",
+                    "title": "craft-odf: the kept-markup edit sweep samples blocks at the gate",
+                    "state": "open",
+                    "reviewed": false
                 }
             ],
-            "updated": "2026-11-27"
+            "updated": "2026-11-28"
         },
         "slop-editor": {
             "commits": 26,

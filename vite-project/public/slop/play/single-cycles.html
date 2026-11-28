@@ -122,6 +122,15 @@ kbd { font-family: var(--f-mono); font-size: 0.78rem; font-weight: 600; color: v
 #ov { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
 .pipbar { position: absolute; left: 0; right: 0; bottom: 12px; display: flex; justify-content: center; z-index: 5; pointer-events: none; }
 .pipbar:empty { display: none; }
+/* "Turn by turn" tune panel (local only): seconds per turn, how arrows recolor, replay */
+.tune { position: absolute; left: 14px; bottom: 64px; z-index: 6; display: grid; gap: 6px; padding: 8px 10px; border-radius: 10px; border: 1px dashed var(--ink-3); background: color-mix(in srgb, var(--panel) 92%, transparent); font-family: var(--f-mono); font-size: 0.72rem; color: var(--ink-2); }
+.tune[hidden] { display: none; }
+.tune label { display: flex; align-items: center; gap: 6px; }
+.tune input { width: 110px; accent-color: var(--accent); }
+.tune b { color: var(--ink); font-weight: 600; min-width: 3.2em; }
+.tune .row { display: flex; gap: 3px; flex-wrap: wrap; }
+.tune button { font: inherit; padding: 2px 8px; border-radius: 99px; border: 1px solid var(--rule); background: var(--panel); color: var(--ink-2); cursor: pointer; }
+.tune button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
 .cap { position: absolute; left: 16px; right: 16px; bottom: 30px; display: flex; justify-content: center; pointer-events: none; }
 .cap > span { font-family: var(--f-mono); font-size: 0.8rem; line-height: 1.35; color: var(--ink); background: color-mix(in srgb, var(--panel) 88%, transparent); border: 1px solid var(--rule); border-radius: 99px; padding: 6px 14px; max-width: 100%; text-align: center; transition: opacity .25s; }
 .cap > span:empty { display: none; }
@@ -129,6 +138,12 @@ kbd { font-family: var(--f-mono); font-size: 0.78rem; font-weight: 600; color: v
 /* Front-page running tally: one bar split by how many cycles each scramble had */
 .tally { position: absolute; left: 50%; transform: translateX(-50%); width: min(460px, calc(100% - 32px)); bottom: 72px; display: grid; gap: 4px; pointer-events: none; transition: opacity .4s; font-family: var(--f-mono); font-size: 0.72rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .tally[hidden] { display: grid; opacity: 0; }
+.tb-mode { display: inline-flex; gap: 2px; pointer-events: auto; }
+.tally[hidden] .tb-mode { pointer-events: none; }
+.tb-mode button { font: inherit; color: inherit; background: none; border: 0; border-bottom: 1px solid transparent; padding: 0 2px; cursor: pointer; }
+.tb-mode button[aria-pressed="true"] { color: var(--ink); border-bottom-color: var(--ink); }
+.tb-mode button:hover { color: var(--ink); }
+.tb-mode[hidden] { display: none; }
 .tb-head, .tb-foot { display: flex; justify-content: space-between; gap: 8px; }
 .tb-head b, .tb-foot b { color: var(--ink); }
 .tb-bar { display: flex; height: 26px; border-radius: 7px; overflow: hidden; border: 1px solid var(--rule); background: color-mix(in srgb, var(--panel) 70%, transparent); }
@@ -319,6 +334,11 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
         <div class="tally" id="tally" hidden=""></div>
         <div class="cap"><span id="cap"></span></div>
         <div class="pipbar" id="pipbar"></div>
+        <div class="tune" id="tune" hidden="">
+          <label>turn <input type="range" id="tune-turn" min="0.3" max="3" step="0.1"><b id="tune-turn-v"></b></label>
+          <div class="row" id="tune-modes"><button data-m="trace">trace all</button><button data-m="changed">trace changed</button><button data-m="shift">hue shift</button></div>
+          <div class="row"><button id="tune-replay">↺ replay this turn</button></div>
+        </div>
       </div>
     </div>
   </div>
@@ -1533,10 +1553,29 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
   // Running tally of every scramble seen on the front page, kept in this browser: [1, 2, 3, 4+ cycles, no break needed] and the count.
   const TALLY = {c: [0, 0, 0, 0, 0], n: 0};
   try { const t = JSON.parse(localStorage.getItem('sc-tally') || 'null'); if (t && t.c && t.c.length === 5) Object.assign(TALLY, t); } catch (e) {}
-  function tallyAdd(info) {
-    if (info.n) TALLY.c[Math.min(4, info.n) - 1]++; if (info.n === 1 && info.ur) TALLY.c[4]++; TALLY.n++;
-    try { localStorage.setItem('sc-tally', JSON.stringify(TALLY)); } catch (e) {}
+  // All visitors' tally, from /api/tally (null until it loads, and for good if there's no endpoint, e.g. under `vite`).
+  // New scrambles are added to it at once and sent in batches.
+  let ALL = null, allMode = false, pending = {c: [0, 0, 0, 0, 0], n: 0}, flushT = 0;
+  try { allMode = localStorage.getItem('sc-tally-all') === '1'; } catch (e) {}
+  fetch('/api/tally').then(r => r.ok ? r.json() : Promise.reject()).then(t => {
+    if (t && t.c && t.c.length === 5 && t.n >= 0) ALL = {c: t.c.map((x, k) => x + pending.c[k]), n: t.n + pending.n};
+  }).catch(() => {});
+  function tallyFlush() {
+    clearTimeout(flushT); flushT = 0;
+    if (!pending.n) return;
+    const body = JSON.stringify(pending); pending = {c: [0, 0, 0, 0, 0], n: 0};
+    try { fetch('/api/tally', {method: 'POST', body, keepalive: true, headers: {'content-type': 'application/json'}}).catch(() => {}); } catch (e) {}
   }
+  addEventListener('pagehide', tallyFlush);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) tallyFlush(); });
+  function tallyBump(t, info) { if (info.n) t.c[Math.min(4, info.n) - 1]++; if (info.n === 1 && info.ur) t.c[4]++; t.n++; }
+  function tallyAdd(info) {
+    tallyBump(TALLY, info); tallyBump(pending, info); if (ALL) tallyBump(ALL, info);
+    try { localStorage.setItem('sc-tally', JSON.stringify(TALLY)); } catch (e) {}
+    if (!flushT) flushT = setTimeout(tallyFlush, 5000);
+    if (pending.n >= 50) tallyFlush();
+  }
+  const tallyView = () => { const t = allMode && ALL ? ALL : TALLY; return {c: t.c.slice(), n: t.n, all: t === ALL, avail: !!ALL}; };
   // The opening slides' cube is one line of real face turns: solved → the scramble ("A scramble", "The buffer") → setup D' L2 brings
   // DF's edge to UL → the T-perm → setup undone, which is exactly the first Old Pochmann swap UR ↔ DF (SWAPS[1], where "Swap, swap,
   // swap" picks up). Any two of those five states are joined by a stretch of this one path, so ←/→ mid-way just turns back.
@@ -1572,16 +1611,49 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
   const PARTNER = POS[DEMO.p[IDX.DF]];
   if (key(OP_PATH.states[OP_AT[1]]) !== key(DEMO)) console.warn('DEMO_MOVES do not reach DEMO');
   if (key(OP_PATH.states[OP_AT[4]]) !== key(SWAPS[1])) console.warn('setup + T-perm + undo is not the swap UR ↔ DF');
-  const OP_STOPS = [...new Set(OP_AT.concat(SC_AT))], SHADOW_LEAD = 1.5;
+  const OP_STOPS = [...new Set(OP_AT.concat(SC_AT))];
   OP_STOPS.forEach(a => {
     if (OP_PATH.states.filter(x => key(x) === key(OP_PATH.states[a])).length !== 1) console.warn('OP_PATH revisits state', a);
     OP_STOPS.forEach(b => {
       if (a === b) return;
-      // "Turn by turn" b0–b2, forward: the ring shows the old cycles, fades them to shadows, then turns (SHADOW_LEAD) and traces over them.
-      const sh = SC_AT.slice(0, 3).includes(a) && SC_AT[SC_AT.indexOf(a) + 1] === b;
-      TURNS[key(OP_PATH.states[a]) + '>' + key(OP_PATH.states[b])] = {path: OP_PATH, from: a, to: b, lead: sh ? SHADOW_LEAD : a === OP_AT[1] && b === OP_AT[2] ? 0.9 : 0, shadow: sh, first: sh && a === SC_AT[0]};
+      TURNS[key(OP_PATH.states[a]) + '>' + key(OP_PATH.states[b])] = {path: OP_PATH, from: a, to: b, lead: a === OP_AT[1] && b === OP_AT[2] ? 0.9 : 0};
     });
   });
+  // "Turn by turn" (and "Flatten it"): each turn is previewed on the ring as dashed tracks, its four pieces are carried along them
+  // in step with the cube, dragging their arrows home, then the arrows take their new cycles' colors. Tuned from the stage's
+  // tune panel (local only; kept per browser): turn = seconds per turn, cube and ring; mode = how arrows recolor ('trace' every
+  // cycle from its first slot, trace only the 'changed' ones, or 'shift' their hue in place).
+  const CARRY = {turn: 1.2, mode: 'trace'};
+  try { Object.assign(CARRY, JSON.parse(localStorage.getItem('sc-carry') || '{}')); } catch (e) {}
+  const applyCarry = () => { try { localStorage.setItem('sc-carry', JSON.stringify(CARRY)); } catch (e) {} };
+  const colByHome = s => { const c = {}; arrowsOf(s).forEach(([, h, col]) => { c[h] = col; }); return c; };
+  // The timeline the cube (startTransition) and the ring (makeRingTurns) share: per turn, the preview (from pv0), the turn (go,
+  // dur), the recolor (rec: home → [start, dur]). It plays a copy of OP_PATH whose scramble turns take CARRY.turn (elsewhere they
+  // keep PRES_SC). One build plays in full; a jump over several builds turns at twice the speed with no preview hold, recoloring
+  // as the pieces move.
+  function carryPlan(tp) {
+    const ia = SC_AT.indexOf(tp.from), ib = SC_AT.indexOf(tp.to), quick = ia < 0 || ib < 0 || Math.abs(ia - ib) !== 1;
+    const P = Object.assign({}, tp.path, {mul: tp.path.mul.map((x, k) => (k >= SC_AT[0] && k < SC_AT[SC_AT.length - 1] ? CARRY.turn / RV.spd : x) * (quick ? 0.5 : 1))});
+    const seg = pathSegment(P, tp.from, tp.to), d = turnTiming(P).durs, fwd = tp.to > tp.from, f = CARRY.turn / 1.2, sine = u => (1 - Math.cos(Math.PI * u)) / 2;
+    const stages = []; let t = 0, s = P.states[tp.from];
+    seg.moves.forEach((mv, k) => {
+      const B = turnState(s, mv), dur = d[fwd ? tp.from + k : tp.from - 1 - k];
+      const go = Math.max(k ? 0 : UI_CLEAR, quick ? t : t + 0.9 * f), land = go + dur, mode = quick ? 'move' : CARRY.mode;
+      const st = ringStage(s, B, () => ({t0: go, dur, ez: sine})), cA = colByHome(s), cB = colByHome(B);
+      // Traced cycles run from their first slot (UR's from UR), arrow by arrow, as in ringTail.
+      const cs = cyclesOf(B).filter(c => c.length > 1);
+      const traced = mode === 'trace' ? cs : mode === 'changed' ? cs.filter(c => c.some(i => cA[B.p[i]] !== cB[B.p[i]])) : [];
+      const longest = Math.max(0, ...traced.map(c => c.length)), per = Math.min(0.3, 2.4 / Math.max(1, longest)) * f, r0 = land + 0.15 * f;
+      const rec = {}, tr = new Set();
+      for (const h in cB) rec[h] = mode === 'move' ? [go, dur] : [land, (mode === 'shift' ? 0.7 : 0.5) * f];
+      traced.forEach(c => c.forEach((i, q) => { rec[B.p[i]] = [r0 + q * per, per]; tr.add(B.p[i]); }));
+      const recEnd = mode === 'move' ? land : mode === 'shift' ? land + 0.7 * f : traced.length ? r0 + per * longest : land + 0.3 * f;
+      Object.assign(st, {track: true, start: t, pv0: quick ? go - 0.3 : t, go, dur, land, quick, f, cA, cB, rec, traced: tr, r0, per,
+        rip: traced.map(c => ({nodes: c.concat([c[0]]), col: cB[B.p[c[0]]]})), recEnd});
+      stages.push(st); s = B; t = recEnd;
+    });
+    return {P, stages, end: t + 0.45 * f};
+  }
   // The moves (and captions) that take path P from state index a to b, in either direction.
   function pathSegment(P, a, b) {
     const moves = [], caps = [], mul = [];
@@ -1740,6 +1812,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
     }
   }
   const UI_CLEAR = 0.3; // seconds the overlay gets to fade before a turn sequence between slides
+  let carryView = false; // this frame's slide carries pieces round the ring (split + peel): its turns hold for the ring (carryPlan)
   // pend: states still to visit, in order, once the running animation lands, when the target can't be reached by turning that
   // animation around (e.g. swap demos after face turns, or face turns after a swap demo). Any newer press replaces it.
   let pend = null;
@@ -1779,6 +1852,16 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       if (!anim && p && near(from)) { anim = {t0: now, steps: [], to}; appendPath(anim, p); return; }
     }
     const tp = TURNS[key(from) + '>' + key(to)];
+    if (tp && !anim && near(from) && carryView && tp.path === OP_PATH) {
+      // "Turn by turn": the cube holds while the ring previews each turn and recolors after it (carryPlan), so the two keep in step.
+      const {P, stages} = carryPlan(tp), steps = [], dir = tp.to > tp.from ? 1 : -1; let t = 0, i = tp.from;
+      for (const st of stages) {
+        const P0 = posesOf(P.states[i]), at = i;
+        if (st.go > t + 1e-3) steps.push({dur: st.go - t, pos: () => at, f: () => P0});
+        steps.push(...pathSteps(P, i, i + dir)); i += dir; t = st.land;
+      }
+      anim = {t0: now, to, path: P, steps}; return;
+    }
     if (tp && !anim && near(from)) {
       // A short hold first, so the slide's labels, tags and glows fade out before the turns start (front page excepted).
       // lead: a longer hold where something else changes first (the T-perm slide's corners color in before its setup turns).
@@ -1877,10 +1960,10 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
     // Front page: starts solved (also when you come back to it), then scrambles with face turns every heroP() seconds.
     hero: {n: 1, f: (b, el) => {
       const base = {spin: true, split: true, buf: true, arrows: true};
-      if (el < HERO_DELAY) return Object.assign(base, {state: SOLVED, tally: {c: TALLY.c.slice(), n: TALLY.n, now: 0}, caption: Slop.html('hero.caption')});
+      if (el < HERO_DELAY) return Object.assign(base, {state: SOLVED, tally: Object.assign(tallyView(), {now: 0}), caption: Slop.html('hero.caption')});
       const P = heroP(), idx = Math.floor((el - HERO_DELAY) / P), t = el - HERO_DELAY - idx * P, q = idx % HERO_SEQ.length;
       const settled = reduce || t > entryTotal(TURNS[key(q ? HERO_SEQ[q - 1] : SOLVED) + '>' + key(HERO_SEQ[q])]) + 2.8;
-      return Object.assign(base, {state: HERO_SEQ[q], dimHome: settled ? HERO_SEQ[q] : null, heroDone: settled ? idx : null, tally: {c: TALLY.c.slice(), n: TALLY.n, now: settled ? HERO_INFO[q].n : 0},
+      return Object.assign(base, {state: HERO_SEQ[q], dimHome: settled ? HERO_SEQ[q] : null, heroDone: settled ? idx : null, tally: Object.assign(tallyView(), {now: settled ? HERO_INFO[q].n : 0}),
         caption: settled ? `Scramble ${idx + 1}: ${HERO_INFO[q].text}` : `Scrambling: ${HERO_MOVES[q].length} face turns`});
     }},
     // b0: one center, edge and corner, each outlined and tagged in its own color (PIECE, as in the card's text). Hovering a kind's word in the
@@ -1894,8 +1977,8 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
     }},
     homes: {n: 1, f: () => ({view: V_HOME, track: NAMES_MARK, labels: 'all', caption: Slop.html('homes.caption')})},
     // "Scrambling": R on the cube, its arrows drawing out with the turn (drawTurn). "Flatten it": the slots peel off the cube into a ring
-    // beside it (split + peel). "Turn by turn": one build per turn (SC_AT); the ring follows each turn, then traces the new cycles
-    // (makeRingTurns; the first three show the old cycles, fade them to shadows, and trace the new ones over them).
+    // beside it (split + peel). "Turn by turn": one build per turn (SC_AT); the ring previews each turn, carries its pieces in step
+    // with the cube, then recolors the cycles (makeRingTurns, carryPlan, drawCarry).
     scramble: {n: 1, f: () => ({state: SC[0], cornerSet: OP_MOVES.slice(0, SC_AT[0]), arrows: true, drawTurn: true, peel: true,
       labels: ['UR', 'FR', 'DR', 'BR'], caption: Slop.html('scramble.caption')})},
     flatten: {n: 1, f: () => ({state: SC[0], cornerSet: OP_MOVES.slice(0, SC_AT[0]), arrows: true, split: true, peel: true, caption: Slop.html('flatten.caption')})},
@@ -2066,16 +2149,23 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
   let turnD = 1; // drawTurn ("Scrambling" b0): how far its turn has played, 0..1; its arrows draw out with it, heads riding the tip
   const ovKey = sp => (sp.morph ? key(sp.state) : sp.state.p.join()) + '|' + JSON.stringify(sp.arrows) + '|' + JSON.stringify(sp.focus) + '|' + sp.neutral;
 
+  // The ring's bend from A to B: long chords bend toward the middle, short hops bow to their left (side × length).
+  function bendQ(A, B, G, side) {
+    const dx = B[0] - A[0], dy = B[1] - A[1], len = Math.hypot(dx, dy) || 1, mx = (A[0] + B[0]) / 2, my = (A[1] + B[1]) / 2;
+    const pull = 0.42 * clamp((len / G.RR - 0.55) / 0.85);
+    return [mx + (G.cx - mx) * pull - dy / len * side * len, my + (G.cy - my) * pull + dx / len * side * len];
+  }
   // Arrow curves for [from, to, color] triples. Each bows to its left; ta/tb are the angles at which it leaves A and reaches B.
+  // Optional 4th and 5th: how much it bows apart as half of an opposite pair (0..1), and where its head sits (0..1 along it).
   function arrowGeo(arr, G) {
     const {pts, m, cx, cy, NR, RR} = G;
-    const geo = arr.map(([a, b, col]) => {
+    const geo = arr.map(([a, b, col, pw, thFix]) => {
       const A = pts[a], B = pts[b], dx = B[0] - A[0], dy = B[1] - A[1], len = Math.hypot(dx, dy) || 1;
       const mx = (A[0] + B[0]) / 2, my = (A[1] + B[1]) / 2, bow = lerp(0.28, 0.1, m) * len;
       // On the ring, long chords bend toward the middle; short hops (1–2 slots) keep to the ring.
       const pull = 0.4 * m * clamp((len / G.RR - 0.75) / 0.6);
       const qx = mx - dy / len * bow + (cx - mx) * pull, qy = my + dx / len * bow + (cy - my) * pull;
-      return {a, b, col, A, B, ta: Math.atan2(qy - A[1], qx - A[0]), tb: Math.atan2(qy - B[1], qx - B[0]),
+      return {a, b, col, pw, thFix, A, B, ta: Math.atan2(qy - A[1], qx - A[0]), tb: Math.atan2(qy - B[1], qx - B[0]),
         ha: Math.hypot(qx - A[0], qy - A[1]), hb: Math.hypot(qx - B[0], qy - B[1])};
     });
     // Every node in a cycle has one arrow in and one out. Fan them apart so the two never touch.
@@ -2097,9 +2187,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       if (w > 0) {
         // On the ring: one smooth quadratic bend, like a chord diagram. Long chords bend toward the middle, short hops
         // bow gently to their left, and a pair of opposite arrows bows apart.
-        const A = g.A, B = g.B, dx = B[0] - A[0], dy = B[1] - A[1], len = Math.hypot(dx, dy) || 1, mx = (A[0] + B[0]) / 2, my = (A[1] + B[1]) / 2;
-        const pull = 0.42 * clamp((len / RR - 0.55) / 0.85), side = (pairs.has(g.b + '>' + g.a) ? 0.22 : 0.08) * len;
-        const Q = [mx + (cx - mx) * pull - dy / len * side, my + (cy - my) * pull + dx / len * side];
+        const A = g.A, B = g.B, Q = bendQ(A, B, G, g.pw != null ? lerp(0.08, 0.22, g.pw) : pairs.has(g.b + '>' + g.a) ? 0.22 : 0.08);
         const ea = unit(A, Q), eb = unit(B, Q), R0 = [A[0] + ea[0] * (NR + 4), A[1] + ea[1] * (NR + 4)], R3 = [B[0] + eb[0] * (NR + 4), B[1] + eb[1] * (NR + 4)];
         P0 = L(P0, R0, w); P3 = L(P3, R3, w); c1 = L(c1, L(R0, Q, 2 / 3), w); c2 = L(c2, L(R3, Q, 2 / 3), w);
       }
@@ -2109,8 +2197,8 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
     const at = (g, t) => { const o = 1 - t; return [o * o * o * g.P0[0] + 3 * o * o * t * g.c1[0] + 3 * o * t * t * g.c2[0] + t * t * t * g.P3[0], o * o * o * g.P0[1] + 3 * o * o * t * g.c1[1] + 3 * o * t * t * g.c2[1] + t * t * t * g.P3[1]]; };
     const samples = geo.map(g => [...Array(25).keys()].map(k => at(g, k / 24)));
     for (const [n, g] of geo.entries()) {
-      let best = 0.5, bestD = -1;
-      for (const t of [0.5, 0.44, 0.56, 0.38, 0.62, 0.32, 0.68]) {
+      let best = g.thFix != null ? g.thFix : 0.5, bestD = -1;
+      if (g.thFix == null) for (const t of [0.5, 0.44, 0.56, 0.38, 0.62, 0.32, 0.68]) {
         const p = at(g, t); let d = 1e9;
         samples.forEach((sm, k) => { if (k !== n) for (const q of sm) d = Math.min(d, Math.hypot(q[0] - p[0], q[1] - p[1])); });
         if (d >= 16) { best = t; break; }
@@ -2154,26 +2242,10 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
     const dur = Math.min(total, Math.max(0.35, total * 0.5)), stag = n > 1 ? (total - dur) / (n - 1) : 0;
     return ringTail(A, B, t0, [ringStage(A, B, (i, j, k) => ({t0: k * stag, dur}))], total + 0.15, false, true);
   }
-  // "Scrambling": the ring follows each turn of a TURNS entry in step with the cube (same hold, same per-turn times), then traces
-  // the new cycles.
+  // "Turn by turn": every turn is previewed, carried and recolored on the ring (carryPlan, drawCarry), in step with the cube.
   function makeRingTurns(A, tp, t0) {
-    const seg = pathSegment(tp.path, tp.from, tp.to), d = turnTiming(tp.path).durs, fwd = tp.to > tp.from, sine = u => (1 - Math.cos(Math.PI * u)) / 2;
-    let t = Math.max(UI_CLEAR, tp.lead || 0), s = A; const stages = [];
-    seg.moves.forEach((mv, k) => {
-      const B = turnState(s, mv), dur = d[fwd ? tp.from + k : tp.from - 1 - k], t1 = t;
-      stages.push(ringStage(s, B, () => ({t0: t1, dur, ez: sine}))); s = B; t += dur;
-    });
-    const R = ringTail(A, s, t0, stages, t + 0.2, false, true);
-    if (tp.shadow) {
-      // The turn's own 4-cycle shows dimmed beside the old cycles' shadows (moveArr; mv[a] = the slot a's piece came from), and the
-      // shadows fade out once the new cycles are traced. The first time, the trace is slow and lights up the two arrows each new one
-      // follows: the turn's arrow out of a, then the old arrow out of mv[a].
-      const mvS = turnState(SOLVED, seg.moves[0]);
-      Object.assign(R, {shadow: true, moveArr: arrowsOf(mvS).map(([a, b]) => [a, b, 'm']), mv: mvS.p, first: !!tp.first});
-      if (tp.first) { R.per = 0.75; R.end = R.drawStart + R.per * Math.max(...R.orders.map(o => o.nodes.length - 1)) + 0.25; }
-      R.end += 0.8;
-    }
-    return R;
+    const plan = carryPlan(tp), last = plan.stages[plan.stages.length - 1];
+    return {t0, A, B: last.B, stages: plan.stages, carry: true, quiet: true, drawStart: plan.end, end: plan.end};
   }
   const stageAt = (R, t) => { let st = R.stages[0]; for (const x of R.stages) if (x.start <= t) st = x; return st; };
   // A traveling ring piece at progress u from slot i to slot j: straight across, rising toward you (bigger, with a shadow)
@@ -2183,6 +2255,65 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
     const P = [cx + RR * Math.cos(a0), cy + RR * Math.sin(a0)], Q = [cx + RR * Math.cos(a1), cy + RR * Math.sin(a1)];
     const e = ez(u), b = Math.sin(Math.PI * u), dx = Q[0] - P[0], dy = Q[1] - P[1], l = Math.hypot(dx, dy) || 1, bow = Math.min(NR * 1.4, l * 0.25);
     return {x: P[0] + dx * e - dy / l * b * bow, y: P[1] + dy * e + dx / l * b * bow, sc: 1 + 0.45 * b, lift: b};
+  }
+  // A carried ring piece at progress u from slot i to slot j: along the turn's dashed track (bendQ), lifted like ringMove.
+  function trackMove(i, j, u, G) {
+    const A = G.pts[i], B = G.pts[j], Q = bendQ(A, B, G, 0.08), e = (1 - Math.cos(Math.PI * u)) / 2, o = 1 - e, b = Math.sin(Math.PI * u);
+    return {x: o * o * A[0] + 2 * o * e * Q[0] + e * e * B[0], y: o * o * A[1] + 2 * o * e * Q[1] + e * e * B[1], sc: 1 + 0.45 * b, lift: b};
+  }
+  // The part of a cubic g ({P0, c1, c2, P3}) between u0 and u1, as [P0, c1, c2, P3].
+  function bezPart(g, u0, u1) {
+    const L = (p, q, u) => [lerp(p[0], q[0], u), lerp(p[1], q[1], u)];
+    const split = (C, u) => { const q1 = L(C[0], C[1], u), q2 = L(C[1], C[2], u), q3 = L(C[2], C[3], u), r1 = L(q1, q2, u), r2 = L(q2, q3, u), S = L(r1, r2, u); return [[C[0], q1, r1, S], [S, r2, q3, C[3]]]; };
+    const left = split([g.P0, g.c1, g.c2, g.P3], u1)[0];
+    return u0 <= 0 ? left : split(left, u0 / u1)[1];
+  }
+  // "Turn by turn" (makeRingTurns): this turn's dashed tracks, the arrows (a carried piece's arrow leaves from wherever the piece is,
+  // its head stays on its home), and the recolor: the new color runs along traced arrows from their tails with a bright tip and a
+  // ripple on each slot it reaches; untraced arrows shift hue in place.
+  function drawCarry(R, t, G) {
+    const st = stageAt(R, t), {A, B, slotB, mv, f, cA, cB, rec, traced} = st, {pts} = G, f1 = v => v.toFixed(1);
+    const u = clamp((t - st.go) / st.dur), e = (1 - Math.cos(Math.PI * u)) / 2;
+    const thOf = s => { const o = {}; arrowGeo(arrowsOf(s), G).forEach(g => { o[g.b] = g.th; }); return o; };
+    const thA = thOf(A), thB = thOf(B), kTh = ss((t - st.land) / (0.4 * f));
+    const pair = (s, h) => { const x = s.p.indexOf(h); return x !== h && s.p[h] === x ? 1 : 0; }; // h's arrow is half of a 2-cycle in s
+    const P2 = pts.slice(), arr = [], al = [];
+    let tracks = '';
+    for (let i = 0; i < 12; i++) {
+      const h = A.p[i], j = slotB[h], moving = mv[i].t0 < 1e8 && j !== i;
+      if (!moving && h === i) continue;
+      let tail = i, a = 1;
+      if (moving) {
+        const P = trackMove(i, j, u, G); P2.push([P.x, P.y]); tail = P2.length - 1;
+        a = h === i ? ss(u / 0.35) : h === j ? 1 - ss((u - 0.65) / 0.35) : 1; // leaving home, its arrow grows; arriving, it shrinks away
+        const Q = bendQ(pts[i], pts[j], G, 0.08), ta = 0.75 * ss((t - st.pv0) / (0.5 * f)) * (st.quick ? 1 - ss((u - 0.75) / 0.25) : 1 - ss((t - st.land) / (0.4 * f)));
+        if (ta > 0.01) tracks += `<path d="M${f1(pts[i][0])} ${f1(pts[i][1])}Q${f1(Q[0])} ${f1(Q[1])} ${f1(pts[j][0])} ${f1(pts[j][1])}" style="fill: none; stroke: var(--ink-2)" stroke-width="2" stroke-dasharray="5 6" stroke-dashoffset="${f1(-t * 14)}" stroke-linecap="round" opacity="${ta.toFixed(2)}"/>`;
+      }
+      if (a < 0.01) continue;
+      const tA = thA[h] ?? thB[h] ?? 0.5, tB = thB[h] ?? tA;
+      arr.push([tail, h, 0, lerp(pair(A, h), pair(B, h), e), lerp(tA, tB, kTh)]); al.push(a);
+    }
+    const HL = 12, HW = 5.2, sw = 2.4, cv = c => `var(--c${c})`;
+    const mix = (c0, c1, k) => k < 0.01 || c0 === c1 ? cv(k < 0.01 ? c0 : c1) : k > 0.99 ? cv(c1) : `color-mix(in oklch, ${cv(c1)} ${(100 * k).toFixed(0)}%, ${cv(c0)})`;
+    const path = (C, col, w, op) => `<path d="M${f1(C[0][0])} ${f1(C[0][1])}C${f1(C[1][0])} ${f1(C[1][1])} ${f1(C[2][0])} ${f1(C[2][1])} ${f1(C[3][0])} ${f1(C[3][1])}" style="fill: none; stroke: ${col}" stroke-width="${w.toFixed(2)}" stroke-linecap="round" opacity="${op.toFixed(2)}"/>`;
+    let lines = '', heads = '', rips = '';
+    arrowGeo(arr, Object.assign({}, G, {pts: P2})).forEach((g, n) => {
+      const h = g.b, c0 = cA[h] ?? cB[h], c1 = cB[h] ?? cA[h], [r0, rd] = rec[h] || [st.land, 0.5 * f], k = clamp((t - r0) / rd), op = al[n];
+      let hc;
+      if (traced.has(h)) {
+        lines += path([g.P0, g.c1, g.c2, g.P3], cv(c0), sw, op);
+        if (k > 0.01) lines += path(bezPart(g, 0, k), cv(c1), sw, op);
+        if (k > 0.01 && k < 0.99) lines += path(bezPart(g, Math.max(0, k - 0.22), k), cv(c1), sw + 3.2, op * 0.45); // the bright tip
+        hc = k >= g.th ? cv(c1) : cv(c0);
+      } else { hc = mix(c0, c1, ss(k)); lines += path([g.P0, g.c1, g.c2, g.P3], hc, sw, op); }
+      heads += `<path d="M${HL / 2} 0L${-HL / 2} ${HW}L${-HL / 2} ${-HW}Z" transform="translate(${f1(g.hx)} ${f1(g.hy)}) rotate(${f1(g.ang * 180 / Math.PI)})" style="fill: ${hc}; stroke: var(--stage)" stroke-width="1.2" stroke-linejoin="round" opacity="${op.toFixed(2)}"/>`;
+    });
+    for (const o of st.rip) o.nodes.forEach((sl, q) => { // a ripple on each slot as the trace reaches it
+      const d = t - (st.r0 + q * st.per);
+      if (d < 0 || d > 0.6) return;
+      rips += `<circle cx="${f1(pts[sl][0])}" cy="${f1(pts[sl][1])}" r="${f1(G.NR + 3 + 13 * ss(d / 0.6))}" style="fill: none; stroke: ${cv(o.col)}" stroke-width="2" opacity="${(0.85 * (1 - d / 0.6)).toFixed(2)}"/>`;
+    });
+    return tracks + lines + heads + rips;
   }
   function ringCaption(R, t) {
     if (R.quiet) return null;
@@ -2218,36 +2349,26 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
         const ang = Math.atan2(ty, tx) + Math.PI * rev;
         out += `<path d="M9 0L-6 6.5L-6 -6.5Z" transform="translate(${px.toFixed(1)} ${py.toFixed(1)}) rotate(${(ang * 180 / Math.PI).toFixed(1)})" style="fill: var(--c2); stroke: var(--stage)" stroke-width="1.5"/>`;
       }
-    } else {
+    } else if (R && R.carry) out += drawCarry(R, t, G);
+    else {
       // Ring rearrangement (R): old arrows retract, pieces travel round the ring, then the new arrows draw in.
       const src = R ? (t < R.drawStart ? R.A : R.B) : s;
       let arr = [];
       if (L.arrows === true) arr = arrowsOf(src);
       else if (L.arrows === 'buffer') arr = arrowsOf(src, true);
       else if (Array.isArray(L.arrows)) arr = L.arrows.map(([a, b]) => [IDX[a], IDX[b], 1]);
-      // shadow: the old cycles stay whole (no retract), fade to a faint shadow before the turn, and fade out after the new trace.
-      const drawK = !R ? (L.drawTurn ? () => turnD : null) : t < R.drawStart ? (R.drawOnly ? () => 0 : R.shadow ? () => 1 : n => 1 - ss((t - n * 0.03) / R.tRet))
+      const drawK = !R ? (L.drawTurn ? () => turnD : null) : t < R.drawStart ? (R.drawOnly ? () => 0 : n => 1 - ss((t - n * 0.03) / R.tRet))
         : n => ss((t - R.drawStart - R.step[n] * R.per) / R.per);
-      const SHADOW = 0.2, MOVE_DIM = 0.45, fadeOut = R ? 1 - ss((t - R.end + 0.7) / 0.6) : 0;
-      const shadowA = !R || !R.shadow ? 0 : t < R.drawStart ? lerp(1, SHADOW, ss((t - 0.6) / 0.6)) : SHADOW * fadeOut;
-      const moveA = !R || !R.moveArr ? 0 : t < R.drawStart ? MOVE_DIM * ss((t - 0.9) / 0.5) : MOVE_DIM * fadeOut;
-      const boostSh = new Array(12).fill(0), boostMv = new Array(12).fill(0); // first time: the arrows the new one being drawn follows
-      if (R && R.first && t >= R.drawStart) arr.forEach(([a], n) => {
-        const b = clamp(1 - Math.abs((t - R.drawStart - R.step[n] * R.per) / R.per - 0.5) / 0.7);
-        boostSh[R.mv[a]] = Math.max(boostSh[R.mv[a]], b); if (R.mv[a] !== a) boostMv[a] = Math.max(boostMv[a], b);
-      });
-      const colV = c => c === 'm' ? 'var(--ink-2)' : `var(--c${c})`;
+      const colV = c => `var(--c${c})`;
       const HL = lerp(13, 12, m), HW = lerp(5.6, 5.2, m), sw = lerp(3, 2.4, m), f1 = v => v.toFixed(1);
       const Lp = (p, q, u) => [lerp(p[0], q[0], u), lerp(p[1], q[1], u)];
       let lines = '', heads = '';
-      const shadowArr = shadowA > 0.01 ? arrowsOf(R.A) : [], moveArr = moveA > 0.01 ? R.moveArr : [], nSh = shadowArr.length, nBg = nSh + moveArr.length;
-      // Separate geometry, so a new arrow that matches an old one lies exactly on its shadow.
-      arrowGeo(shadowArr, G).concat(arrowGeo(moveArr, G), arrowGeo(R && R.shadow && t < R.drawStart ? [] : arr, G)).forEach((g, n) => {
-        const sh = n < nSh, mvA = !sh && n < nBg, k = n < nBg ? 1 : drawK ? drawK(n - nBg) : 1;
+      arrowGeo(arr, G).forEach((g, n) => {
+        const k = drawK ? drawK(n) : 1;
         if (k < 0.01) return;
         let {P0, c1, c2, P3} = g;
         if (k < 0.999) { const q1 = Lp(P0, c1, k), q2 = Lp(c1, c2, k), q3 = Lp(c2, P3, k), r1 = Lp(q1, q2, k); [c1, c2, P3] = [q1, r1, Lp(r1, Lp(q2, q3, k), k)]; }
-        const op = lerp(0.25 + 0.75 * Math.min(vis[g.a], vis[g.b]), 1, m) * (focus && !(focus.has(g.a) && focus.has(g.b)) ? 0.25 : 1) * (sh ? shadowA + (1 - shadowA) * 0.85 * boostSh[g.a] : mvA ? moveA + (1 - moveA) * 0.85 * boostMv[g.a] : 1);
+        const op = lerp(0.25 + 0.75 * Math.min(vis[g.a], vis[g.b]), 1, m) * (focus && !(focus.has(g.a) && focus.has(g.b)) ? 0.25 : 1);
         lines += `<path d="M${f1(P0[0])} ${f1(P0[1])}C${f1(c1[0])} ${f1(c1[1])} ${f1(c2[0])} ${f1(c2[1])} ${f1(P3[0])} ${f1(P3[1])}" style="fill: none; stroke: ${colV(g.col)}" stroke-width="${sw}" stroke-linecap="round" opacity="${op.toFixed(2)}"/>`;
         // The head sits halfway along the full curve, pointing along it; it grows in as the line passes.
         // drawTurn: it rides the tip of the line (its point at the line's end) until it reaches that spot, stays there, and the line draws on without it.
@@ -2282,7 +2403,7 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       if (stg && stg.mv[i].t0 < 1e8) {
         const j = stg.slotB[s.p[i]], ul = clamp((t - stg.mv[i].t0) / stg.mv[i].dur);
         if (ul > 0) {
-          const P = ringMove(i, j, ul, G, stg.mv[i].ez); x = P.x; y = P.y; sc = P.sc; lift = P.lift; moving = ul < 1;
+          const P = stg.track ? trackMove(i, j, ul, G) : ringMove(i, j, ul, G, stg.mv[i].ez); x = P.x; y = P.y; sc = P.sc; lift = P.lift; moving = ul < 1;
           if (ul > 0.5) fl = stg.B.fl[j];
           hk = lerp(hk, stg.B.p[j] === j && !stg.B.fl[j] ? 0.5 : 1, ss(ul));
         }
@@ -2528,9 +2649,25 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
   }
 
 
+  // ---------------- "Turn by turn" tune panel ----------------
+  // Local only (localhost, the editor's 127.0.0.1, or ?tune): seconds per turn, how arrows recolor (CARRY), and replaying the
+  // build's turn. Choosing a mode replays it too.
+  const TUNE = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) || /[?&]tune\b/.test(location.search);
+  const tuneEl = document.getElementById('tune'), tuneTurn = document.getElementById('tune-turn'), tuneV = document.getElementById('tune-turn-v'), tuneModes = document.getElementById('tune-modes');
+  let replayReq = false;
+  const tuneShow = () => {
+    tuneTurn.value = CARRY.turn; tuneV.textContent = (+CARRY.turn).toFixed(1) + ' s';
+    tuneModes.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.m === CARRY.mode));
+  };
+  tuneTurn.addEventListener('input', () => { CARRY.turn = +tuneTurn.value; applyCarry(); tuneShow(); });
+  tuneTurn.addEventListener('change', () => tuneTurn.blur()); // so ←/→ go back to the slides
+  tuneModes.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; CARRY.mode = b.dataset.m; applyCarry(); tuneShow(); replayReq = true; b.blur(); });
+  document.getElementById('tune-replay').addEventListener('click', e => { replayReq = true; e.currentTarget.blur(); });
+  tuneShow();
+
   // ---------------- drag to turn ----------------
   let drag = null, dragOff = {x: 0, y: 0}, lastDrag = -10;
-  stageEl.addEventListener('pointerdown', e => { if (e.target.closest('button')) return; drag = {x: e.clientX, y: e.clientY, ox: dragOff.x, oy: dragOff.y}; });
+  stageEl.addEventListener('pointerdown', e => { if (e.target.closest('button, .tune')) return; drag = {x: e.clientX, y: e.clientY, ox: dragOff.x, oy: dragOff.y}; });
   window.addEventListener('pointermove', e => {
     if (!drag) return;
     dragOff.y = drag.oy + (e.clientX - drag.x) * 0.01;
@@ -2640,6 +2777,10 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
   for (const k in layers) layers[k] = document.getElementById(layers[k]);
   const capEl = document.getElementById('cap'), tallyEl = document.getElementById('tally');
   let heroSession = null, heroCounted = null;
+  tallyEl.addEventListener('click', e => {
+    const b = e.target.closest('.tb-mode button'); if (!b) return;
+    allMode = b.dataset.all === '1'; b.blur(); try { localStorage.setItem('sc-tally-all', allMode ? '1' : '0'); } catch (err) {}
+  });
   let tallyKey = null, curFan = null; const cornerColA = new Array(8).fill(0);
   let active = 'hero', enterT = 0, lastT = 0, curLayer = 'cube', curCap = null, curMode = 0, curSlide = '';
   // After an edit in the editor (slop-editor edit): segment titles come from the headings; the fan note and caption redraw.
@@ -2684,12 +2825,22 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
       const ch = chapStart.filter(x => x <= activeIdx).length - 1;
       chapBtns.forEach((b, c) => b.setAttribute('aria-current', String(c === ch)));
       slideNo.innerHTML = `<span><b>${activeIdx + 1}</b> / ${stepEls.length}</span>`;
+      tuneEl.hidden = !(TUNE && active === 'chain');
       pipBar.innerHTML = nAct > 1 ? `<span class="pips">${[...Array(nAct).keys()].map(j => `<i class="pip${j <= activeBuild ? ' on' : ''}"></i>`).join('')}</span>` : '';
     }
     if (active === 'hero' && heroSession !== enterT) { heroSession = enterT; if (frameNo > 1) newHeroChain(); }
     const spec = Object.assign({}, DEF, S[active].f(activeBuild, now - enterT));
     if (spec.heroDone != null && heroCounted !== enterT + ':' + spec.heroDone) { heroCounted = enterT + ':' + spec.heroDone; tallyAdd(HERO_INFO[spec.heroDone % HERO_SEQ.length]); }
     const onCube = spec.layer === 'cube', entering = onCube && curLayer !== 'cube';
+    carryView = !!(spec.split && spec.peel);
+    if (replayReq) { // tune panel: back to the build's previous state, at once, and play its turn again
+      replayReq = false;
+      if (active === 'chain' && has3D && !reduce && curLayer === 'cube') {
+        const A0 = SC[activeBuild]; anim = null; pend = null; turnNow = null;
+        setCubies(OP_MOVES.slice(0, SC_AT[activeBuild])); setPoses(posesOf(A0)); animKey = key(A0); prevState = A0;
+        ovCur = Object.assign({}, ovCur, {key: '', state: A0, ring: null}); ovPrev = null;
+      }
+    }
     if (spec.layer !== curLayer) { layers[curLayer].classList.remove('on'); layers[spec.layer].classList.add('on'); curLayer = spec.layer; }
     if (spec.chartMode !== curMode) { layers.chart.classList.toggle('mode2', spec.chartMode === 2); curMode = spec.chartMode; }
 
@@ -2777,10 +2928,12 @@ tr.grp td { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.09
     if (tk !== tallyKey) {
       tallyKey = tk; tallyEl.hidden = !tk;
       if (tk) {
-        const {c, n, now: nw} = spec.tally, pct = x => n ? Math.round(100 * x / n) + '%' : '–', lab = ['1 cycle', '2 cycles', '3 cycles', '4 or more'];
-        if (!tallyEl.firstChild) tallyEl.innerHTML = `<div class="tb-head"><span>Running tally</span><span class="tb-n"></span></div><div class="tb-bar">` +
+        const {c, n, now: nw, all, avail} = spec.tally, pct = x => n ? Math.round(100 * x / n) + '%' : '–', lab = ['1 cycle', '2 cycles', '3 cycles', '4 or more'];
+        if (!tallyEl.firstChild) tallyEl.innerHTML = `<div class="tb-head"><span class="tb-title">Running tally</span><span class="tb-mode" hidden><button type="button" data-all="0">This browser</button>/<button type="button" data-all="1">All visitors</button></span><span class="tb-n"></span></div><div class="tb-bar">` +
           lab.map((l, k) => `<div class="tb-seg" style="background: var(--c${k + 1})"><span></span></div>`).join('') + `</div><div class="tb-key">` +
           lab.map((l, k) => `<span><i style="background: var(--c${k + 1})"></i>${l}</span>`).join('') + `</div><div class="tb-foot"><span class="tb-nb"></span><span>exact 22.65%</span></div>`;
+        const mode = tallyEl.querySelector('.tb-mode'); mode.hidden = !avail; tallyEl.querySelector('.tb-title').hidden = !!avail;
+        mode.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.all === (all ? '1' : '0'))));
         tallyEl.querySelector('.tb-n').innerHTML = `<b>${n}</b> ${n === 1 ? 'scramble' : 'scrambles'}`;
         tallyEl.querySelectorAll('.tb-seg').forEach((el, k) => {
           const share = n ? c[k] / n : 0;
